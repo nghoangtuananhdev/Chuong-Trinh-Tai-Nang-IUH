@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.vite/
+.pnpm-store/
+*.log
+
+# Local design reference repository; not required by the production website.
+taste-skill/
