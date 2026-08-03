@@ -2,27 +2,27 @@
   const roles = {
     admin: {
       name: "Quản trị hệ thống", label: "Quản trị viên", initials: "QT",
-      menus: [["overview","Tổng quan","speedometer2"],["majors","Chuyên ngành toàn trường","journal-bookmark"],["classes","Lớp CN/KSTN toàn trường","easel"],["teachers","Tài khoản giảng viên","person-workspace"],["students","Tài khoản sinh viên","people"],["permissions","Phân quyền giảng viên","person-gear"],["rounds","Đợt xét tuyển toàn trường","calendar2-check"]]
+      menus: [["majors","Chuyên ngành toàn trường","journal-bookmark"],["classes","Lớp CN/KSTN toàn trường","easel"],["teachers","Tài khoản giảng viên","person-workspace"],["students","Tài khoản sinh viên","people"],["permissions","Phân quyền giảng viên","person-gear"],["rounds","Đợt xét tuyển toàn trường","calendar2-check"]]
     },
     training: {
       name: "Nguyễn Minh Anh", label: "Đại diện Phòng Đào tạo", initials: "PĐT",
-      menus: [["overview","Tổng quan","speedometer2"],["majors","Chuyên ngành toàn trường","journal-bookmark"],["classesView","Thông tin lớp toàn trường","easel"],["teachers","Tài khoản giảng viên","person-workspace"],["students","Tài khoản sinh viên","people"],["permissions","Phân quyền giảng viên","person-gear"],["roundsView","Thông tin đợt xét tuyển","calendar2-check"],["profiles","Hồ sơ sinh viên","folder2-open"],["finalApproval","Duyệt danh sách trúng tuyển","check2-square"]]
+      menus: [["majors","Chuyên ngành toàn trường","journal-bookmark"],["classesView","Thông tin lớp toàn trường","easel"],["teachers","Tài khoản giảng viên","person-workspace"],["students","Tài khoản sinh viên","people"],["permissions","Phân quyền giảng viên","person-gear"],["roundsView","Thông tin đợt xét tuyển","calendar2-check"],["profiles","Hồ sơ sinh viên","folder2-open"],["finalApproval","Duyệt danh sách trúng tuyển","check2-square"]]
     },
     dean: {
       name: "PGS. TS. Lê Hoàng", label: "Ban lãnh đạo khoa", initials: "BLĐ",
-      menus: [["overview","Tổng quan","speedometer2"],["majors","Chuyên ngành của khoa","journal-bookmark"],["classes","Lớp CN/KSTN của khoa","easel"],["teachers","Tài khoản giảng viên khoa","person-workspace"],["permissions","Phân quyền giảng viên","person-gear"],["rounds","Đợt xét tuyển của khoa","calendar2-check"],["criteria","Bộ tiêu chí xét tuyển","list-check"],["profiles","Hồ sơ sinh viên","folder2-open"],["approvals","Phê duyệt hồ sơ","clipboard-check"],["results","Danh sách trúng tuyển","award"]]
+      menus: [["majors","Chuyên ngành của khoa","journal-bookmark"],["classes","Lớp CN/KSTN của khoa","easel"],["teachers","Tài khoản giảng viên khoa","person-workspace"],["permissions","Phân quyền giảng viên","person-gear"],["rounds","Đợt xét tuyển của khoa","calendar2-check"],["criteria","Bộ tiêu chí xét tuyển","list-check"],["profiles","Hồ sơ sinh viên","folder2-open"],["approvals","Phê duyệt hồ sơ","clipboard-check"],["results","Danh sách trúng tuyển","award"]]
     },
     head: {
       name: "TS. Trần Ngọc Bình", label: "Chủ nhiệm ngành", initials: "CN",
-      menus: [["overview","Tổng quan","speedometer2"],["teachers","Tài khoản giảng viên ngành","person-workspace"],["permissions","Phân quyền giảng viên","person-gear"],["rounds","Đợt xét tuyển của ngành","calendar2-check"],["criteria","Bộ tiêu chí xét tuyển","list-check"],["classes","Lớp CN/KSTN của ngành","easel"],["profiles","Hồ sơ sinh viên","folder2-open"],["approvals","Phê duyệt hồ sơ","clipboard-check"],["results","Xác nhận danh sách trúng tuyển","award"]]
+      menus: [["teachers","Tài khoản giảng viên ngành","person-workspace"],["permissions","Phân quyền giảng viên","person-gear"],["rounds","Đợt xét tuyển của ngành","calendar2-check"],["criteria","Bộ tiêu chí xét tuyển","list-check"],["classes","Lớp CN/KSTN của ngành","easel"],["profiles","Hồ sơ sinh viên","folder2-open"],["approvals","Phê duyệt hồ sơ","clipboard-check"],["results","Xác nhận danh sách trúng tuyển","award"]]
     },
     lecturer: {
       name: "ThS. Phạm Thị Dung", label: "Giảng viên phụ trách", initials: "GV",
-      menus: [["overview","Tổng quan","speedometer2"],["classes","Lớp đang đảm nhận","easel"],["rounds","Đợt xét tuyển của lớp","calendar2-check"],["criteria","Bộ tiêu chí xét tuyển","list-check"],["profiles","Hồ sơ sinh viên","folder2-open"],["approvals","Phê duyệt hồ sơ","clipboard-check"],["studentPasswords","Đặt lại mật khẩu sinh viên","key"]]
+      menus: [["classes","Lớp đang đảm nhận","easel"],["rounds","Đợt xét tuyển của lớp","calendar2-check"],["criteria","Bộ tiêu chí xét tuyển","list-check"],["profiles","Hồ sơ sinh viên","folder2-open"],["approvals","Phê duyệt hồ sơ","clipboard-check"],["studentPasswords","Đặt lại mật khẩu sinh viên","key"]]
     },
     student: {
       name: "Nguyễn Hoàng Nam", label: "Sinh viên CN/KSTN", initials: "SV",
-      menus: [["overview","Tổng quan","speedometer2"],["application","Cập nhật hồ sơ xét tuyển duy trì","file-earmark-person"],["notifications","Thông báo của tôi","bell"]]
+      menus: [["application","Cập nhật hồ sơ xét tuyển duy trì","file-earmark-person"]]
     }
   };
 
@@ -91,7 +91,7 @@
   const $ = (s, root=document) => root.querySelector(s);
   const roleKey = document.body.dataset.role || "admin";
   const role = roles[roleKey] || roles.admin;
-  let active = "overview";
+  let active = role.menus[0][0];
 
   function badge(value) {
     const v = String(value);
@@ -109,22 +109,6 @@
 
   function pageHead(title, desc, action="") {
     return `<div class="page-head"><div><h1>${title}</h1><p>${desc}</p></div>${action}</div>`;
-  }
-
-  function overview() {
-    const isStudent = roleKey === "student";
-    const stats = isStudent
-      ? [["clipboard-check","92","Điểm hồ sơ"],["check-circle","Đã duyệt","Trạng thái"],["calendar-event","25/08","Hạn cập nhật"],["bell","3","Thông báo mới"]]
-      : [["people","128","Hồ sơ sinh viên"],["hourglass-split","24","Chờ phê duyệt"],["mortarboard","12","Lớp CN/KSTN"],["calendar2-check","2","Đợt đang diễn ra"]];
-    const cards = stats.map(([i,n,l]) => `<div class="stat-card"><span class="stat-icon"><i class="bi bi-${i}"></i></span><div><strong>${n}</strong><small>${l}</small></div></div>`).join("");
-    const rows = data.profiles.slice(0,3).map(r => `<tr>${r.map((v,i)=>`<td>${i===5?badge(v):v}</td>`).join("")}</tr>`).join("");
-    return `${pageHead(`Xin chào, ${role.name}`,`Tổng quan hoạt động dành cho ${role.label}.`)}
-      <div class="stats-grid">${cards}</div>
-      <div class="row g-3">
-        <div class="col-lg-8"><section class="panel"><div class="panel-head"><h2 class="panel-title">${isStudent?"Tiến độ hồ sơ":"Hồ sơ cần xử lý gần đây"}</h2><button class="btn btn-sm btn-soft" data-page="${isStudent?"application":"approvals"}">Xem chi tiết</button></div>
-        <div class="panel-body">${isStudent ? `<div class="process"><div class="process-step done"><strong>1. Tiếp nhận</strong><br><small>Đã nộp đủ hồ sơ</small></div><div class="process-step done"><strong>2. Xét duyệt</strong><br><small>Giảng viên đã duyệt</small></div><div class="process-step current"><strong>3. Công bố</strong><br><small>Chờ danh sách chính thức</small></div></div>` : `<div class="table-responsive"><table class="table data-table"><thead><tr><th>MSSV</th><th>Họ tên</th><th>Lớp</th><th>Loại hồ sơ</th><th>Điểm</th><th>Trạng thái</th></tr></thead><tbody>${rows}</tbody></table></div>`}</div></section></div>
-        <div class="col-lg-4"><section class="panel"><div class="panel-head"><h2 class="panel-title">Thông báo mới</h2></div><div class="panel-body"><div class="timeline-mini"><div class="timeline-item"><strong>Hồ sơ đã được cập nhật</strong><div class="small text-muted">10 phút trước</div></div><div class="timeline-item"><strong>Mở đợt xét tuyển năm 2026</strong><div class="small text-muted">Hôm qua</div></div><div class="timeline-item"><strong>Lịch công bố kết quả</strong><div class="small text-muted">02/08/2026</div></div></div></div></section></div>
-      </div>`;
   }
 
   function tablePage(key) {
@@ -172,10 +156,6 @@
       <div class="d-flex justify-content-end mt-4"><button class="btn btn-primary" type="submit"><i class="bi bi-send me-1"></i> Cập nhật và gửi phê duyệt</button></div></form></div></section>`;
   }
 
-  function notifications() {
-    return `${pageHead("Thông báo của tôi","Các cập nhật liên quan đến hồ sơ và đợt xét tuyển.",`<button class="btn btn-soft" data-action="readAll">Đánh dấu đã đọc</button>`)}<section class="panel"><div class="panel-body"><div class="timeline-mini"><div class="timeline-item"><strong>Hồ sơ duy trì KSTN đã được duyệt</strong><p class="small text-muted mb-0">Giảng viên phụ trách đã duyệt hồ sơ của bạn. 10 phút trước</p></div><div class="timeline-item"><strong>Yêu cầu cập nhật minh chứng TOEIC</strong><p class="small text-muted mb-0">Vui lòng tải bản scan rõ nét trước ngày 25/08/2026.</p></div><div class="timeline-item"><strong>Mở đợt xét tuyển năm học 2026 - 2027</strong><p class="small text-muted mb-0">Đợt xét tuyển mới đã mở từ ngày 01/08/2026.</p></div></div></div></section>`;
-  }
-
   function passwordPage() {
     return `${pageHead("Đặt lại mật khẩu sinh viên","Tạo mật khẩu mặc định mới và yêu cầu sinh viên đổi ở lần đăng nhập kế tiếp.")}<section class="panel"><div class="panel-body"><div class="toolbar"><div class="search"><i class="bi bi-search"></i><input class="form-control table-search" placeholder="Tìm MSSV hoặc họ tên..."></div></div><div class="table-responsive"><table class="table data-table"><thead><tr><th>MSSV</th><th>Họ tên</th><th>Lớp</th><th>Email</th><th class="text-end">Thao tác</th></tr></thead><tbody>${data.students.map(r=>`<tr>${r.slice(0,4).map(v=>`<td>${v}</td>`).join("")}<td class="text-end"><button class="btn btn-sm btn-outline-primary" data-action="resetPassword">Đặt lại mật khẩu</button></td></tr>`).join("")}</tbody></table></div></div></section>`;
   }
@@ -188,19 +168,16 @@
     active = page;
     document.querySelectorAll(".menu-btn").forEach(b=>b.classList.toggle("active",b.dataset.page===page));
     let html;
-    if (page === "overview") html = overview();
-    else if (tableMeta[page]) html = tablePage(page);
+    if (tableMeta[page]) html = tablePage(page);
     else if (page === "rounds" || page === "roundsView") html = rounds(page === "roundsView");
     else if (page === "criteria") html = criteriaPage();
     else if (page === "approvals") html = approvals(false);
     else if (page === "results" || page === "finalApproval") html = approvals(true);
     else if (page === "application") html = application();
-    else if (page === "notifications") html = notifications();
     else if (page === "studentPasswords") html = passwordPage();
     else if (page === "profile") html = profilePage();
-    else html = overview();
+    else { render(role.menus[0][0]); return; }
     $("#workspace").innerHTML = html;
-    $("#pageContext").textContent = role.menus.find(m=>m[0]===page)?.[1] || "Tài khoản";
     document.body.classList.remove("menu-open");
   }
 
@@ -236,21 +213,20 @@
     const action = actionBtn.dataset.action;
     if (action === "add" || action === "edit") openForm(actionBtn.dataset.type,action === "edit");
     else if (action === "delete") { if (confirm("Bạn có chắc muốn xóa bản ghi này?")) { actionBtn.closest("tr")?.remove(); toast("Đã xóa bản ghi khỏi danh sách."); } }
-    else if (action === "approve") { actionBtn.closest("tr")?.remove(); toast("Đã phê duyệt và gửi thông báo cho sinh viên."); }
+    else if (action === "approve") { actionBtn.closest("tr")?.remove(); toast("Đã phê duyệt hồ sơ sinh viên."); }
     else if (action === "reject") { const reason=prompt("Nhập lý do từ chối hồ sơ:"); if(reason){ actionBtn.closest("tr")?.remove(); toast("Đã từ chối hồ sơ và lưu lý do.","danger"); } }
     else if (action === "export") exportCsv();
     else if (action === "recoverPassword") toast("Đã gửi hướng dẫn khôi phục mật khẩu đến email tài khoản.");
     else if (action === "resetPassword") { if(confirm("Đặt lại mật khẩu mặc định cho sinh viên này?")) toast("Đã tạo mật khẩu mặc định và yêu cầu đổi ở lần đăng nhập sau."); }
     else if (action === "roundDetail") alert("Đợt xét tuyển gồm 3 giai đoạn: Tiếp nhận hồ sơ → Xét duyệt → Công bố kết quả.");
     else if (action === "view") alert("Đã mở chế độ xem chi tiết. Dữ liệu hiện đang được mô phỏng ở front-end.");
-    else if (action === "readAll") { document.querySelector(".notif-dot")?.remove(); toast("Đã đánh dấu tất cả thông báo là đã đọc."); }
     else if (action === "saveDraft") toast("Đã lưu bản nháp trên thiết bị.");
   });
 
   document.addEventListener("input", e => {
     if (!e.target.classList.contains("table-search")) return;
     const q = e.target.value.toLowerCase();
-    e.target.closest(".panel").querySelectorAll("tbody tr").forEach(tr => tr.hidden = !tr.textContent.toLowerCase().includes(q));
+    e.target.closest(".panel")?.querySelectorAll("tbody tr").forEach(tr => tr.hidden = !tr.textContent.toLowerCase().includes(q));
   });
 
   document.addEventListener("submit", e => {
@@ -260,7 +236,6 @@
     if (e.target.id === "changePasswordForm") { e.preventDefault(); const inputs=e.target.querySelectorAll("input"); if(inputs[1].value!==inputs[2].value){toast("Mật khẩu xác nhận không khớp.","danger");return;} bootstrap.Modal.getInstance($("#changePasswordModal"))?.hide(); toast("Đổi mật khẩu thành công."); e.target.reset(); }
   });
 
-  $("#mobileMenu")?.addEventListener("click",()=>document.body.classList.toggle("menu-open"));
   $("#profileLink")?.addEventListener("click",e=>{e.preventDefault();render("profile")});
   setupChrome();
   render(active);

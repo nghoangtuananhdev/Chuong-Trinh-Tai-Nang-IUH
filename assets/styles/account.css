@@ -182,8 +182,6 @@ body {
 .modal-footer { padding: 1rem 1.5rem; background: #fcfcfd; border-top-color: var(--line); }
 .modal .form-control { min-height: 46px; border-color: #d9dee8; border-radius: 10px; }
 
-@keyframes bellPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.1); } }
-.bell-pulse:hover { animation: bellPulse .6s ease-in-out; }
 
 @media (max-width: 767.98px) {
   :root { --sidebar-width: 82px; --header-height: 68px; }
