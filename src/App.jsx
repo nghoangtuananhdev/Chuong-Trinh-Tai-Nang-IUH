@@ -2,12 +2,12 @@ import { useEffect, useMemo, useState } from "react";
 import {
   ArrowRight, Award, BookOpen, Building2, CalendarCheck, CalendarDays,
   CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, ClipboardCheck,
-  ClipboardList, Download, Eye, FileText, FolderOpen, GraduationCap, Info,
+  ClipboardList, Eye, FileText, FolderOpen, GraduationCap, Info,
   KeyRound, LockKeyhole, LogIn, LogOut, Pencil, Plus, RotateCcw, Save, Search,
   Send, ShieldCheck, Trash2, User, UserCog, Users, X
 } from "lucide-react";
 import logo from "../assets/img/logo-iuh-khoa-cntt.svg";
-import { createInitialClasses, createInitialMajors, criteriaRows, publicRounds, roles, roundRows, tableData } from "./data.js";
+import { createInitialClasses, createInitialMajors, createInitialPermissions, criteriaRows, permissionActorRoles, publicRounds, roles, roundRows, tableData } from "./data.js";
 
 const menuIcons = {
   book: BookOpen, class: GraduationCap, teacher: UserCog, users: Users,
@@ -56,7 +56,7 @@ function StatusBadge({children}) {
       : /từ chối|khóa|kết thúc/.test(value)
         ? "bg-rose-50 text-rose-700 ring-rose-200"
         : "bg-slate-100 text-slate-600 ring-slate-200";
-  return <span className={`inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold ring-1 ring-inset ${style}`}>{children}</span>;
+  return <span className={`inline-flex whitespace-nowrap rounded-full px-2.5 py-1 text-[11px] font-semibold ring-1 ring-inset ${style}`}>{children}</span>;
 }
 
 function Pagination({page,totalPages,onChange,total}) {
@@ -112,17 +112,135 @@ function PageHead({title,description,action}) {
 }
 
 function TableActions({readonly=false,onView,onEdit,onDelete}) {
-  return <div className="flex justify-end gap-1.5"><button className="ui-icon-btn" title="Xem chi tiết" onClick={onView}><Eye size={15}/></button>{!readonly&&<><button className="ui-icon-btn" title="Chỉnh sửa" onClick={onEdit}><Pencil size={14}/></button><button className="ui-icon-btn hover:!border-rose-200 hover:!bg-rose-50 hover:!text-rose-600" title="Xóa" onClick={onDelete}><Trash2 size={14}/></button></>}</div>;
+  return <div className="flex justify-end gap-1.5"><button type="button" className="ui-icon-btn" title="Xem chi tiết" aria-label="Xem chi tiết" onClick={onView}><Eye size={15}/></button>{!readonly&&<><button type="button" className="ui-icon-btn" title="Chỉnh sửa" aria-label="Chỉnh sửa" onClick={onEdit}><Pencil size={14}/></button><button type="button" className="ui-icon-btn hover:!border-rose-200 hover:!bg-rose-50 hover:!text-rose-600" title="Xóa" aria-label="Xóa" onClick={onDelete}><Trash2 size={14}/></button></>}</div>;
+}
+
+function TableToolbar({action,query,onQueryChange,searchLabel,placeholder,filterValue="",onFilterChange,filterLabel,filterAllLabel,filterOptions=[]}) {
+  const hasFilters=Boolean(query||filterValue);
+  return <div className="table-toolbar">
+    <div className="table-toolbar-controls">
+      <label className="table-search"><span className="sr-only">{searchLabel}</span><Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"/><input className="ui-input pl-9" aria-label={searchLabel} value={query} onChange={event=>onQueryChange(event.target.value)} placeholder={placeholder}/></label>
+      {onFilterChange&&<label className="table-filter"><span className="sr-only">{filterLabel}</span><select className="ui-input" aria-label={filterLabel} value={filterValue} onChange={event=>onFilterChange(event.target.value)}><option value="">{filterAllLabel}</option>{filterOptions.map(option=><option key={option} value={option}>{option}</option>)}</select></label>}
+      {hasFilters&&<button type="button" className="ui-btn-secondary table-reset" onClick={()=>{onQueryChange("");onFilterChange?.("");}}><RotateCcw size={16}/>Đặt lại</button>}
+    </div>
+    {action&&<div className="table-toolbar-action">{action}</div>}
+  </div>;
+}
+
+function TableEmptyState({colSpan,title,description,icon:Icon=Search}) {
+  return <tr><td colSpan={colSpan}><div className="table-empty"><div><Icon className="mx-auto text-slate-400"/><strong className="mt-3 block text-sm text-slate-700">{title}</strong><span className="mt-1 block text-xs text-slate-500">{description}</span></div></div></td></tr>;
+}
+
+function TablePanel({toolbar,children,pagination}) {
+  return <section className="ui-card table-panel overflow-hidden">{toolbar}{children}{pagination}</section>;
 }
 
 function DataTablePage({meta,onToast,onOpenForm}) {
-  const [query,setQuery]=useState(""), [page,setPage]=useState(1);
-  const rows=useMemo(()=>meta.rows.filter(row=>row.join(" ").toLowerCase().includes(query.toLowerCase())),[meta.rows,query]);
+  const [query,setQuery]=useState(""), [filter,setFilter]=useState(""), [page,setPage]=useState(1);
+  const filterOptions=useMemo(()=>meta.filterIndex===undefined?[]:[...new Set(meta.rows.map(row=>row[meta.filterIndex]))].sort((a,b)=>String(a).localeCompare(String(b),"vi")),[meta]);
+  const rows=useMemo(()=>{const keyword=query.trim().toLocaleLowerCase("vi");return meta.rows.filter(row=>(!filter||row[meta.filterIndex]===filter)&&(!keyword||row.join(" ").toLocaleLowerCase("vi").includes(keyword)));},[meta,query,filter]);
   const totalPages=Math.max(1,Math.ceil(rows.length/10));
-  useEffect(()=>setPage(1),[query]);
+  useEffect(()=>setPage(1),[query,filter]);
+  useEffect(()=>{if(page>totalPages)setPage(totalPages);},[page,totalPages]);
   const visible=rows.slice((page-1)*10,page*10);
-  const exportCsv=()=>{ const csv=[meta.columns,...rows].map(row=>row.map(value=>`"${String(value).replaceAll('"','""')}"`).join(",")).join("\r\n"); const url=URL.createObjectURL(new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8"})); const anchor=document.createElement("a"); anchor.href=url; anchor.download="du-lieu-iuh.csv"; anchor.click(); URL.revokeObjectURL(url); onToast("Đã xuất danh sách thành tệp CSV mở được bằng Excel."); };
-  return <><PageHead title={meta.title} description={meta.desc} action={!meta.readonly&&<button className="ui-btn-primary" onClick={()=>onOpenForm("Thêm mới bản ghi")}><Plus size={16}/>Thêm mới</button>}/><section className="ui-card overflow-hidden"><div className="flex flex-wrap gap-2 p-4"><label className="relative min-w-[220px] flex-1 sm:max-w-sm"><Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"/><input className="ui-input pl-9" value={query} onChange={event=>setQuery(event.target.value)} placeholder="Tìm kiếm trong danh sách..."/></label><button className="ui-btn-secondary" onClick={exportCsv}><Download size={16}/>Xuất Excel</button></div><div className="overflow-x-auto"><table className="ui-table"><thead><tr>{meta.columns.map(column=><th key={column}>{column}</th>)}<th className="text-right">Thao tác</th></tr></thead><tbody>{visible.map(row=><tr key={row.join("-")} >{row.map((value,cell)=><td key={cell}>{cell===row.length-1?<StatusBadge>{value}</StatusBadge>:value}</td>)}<td><TableActions readonly={meta.readonly} onView={()=>onOpenForm("Chi tiết bản ghi",true)} onEdit={()=>onOpenForm("Chỉnh sửa bản ghi")} onDelete={()=>onToast("Đã xóa bản ghi khỏi danh sách.")}/></td></tr>)}</tbody></table></div><Pagination page={page} totalPages={totalPages} onChange={setPage} total={rows.length}/></section></>;
+  const action=!meta.readonly?<button className="ui-btn-primary" onClick={()=>onOpenForm("Thêm mới bản ghi")}><Plus size={16}/>Thêm mới</button>:null;
+  return <TablePanel toolbar={<TableToolbar action={action} query={query} onQueryChange={setQuery} searchLabel={`Tìm kiếm ${meta.title.toLocaleLowerCase("vi")}`} placeholder={meta.searchPlaceholder||"Tìm kiếm trong danh sách..."} filterValue={filter} onFilterChange={meta.filterIndex===undefined?undefined:setFilter} filterLabel={meta.filterLabel} filterAllLabel={meta.filterAllLabel} filterOptions={filterOptions}/>} pagination={<Pagination page={page} totalPages={totalPages} onChange={setPage} total={rows.length}/>}> <div className="overflow-x-auto"><table className="ui-table"><thead><tr>{meta.columns.map(column=><th key={column}>{column}</th>)}<th className="text-right">Thao tác</th></tr></thead><tbody>{visible.map(row=><tr key={row.join("-")} >{row.map((value,cell)=><td key={cell}>{cell===row.length-1&&meta.statusLast!==false?<StatusBadge>{value}</StatusBadge>:value}</td>)}<td><TableActions readonly={meta.readonly} onView={()=>onOpenForm("Chi tiết bản ghi",true)} onEdit={()=>onOpenForm("Chỉnh sửa bản ghi")} onDelete={()=>onToast("Đã xóa bản ghi khỏi danh sách.")}/></td></tr>)}{!visible.length&&<TableEmptyState colSpan={meta.columns.length+1} title="Không tìm thấy dữ liệu phù hợp" description="Hãy thử thay đổi từ khóa hoặc bộ lọc đang chọn."/>}</tbody></table></div></TablePanel>;
+}
+
+function TeacherManagement({onToast,onOpenForm}) {
+  const rows=tableData.teachers.rows;
+  const [query,setQuery]=useState(""), [roleFilter,setRoleFilter]=useState(""), [page,setPage]=useState(1);
+  const roleOptions=useMemo(()=>[...new Set(rows.map(row=>row[2]))].sort((a,b)=>a.localeCompare(b,"vi")),[rows]);
+  const filteredRows=useMemo(()=>{
+    const keyword=query.trim().toLocaleLowerCase("vi");
+    return rows.filter(row=>(!roleFilter||row[2]===roleFilter)&&(!keyword||row.join(" ").toLocaleLowerCase("vi").includes(keyword)));
+  },[rows,query,roleFilter]);
+  const totalPages=Math.max(1,Math.ceil(filteredRows.length/10));
+  const visible=filteredRows.slice((page-1)*10,page*10);
+  useEffect(()=>setPage(1),[query,roleFilter]);
+
+  return <section className="ui-card overflow-hidden">
+    <TableToolbar action={<button className="ui-btn-primary" onClick={()=>onOpenForm("Thêm tài khoản giảng viên")}><Plus size={16}/>Thêm tài khoản giảng viên</button>} query={query} onQueryChange={setQuery} searchLabel="Tìm kiếm tài khoản giảng viên" placeholder="Tìm theo họ tên, Gmail hoặc vai trò..." filterValue={roleFilter} onFilterChange={setRoleFilter} filterLabel="Lọc theo vai trò" filterAllLabel="Tất cả vai trò" filterOptions={roleOptions}/>
+    <div className="overflow-x-auto">
+      <table className="ui-table">
+        <thead><tr><th className="w-[24%]">Họ và tên</th><th className="w-[30%]">Gmail</th><th>Vai trò</th><th>Trạng thái</th><th className="text-right">Thao tác</th></tr></thead>
+        <tbody>
+          {visible.map(row=><tr key={row[1]}><td className="font-semibold text-slate-800">{row[0]}</td><td>{row[1]}</td><td>{row[2]}</td><td><StatusBadge>{row[3]}</StatusBadge></td><td><TableActions onView={()=>onOpenForm("Chi tiết tài khoản giảng viên",true)} onEdit={()=>onOpenForm("Chỉnh sửa tài khoản giảng viên")} onDelete={()=>onToast("Đã xóa tài khoản giảng viên khỏi danh sách.")}/></td></tr>)}
+          {!visible.length&&<TableEmptyState colSpan={5} title="Không tìm thấy tài khoản phù hợp" description="Hãy thử thay đổi từ khóa hoặc vai trò đang chọn."/>}
+        </tbody>
+      </table>
+    </div>
+    <Pagination page={page} totalPages={totalPages} onChange={setPage} total={filteredRows.length}/>
+  </section>;
+}
+
+function StudentManagement({students,setStudents,classes,onToast}) {
+  const [query,setQuery]=useState(""), [classFilter,setClassFilter]=useState(""), [page,setPage]=useState(1), [modal,setModal]=useState(null);
+  const classOptions=useMemo(()=>[...new Set([...classes.map(item=>item.className),...students.map(item=>item.className)])].filter(Boolean).sort((a,b)=>a.localeCompare(b,"vi")),[classes,students]);
+  const filteredStudents=useMemo(()=>{
+    const keyword=query.trim().toLocaleLowerCase("vi");
+    return students.filter(item=>(!classFilter||item.className===classFilter)&&(!keyword||`${item.id} ${item.name} ${item.className} ${item.gmail}`.toLocaleLowerCase("vi").includes(keyword)));
+  },[students,query,classFilter]);
+  const totalPages=Math.max(1,Math.ceil(filteredStudents.length/10));
+  const visible=filteredStudents.slice((page-1)*10,page*10);
+  useEffect(()=>setPage(1),[query,classFilter]);
+  useEffect(()=>{if(page>totalPages)setPage(totalPages);},[page,totalPages]);
+
+  const saveStudent=event=>{
+    event.preventDefault();
+    const values=Object.fromEntries(new FormData(event.currentTarget));
+    const next={
+      id:values.id.trim(),
+      name:values.name.trim().replace(/\s+/g," "),
+      className:values.className,
+      gmail:values.gmail.trim().toLocaleLowerCase("vi"),
+      status:values.status
+    };
+    const duplicate=students.some(item=>item.id!==modal.originalId&&(item.id===next.id||item.gmail===next.gmail));
+    if(duplicate){onToast("MSSV hoặc Gmail đã tồn tại trong hệ thống.");return;}
+    if(modal.originalId){
+      setStudents(list=>list.map(item=>item.id===modal.originalId?next:item));
+      onToast("Đã cập nhật tài khoản sinh viên.");
+    }else{
+      setStudents(list=>[...list,next]);
+      onToast("Đã thêm tài khoản sinh viên mới.");
+    }
+    setModal(null);
+  };
+  const removeStudent=()=>{
+    setStudents(list=>list.filter(item=>item.id!==modal.student.id));
+    setModal(null);
+    onToast("Đã xóa tài khoản sinh viên khỏi danh sách.");
+  };
+
+  return <>
+    <section className="ui-card overflow-hidden">
+      <TableToolbar action={<button className="ui-btn-primary" onClick={()=>setModal({type:"form",originalId:null,id:"",name:"",className:classOptions[0]||"",gmail:"",status:"Hoạt động"})}><Plus size={16}/>Thêm tài khoản sinh viên</button>} query={query} onQueryChange={setQuery} searchLabel="Tìm kiếm tài khoản sinh viên" placeholder="Tìm theo MSSV, họ tên hoặc Gmail..." filterValue={classFilter} onFilterChange={setClassFilter} filterLabel="Lọc theo tên lớp" filterAllLabel="Tất cả lớp" filterOptions={classOptions}/>
+      <div className="overflow-x-auto">
+        <table className="ui-table min-w-[900px]">
+          <thead><tr><th className="w-[13%]">MSSV</th><th className="w-[23%]">Họ và tên</th><th className="w-[18%]">Tên lớp</th><th className="w-[25%]">GMAIL</th><th>Trạng thái</th><th className="text-right">Thao tác</th></tr></thead>
+          <tbody>
+            {visible.map(student=><tr key={student.id}><td className="font-semibold text-brand">{student.id}</td><td className="font-semibold text-slate-800">{student.name}</td><td>{student.className}</td><td>{student.gmail}</td><td><StatusBadge>{student.status}</StatusBadge></td><td><TableActions onView={()=>setModal({type:"detail",student})} onEdit={()=>setModal({type:"form",originalId:student.id,...student})} onDelete={()=>setModal({type:"confirmDelete",student})}/></td></tr>)}
+            {!visible.length&&<TableEmptyState colSpan={6} title="Không tìm thấy tài khoản phù hợp" description="Hãy thử thay đổi từ khóa hoặc lớp đang chọn."/>}
+          </tbody>
+        </table>
+      </div>
+      <Pagination page={page} totalPages={totalPages} onChange={setPage} total={filteredStudents.length}/>
+    </section>
+
+    <Modal open={modal?.type==="form"} onClose={()=>setModal(null)} title={modal?.originalId?"Cập nhật tài khoản sinh viên":"Thêm tài khoản sinh viên"}>
+      <form onSubmit={saveStudent} className="space-y-4">
+        <div className="grid gap-4 sm:grid-cols-2"><label><span className="ui-label">MSSV <b className="text-rose-600">*</b></span><input name="id" className="ui-input" inputMode="numeric" defaultValue={modal?.id} placeholder="Ví dụ: 21094501" required/></label><label><span className="ui-label">Họ và tên <b className="text-rose-600">*</b></span><input name="name" className="ui-input" defaultValue={modal?.name} placeholder="Nhập họ và tên" required/></label></div>
+        <label className="block"><span className="ui-label">Gmail <b className="text-rose-600">*</b></span><input name="gmail" className="ui-input" type="email" defaultValue={modal?.gmail} placeholder="mssv@iuh.edu.vn" required/></label>
+        <div className="grid gap-4 sm:grid-cols-2"><label><span className="ui-label">Tên lớp <b className="text-rose-600">*</b></span><select name="className" className="ui-input" defaultValue={modal?.className} required>{classOptions.map(name=><option key={name} value={name}>{name}</option>)}</select></label><label><span className="ui-label">Trạng thái</span><select name="status" className="ui-input" defaultValue={modal?.status}><option>Hoạt động</option><option>Chờ duyệt</option><option>Khóa</option></select></label></div>
+        <div className="flex justify-end gap-2 border-t border-slate-100 pt-4"><button type="button" className="ui-btn-secondary" onClick={()=>setModal(null)}>Hủy</button><button className="ui-btn-primary">Lưu tài khoản</button></div>
+      </form>
+    </Modal>
+    <Modal open={modal?.type==="detail"} onClose={()=>setModal(null)} title="Chi tiết tài khoản sinh viên">
+      <dl className="grid gap-x-5 gap-y-4 sm:grid-cols-2">{[["MSSV",modal?.student?.id],["Họ và tên",modal?.student?.name],["Tên lớp",modal?.student?.className],["Gmail",modal?.student?.gmail]].map(([label,value])=><div key={label} className="border-b border-slate-100 pb-3"><dt className="text-[11px] font-semibold uppercase tracking-[.05em] text-slate-400">{label}</dt><dd className="mt-1 text-sm font-semibold text-slate-800">{value}</dd></div>)}<div><dt className="text-[11px] font-semibold uppercase tracking-[.05em] text-slate-400">Trạng thái</dt><dd className="mt-2"><StatusBadge>{modal?.student?.status}</StatusBadge></dd></div></dl>
+    </Modal>
+    <Modal open={modal?.type==="confirmDelete"} onClose={()=>setModal(null)} size="sm" title="Xác nhận xóa tài khoản"><div className="text-center"><div className="mx-auto grid size-12 place-items-center rounded-full bg-rose-50 text-rose-600"><Trash2/></div><p className="mt-4 text-sm leading-6 text-slate-600">Bạn có chắc muốn xóa tài khoản của <b>{modal?.student?.name}</b> ({modal?.student?.id})? Thao tác này không thể hoàn tác.</p><div className="mt-5 flex gap-2"><button className="ui-btn-secondary flex-1" onClick={()=>setModal(null)}>Hủy</button><button className="ui-btn flex-1 bg-rose-600 text-white hover:bg-rose-700" onClick={removeStudent}>Xóa tài khoản</button></div></div></Modal>
+  </>;
 }
 
 function MajorManagement({majors,setMajors,onToast}) {
@@ -140,7 +258,7 @@ function MajorManagement({majors,setMajors,onToast}) {
   const requestDelete=major=>setModal(major.classes.length?{type:"blocked",major}:{type:"confirmDelete",major});
   const removeMajor=()=>{setMajors(list=>list.filter(item=>item.id!==modal.major.id));setModal(null);onToast("Đã xóa chuyên ngành khỏi danh sách.");};
   const formModal=modal?.type==="form";
-  return <><section className="ui-card overflow-hidden"><div className="flex flex-col gap-3 border-b border-slate-200 bg-slate-50/60 p-4 lg:flex-row lg:items-center lg:justify-between"><button className="ui-btn-primary shrink-0" onClick={()=>setModal({type:"form",id:null,faculty:"",name:""})}><Plus size={16}/>Thêm chuyên ngành mới</button><div className="flex flex-1 flex-col gap-3 sm:flex-row lg:max-w-3xl lg:justify-end"><label className="relative block flex-1 lg:max-w-md"><span className="sr-only">Tìm kiếm</span><Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"/><input className="ui-input pl-9" aria-label="Tìm kiếm theo khoa hoặc chuyên ngành" value={query} onChange={event=>setQuery(event.target.value)} placeholder="Tìm theo khoa hoặc chuyên ngành..."/></label><label className="block sm:w-72"><span className="sr-only">Khoa</span><select className="ui-input" aria-label="Lọc theo khoa" value={facultyFilter} onChange={event=>setFacultyFilter(event.target.value)}><option value="">Tất cả khoa</option>{faculties.map(faculty=><option key={faculty} value={faculty}>{faculty}</option>)}</select></label>{(query||facultyFilter)&&<button type="button" className="ui-btn-secondary shrink-0" onClick={()=>{setQuery("");setFacultyFilter("");}}><RotateCcw size={16}/>Đặt lại</button>}</div></div><div className="overflow-x-auto"><table className="ui-table"><thead><tr><th className="w-[39%]">Khoa</th><th className="w-[39%]">Chuyên ngành</th><th className="text-center">Số lượng lớp</th><th className="text-right">Thao tác</th></tr></thead><tbody>{visible.map(major=><tr key={major.id}><td>{major.faculty}</td><td className="font-semibold text-slate-800">{major.name}</td><td className="text-center"><span className="inline-grid min-w-8 place-items-center rounded-full bg-brand-soft px-2 py-1 text-xs font-bold text-brand">{major.classes.length}</span></td><td><TableActions onView={()=>setModal({type:"detail",major})} onEdit={()=>setModal({type:"form",id:major.id,faculty:major.faculty,name:major.name})} onDelete={()=>requestDelete(major)}/></td></tr>)}{!visible.length&&<tr><td colSpan="4"><div className="grid min-h-40 place-items-center text-center"><div><Search className="mx-auto text-slate-400"/><strong className="mt-3 block text-sm text-slate-700">Không tìm thấy chuyên ngành phù hợp</strong><span className="mt-1 block text-xs text-slate-500">Hãy thử thay đổi từ khóa hoặc khoa đang chọn.</span></div></div></td></tr>}</tbody></table></div><Pagination page={page} totalPages={totalPages} onChange={setPage} total={filteredMajors.length}/></section>
+  return <><section className="ui-card overflow-hidden"><TableToolbar action={<button className="ui-btn-primary" onClick={()=>setModal({type:"form",id:null,faculty:"",name:""})}><Plus size={16}/>Thêm chuyên ngành mới</button>} query={query} onQueryChange={setQuery} searchLabel="Tìm kiếm theo khoa hoặc chuyên ngành" placeholder="Tìm theo khoa hoặc chuyên ngành..." filterValue={facultyFilter} onFilterChange={setFacultyFilter} filterLabel="Lọc theo khoa" filterAllLabel="Tất cả khoa" filterOptions={faculties}/><div className="overflow-x-auto"><table className="ui-table"><thead><tr><th className="w-[39%]">Khoa</th><th className="w-[39%]">Chuyên ngành</th><th className="text-center">Số lượng lớp</th><th className="text-right">Thao tác</th></tr></thead><tbody>{visible.map(major=><tr key={major.id}><td>{major.faculty}</td><td className="font-semibold text-slate-800">{major.name}</td><td className="text-center"><span className="inline-grid min-w-8 place-items-center rounded-full bg-brand-soft px-2 py-1 text-xs font-bold text-brand">{major.classes.length}</span></td><td><TableActions onView={()=>setModal({type:"detail",major})} onEdit={()=>setModal({type:"form",id:major.id,faculty:major.faculty,name:major.name})} onDelete={()=>requestDelete(major)}/></td></tr>)}{!visible.length&&<tr><td colSpan="4"><div className="grid min-h-40 place-items-center text-center"><div><Search className="mx-auto text-slate-400"/><strong className="mt-3 block text-sm text-slate-700">Không tìm thấy chuyên ngành phù hợp</strong><span className="mt-1 block text-xs text-slate-500">Hãy thử thay đổi từ khóa hoặc khoa đang chọn.</span></div></div></td></tr>}</tbody></table></div><Pagination page={page} totalPages={totalPages} onChange={setPage} total={filteredMajors.length}/></section>
     <Modal open={formModal} onClose={()=>setModal(null)} title={modal?.id?"Cập nhật chuyên ngành":"Thêm chuyên ngành mới"} footer={null}><form onSubmit={saveMajor} className="space-y-4"><label className="block"><span className="ui-label">Tên khoa <b className="text-rose-600">*</b></span><input name="faculty" className="ui-input" defaultValue={modal?.faculty} placeholder="Ví dụ: Khoa Công nghệ Thông tin" required/></label><label className="block"><span className="ui-label">Tên chuyên ngành <b className="text-rose-600">*</b></span><input name="name" className="ui-input" defaultValue={modal?.name} placeholder="Ví dụ: Kỹ thuật phần mềm" required/></label><p className="flex gap-2 text-xs leading-5 text-slate-500"><Info size={15} className="shrink-0"/>Mỗi chuyên ngành được xác định duy nhất bởi tên khoa và tên chuyên ngành.</p><div className="flex justify-end gap-2 border-t border-slate-100 pt-4"><button type="button" className="ui-btn-secondary" onClick={()=>setModal(null)}>Hủy</button><button className="ui-btn-primary">Lưu thông tin</button></div></form></Modal>
     <Modal open={modal?.type==="duplicate"} onClose={()=>setModal(null)} size="sm" title="Chuyên ngành đã tồn tại"><div className="text-center"><div className="mx-auto grid size-12 place-items-center rounded-full bg-amber-50 text-amber-600"><Info/></div><p className="mt-4 text-sm leading-6 text-slate-600">Đã có chuyên ngành <b>{modal?.draft?.name}</b> thuộc <b>{modal?.draft?.faculty}</b> được tạo trước đó.</p><button className="ui-btn-primary mt-5 w-full" onClick={()=>setModal({...modal,type:"form",faculty:modal.draft.faculty,name:modal.draft.name})}>Quay lại kiểm tra</button></div></Modal>
     <Modal open={modal?.type==="detail"} onClose={()=>setModal(null)} size="lg" title={`Danh sách lớp — ${modal?.major?.name || ""}`}><div className="mb-4 grid gap-3 sm:grid-cols-[1fr_130px]"><div className="rounded-xl border border-slate-200 bg-slate-50 p-3"><span className="text-[10px] font-bold uppercase text-slate-400">Khoa</span><strong className="mt-1 block text-sm">{modal?.major?.faculty}</strong></div><div className="rounded-xl border border-slate-200 bg-slate-50 p-3"><span className="text-[10px] font-bold uppercase text-slate-400">Số lượng lớp</span><strong className="mt-1 block text-sm">{modal?.major?.classes.length}</strong></div></div>{modal?.major?.classes.length?<div className="overflow-x-auto rounded-xl border border-slate-200"><table className="ui-table min-w-[600px]"><thead><tr><th>Mã lớp</th><th>Khóa</th><th>Năm học</th><th>Trạng thái</th></tr></thead><tbody>{modal.major.classes.map(item=><tr key={item.code}><td className="font-semibold">{item.code}</td><td>{item.cohort}</td><td>{item.academicYear}</td><td><StatusBadge>{item.status}</StatusBadge></td></tr>)}</tbody></table></div>:<div className="grid min-h-44 place-items-center rounded-xl border border-dashed border-slate-300 bg-slate-50 text-center"><div><GraduationCap className="mx-auto text-slate-400"/><strong className="mt-2 block text-sm">Chưa có lớp CN/KSTN</strong><span className="text-xs text-slate-500">Chuyên ngành này hiện chưa được tạo lớp cho bất kỳ khóa nào.</span></div></div>}</Modal>
@@ -157,32 +275,33 @@ function ClassManagement({classes,setClasses,majors,onToast}) {
   const majorOptions=useMemo(()=>[...new Set(majors.map(major=>major.name))].sort((a,b)=>a.localeCompare(b,"vi")),[majors]);
   const filteredClasses=useMemo(()=>{
     const keyword=query.trim().toLocaleLowerCase("vi");
-    return classes.filter(item=>(!majorFilter||item.major===majorFilter)&&(!keyword||`${item.major} ${item.cohort} ${item.lecturer}`.toLocaleLowerCase("vi").includes(keyword)));
+    return classes.filter(item=>(!majorFilter||item.major===majorFilter)&&(!keyword||`${item.className} ${item.major} ${item.cohort} ${item.lecturer}`.toLocaleLowerCase("vi").includes(keyword)));
   },[classes,query,majorFilter]);
   const totalPages=Math.max(1,Math.ceil(filteredClasses.length/10));
   const visible=filteredClasses.slice((page-1)*10,page*10);
   useEffect(()=>setPage(1),[query,majorFilter]);
   useEffect(()=>{if(page>totalPages)setPage(totalPages);},[page,totalPages]);
 
-  const openCreate=()=>setModal({type:"form",id:null,major:majorOptions[0]||"",cohort:"22",lecturer:"",current:0,capacity:30});
+  const openCreate=()=>setModal({type:"form",id:null,className:"",major:majorOptions[0]||"",cohort:"22",lecturer:"",current:0,capacity:30});
   const openEdit=item=>setModal({type:"form",...item});
   const saveClass=event=>{
     event.preventDefault();
     const values=Object.fromEntries(new FormData(event.currentTarget));
+    const className=values.className.trim().replace(/\s+/g," ");
     const major=values.major;
     const cohort=values.cohort.trim();
     const lecturer=values.lecturer.trim().replace(/\s+/g," ");
     const current=Number(values.current);
     const capacity=Number(values.capacity);
     if(current>capacity){onToast("Sĩ số hiện tại không được lớn hơn sĩ số tối đa.");return;}
-    const duplicate=classes.some(item=>item.id!==modal.id&&item.major===major&&item.cohort===cohort);
-    if(duplicate){onToast("Ngành này đã có lớp thuộc khóa đã chọn.");return;}
+    const duplicate=classes.some(item=>item.id!==modal.id&&(item.className.toLocaleLowerCase("vi")===className.toLocaleLowerCase("vi")||(item.major===major&&item.cohort===cohort)));
+    if(duplicate){onToast("Tên lớp đã tồn tại hoặc ngành này đã có lớp thuộc khóa đã chọn.");return;}
     if(modal.id){
-      setClasses(list=>list.map(item=>item.id===modal.id?{...item,major,cohort,lecturer,current,capacity}:item));
+      setClasses(list=>list.map(item=>item.id===modal.id?{...item,className,major,cohort,lecturer,current,capacity}:item));
       onToast("Đã cập nhật thông tin lớp.");
     }else{
       const id=Math.max(0,...classes.map(item=>item.id))+1;
-      setClasses(list=>[...list,{id,major,cohort,lecturer,current,capacity,status:"Chưa mở",admissionRound:null,students:[]}]);
+      setClasses(list=>[...list,{id,className,major,cohort,lecturer,current,capacity,status:"Chưa mở",admissionRound:null,students:[]}]);
       onToast("Đã thêm lớp mới.");
     }
     setModal(null);
@@ -197,20 +316,13 @@ function ClassManagement({classes,setClasses,majors,onToast}) {
 
   return <>
     <section className="ui-card overflow-hidden">
-      <div className="flex flex-col gap-3 border-b border-slate-200 bg-slate-50/60 p-4 lg:flex-row lg:items-center lg:justify-between">
-        <button className="ui-btn-primary shrink-0" onClick={openCreate}><Plus size={16}/>Thêm lớp mới</button>
-        <div className="flex flex-1 flex-col gap-3 sm:flex-row lg:max-w-3xl lg:justify-end">
-          <label className="relative block flex-1 lg:max-w-md"><span className="sr-only">Tìm kiếm</span><Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"/><input className="ui-input pl-9" aria-label="Tìm kiếm lớp" value={query} onChange={event=>setQuery(event.target.value)} placeholder="Tìm theo ngành, khóa hoặc giảng viên..."/></label>
-          <label className="block sm:w-72"><span className="sr-only">Ngành</span><select className="ui-input" aria-label="Lọc theo ngành" value={majorFilter} onChange={event=>setMajorFilter(event.target.value)}><option value="">Tất cả ngành</option>{majorOptions.map(major=><option key={major} value={major}>{major}</option>)}</select></label>
-          {(query||majorFilter)&&<button type="button" className="ui-btn-secondary shrink-0" onClick={()=>{setQuery("");setMajorFilter("");}}><RotateCcw size={16}/>Đặt lại</button>}
-        </div>
-      </div>
+      <TableToolbar action={<button className="ui-btn-primary" onClick={openCreate}><Plus size={16}/>Thêm lớp mới</button>} query={query} onQueryChange={setQuery} searchLabel="Tìm kiếm lớp" placeholder="Tìm theo tên lớp, ngành hoặc giảng viên..." filterValue={majorFilter} onFilterChange={setMajorFilter} filterLabel="Lọc theo ngành" filterAllLabel="Tất cả ngành" filterOptions={majorOptions}/>
       <div className="overflow-x-auto">
-        <table className="ui-table">
-          <thead><tr><th className="w-[28%]">Ngành</th><th>Khóa</th><th className="w-[27%]">Giảng viên phụ trách</th><th className="text-center">Sĩ số</th><th className="text-right">Thao tác</th></tr></thead>
+        <table className="ui-table min-w-[900px]">
+          <thead><tr><th className="w-[16%]">Tên lớp</th><th className="w-[25%]">Ngành</th><th>Khóa</th><th className="w-[24%]">Giảng viên phụ trách</th><th className="text-center">Sĩ số</th><th className="text-right">Thao tác</th></tr></thead>
           <tbody>
-            {visible.map(item=><tr key={item.id}><td className="font-semibold text-slate-800">{item.major}</td><td><span className="inline-grid min-w-8 place-items-center rounded-full bg-brand-soft px-2 py-1 text-xs font-bold text-brand">{item.cohort}</span></td><td>{item.lecturer}</td><td className="text-center font-semibold text-slate-700">{item.current}/{item.capacity}</td><td><TableActions onView={()=>setModal({type:"detail",item})} onEdit={()=>openEdit(item)} onDelete={()=>requestDelete(item)}/></td></tr>)}
-            {!visible.length&&<tr><td colSpan="5"><div className="grid min-h-40 place-items-center text-center"><div><Search className="mx-auto text-slate-400"/><strong className="mt-3 block text-sm text-slate-700">Không tìm thấy lớp phù hợp</strong><span className="mt-1 block text-xs text-slate-500">Hãy thử thay đổi từ khóa hoặc ngành đang chọn.</span></div></div></td></tr>}
+            {visible.map(item=><tr key={item.id}><td className="font-semibold text-brand">{item.className}</td><td className="font-semibold text-slate-800">{item.major}</td><td><span className="inline-grid min-w-8 place-items-center rounded-full bg-brand-soft px-2 py-1 text-xs font-bold text-brand">{item.cohort}</span></td><td>{item.lecturer}</td><td className="text-center font-semibold text-slate-700">{item.current}/{item.capacity}</td><td><TableActions onView={()=>setModal({type:"detail",item})} onEdit={()=>openEdit(item)} onDelete={()=>requestDelete(item)}/></td></tr>)}
+            {!visible.length&&<TableEmptyState colSpan={6} title="Không tìm thấy lớp phù hợp" description="Hãy thử thay đổi từ khóa hoặc ngành đang chọn."/>}
           </tbody>
         </table>
       </div>
@@ -219,6 +331,7 @@ function ClassManagement({classes,setClasses,majors,onToast}) {
 
     <Modal open={modal?.type==="form"} onClose={()=>setModal(null)} title={modal?.id?"Cập nhật lớp":"Thêm lớp mới"}>
       <form onSubmit={saveClass} className="space-y-4">
+        <label className="block"><span className="ui-label">Tên lớp <b className="text-rose-600">*</b></span><input name="className" className="ui-input" defaultValue={modal?.className} placeholder="Ví dụ: KSTN-KTPM-K22" required/></label>
         <label className="block"><span className="ui-label">Ngành <b className="text-rose-600">*</b></span><select name="major" className="ui-input" defaultValue={modal?.major} required>{majorOptions.map(major=><option key={major} value={major}>{major}</option>)}</select></label>
         <div className="grid gap-4 sm:grid-cols-2"><label><span className="ui-label">Khóa <b className="text-rose-600">*</b></span><input name="cohort" className="ui-input" type="number" min="1" max="99" defaultValue={modal?.cohort} required/></label><label><span className="ui-label">Giảng viên phụ trách <b className="text-rose-600">*</b></span><input name="lecturer" className="ui-input" defaultValue={modal?.lecturer} placeholder="Nhập họ tên giảng viên" required/></label></div>
         <div className="grid gap-4 sm:grid-cols-2"><label><span className="ui-label">Sĩ số hiện tại <b className="text-rose-600">*</b></span><input name="current" className="ui-input" type="number" min="0" defaultValue={modal?.current} required/></label><label><span className="ui-label">Sĩ số tối đa <b className="text-rose-600">*</b></span><input name="capacity" className="ui-input" type="number" min="1" defaultValue={modal?.capacity} required/></label></div>
@@ -226,9 +339,9 @@ function ClassManagement({classes,setClasses,majors,onToast}) {
       </form>
     </Modal>
 
-    <Modal open={modal?.type==="detail"} onClose={()=>setModal(null)} size="xl" title={`Thông tin lớp khóa ${detail?.cohort||""}`} description={detail?.major}>
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-        {[['Ngành',detail?.major],['Khóa',detail?.cohort],['Giảng viên phụ trách',detail?.lecturer],['Sĩ số',detail?`${detail.current}/${detail.capacity}`:""],['Trạng thái',detail?.status]].map(([label,value],index)=><div key={label} className={`rounded-xl border border-slate-200 bg-slate-50 p-3 ${index===0?'sm:col-span-2 lg:col-span-1':''}`}><span className="text-[10px] font-bold uppercase tracking-wide text-slate-400">{label}</span>{label==='Trạng thái'?<div className="mt-1"><StatusBadge>{value}</StatusBadge></div>:<strong className="mt-1 block text-sm text-slate-800">{value}</strong>}</div>)}
+    <Modal open={modal?.type==="detail"} onClose={()=>setModal(null)} size="xl" title={`Thông tin lớp ${detail?.className||""}`} description={`${detail?.major||""} · Khóa ${detail?.cohort||""}`}>
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
+        {[['Tên lớp',detail?.className],['Ngành',detail?.major],['Khóa',detail?.cohort],['Giảng viên phụ trách',detail?.lecturer],['Sĩ số',detail?`${detail.current}/${detail.capacity}`:""],['Trạng thái',detail?.status]].map(([label,value])=><div key={label} className="rounded-xl border border-slate-200 bg-slate-50 p-3"><span className="text-[10px] font-bold uppercase tracking-wide text-slate-400">{label}</span>{label==='Trạng thái'?<div className="mt-1"><StatusBadge>{value}</StatusBadge></div>:<strong className="mt-1 block text-sm text-slate-800">{value}</strong>}</div>)}
       </div>
       <div className="mt-5"><h3 className="mb-3 text-sm font-bold text-slate-800">Danh sách sinh viên</h3>{detail?.admissionRound?.opened?(detail.students.length?<div className="overflow-x-auto rounded-xl border border-slate-200"><table className="ui-table min-w-[680px]"><thead><tr><th>MSSV</th><th>Họ và tên</th><th>Email</th><th>Trạng thái</th></tr></thead><tbody>{detail.students.map(student=><tr key={student.id}><td className="font-semibold">{student.id}</td><td>{student.name}</td><td>{student.email}</td><td><StatusBadge>{student.status}</StatusBadge></td></tr>)}</tbody></table></div>:<div className="grid min-h-36 place-items-center rounded-xl border border-dashed border-slate-300 bg-slate-50 text-center"><div><Users className="mx-auto text-slate-400"/><strong className="mt-2 block text-sm">Chưa có sinh viên trong lớp</strong><span className="text-xs text-slate-500">Danh sách sẽ được cập nhật sau khi có kết quả chính thức.</span></div></div>):<div className="grid min-h-36 place-items-center rounded-xl border border-dashed border-slate-300 bg-slate-50 text-center"><div><LockKeyhole className="mx-auto text-slate-400"/><strong className="mt-2 block text-sm">Lớp chưa chính thức được mở</strong><span className="text-xs text-slate-500">Danh sách sinh viên sẽ hiển thị khi đợt xét tuyển của lớp được mở.</span></div></div>}</div>
     </Modal>
@@ -238,21 +351,141 @@ function ClassManagement({classes,setClasses,majors,onToast}) {
   </>;
 }
 
-function RoundsPage({readonly,onToast,onOpenForm}) {
-  return <><PageHead title={readonly?"Thông tin đợt xét tuyển":"Quản lý đợt xét tuyển"} description="Mỗi đợt gồm các giai đoạn tiếp nhận hồ sơ, xét duyệt và công bố kết quả." action={!readonly&&<button className="ui-btn-primary" onClick={()=>onOpenForm("Tạo đợt xét tuyển")}><Plus size={16}/>Tạo đợt xét tuyển</button>}/><section className="ui-card overflow-hidden"><div className="overflow-x-auto"><table className="ui-table"><thead><tr>{["Mã đợt","Tên đợt","Đơn vị","Thời gian","Trạng thái"].map(item=><th key={item}>{item}</th>)}<th className="text-right">Thao tác</th></tr></thead><tbody>{roundRows.map(row=><tr key={row[0]}>{row.map((value,index)=><td key={value}>{index===4?<StatusBadge>{value}</StatusBadge>:value}</td>)}<td><TableActions readonly={readonly} onView={()=>onOpenForm("Chi tiết đợt xét tuyển",true)} onEdit={()=>onOpenForm("Chỉnh sửa đợt xét tuyển")} onDelete={()=>onToast("Đã xóa đợt xét tuyển.")}/></td></tr>)}</tbody></table></div><Pagination page={1} totalPages={1} onChange={()=>{}} total={roundRows.length}/></section></>;
+function PermissionManagement({permissions,setPermissions,onToast}) {
+  const [page,setPage]=useState(1);
+  const [modal,setModal]=useState(null);
+  const [query,setQuery]=useState("");
+  const [roleFilter,setRoleFilter]=useState("");
+  const filteredPermissions=useMemo(()=>{
+    const keyword=query.trim().toLocaleLowerCase("vi");
+    return permissions.filter(item=>(!roleFilter||item.role===roleFilter)&&(!keyword||`${item.name} ${item.role}`.toLocaleLowerCase("vi").includes(keyword)));
+  },[permissions,query,roleFilter]);
+  const totalPages=Math.max(1,Math.ceil(filteredPermissions.length/10));
+  const visible=filteredPermissions.slice((page-1)*10,page*10);
+  useEffect(()=>setPage(1),[query,roleFilter]);
+  useEffect(()=>{if(page>totalPages)setPage(totalPages);},[page,totalPages]);
+
+  const openCreate=()=>setModal({type:"form",id:null,name:"",role:permissionActorRoles[4]});
+  const savePermission=event=>{
+    event.preventDefault();
+    const values=Object.fromEntries(new FormData(event.currentTarget));
+    const name=values.name.trim().replace(/\s+/g," ");
+    const role=values.role;
+    const duplicate=permissions.some(item=>item.id!==modal.id&&item.name.toLocaleLowerCase("vi")===name.toLocaleLowerCase("vi"));
+    if(duplicate){onToast("Tài khoản này đã được phân quyền trước đó.");return;}
+    if(modal.id){
+      setPermissions(list=>list.map(item=>item.id===modal.id?{...item,name,role}:item));
+      onToast("Đã cập nhật vai trò tài khoản.");
+    }else{
+      const id=Math.max(0,...permissions.map(item=>item.id))+1;
+      setPermissions(list=>[...list,{id,name,role}]);
+      onToast("Đã thêm phân quyền mới.");
+    }
+    setModal(null);
+  };
+  const removePermission=()=>{
+    setPermissions(list=>list.filter(item=>item.id!==modal.item.id));
+    setModal(null);
+    onToast("Đã xóa phân quyền khỏi danh sách.");
+  };
+
+  return <>
+    <section className="ui-card overflow-hidden">
+      <TableToolbar action={<button className="ui-btn-primary" onClick={openCreate}><Plus size={16}/>Thêm phân quyền</button>} query={query} onQueryChange={setQuery} searchLabel="Tìm kiếm tài khoản được phân quyền" placeholder="Tìm theo họ và tên..." filterValue={roleFilter} onFilterChange={setRoleFilter} filterLabel="Lọc theo vai trò" filterAllLabel="Tất cả vai trò" filterOptions={permissionActorRoles}/>
+      <div className="overflow-x-auto">
+        <table className="ui-table min-w-[640px]">
+          <thead><tr><th className="w-[50%]">Họ và tên</th><th className="w-[34%]">Vai trò</th><th className="text-right">Thao tác</th></tr></thead>
+          <tbody>
+            {visible.map(item=><tr key={item.id}><td className="font-semibold text-slate-800">{item.name}</td><td><span className="inline-flex items-center gap-2 font-medium text-slate-700"><ShieldCheck size={15} className="shrink-0 text-brand"/>{item.role}</span></td><td><TableActions onView={()=>setModal({type:"detail",item})} onEdit={()=>setModal({type:"form",...item})} onDelete={()=>setModal({type:"confirmDelete",item})}/></td></tr>)}
+            {!visible.length&&<TableEmptyState colSpan={3} title="Không tìm thấy phân quyền phù hợp" description="Hãy thử thay đổi từ khóa hoặc vai trò đang chọn."/>}
+          </tbody>
+        </table>
+      </div>
+      <Pagination page={page} totalPages={totalPages} onChange={setPage} total={filteredPermissions.length}/>
+    </section>
+
+    <Modal open={modal?.type==="form"} onClose={()=>setModal(null)} title={modal?.id?"Cập nhật phân quyền":"Thêm phân quyền"}>
+      <form onSubmit={savePermission} className="space-y-4">
+        <label className="block"><span className="ui-label">Họ và tên <b className="text-rose-600">*</b></span><input name="name" className="ui-input" defaultValue={modal?.name} placeholder="Nhập họ và tên" required/></label>
+        <label className="block"><span className="ui-label">Vai trò <b className="text-rose-600">*</b></span><select name="role" className="ui-input" defaultValue={modal?.role} required>{permissionActorRoles.map(role=><option key={role} value={role}>{role}</option>)}</select></label>
+        <div className="flex justify-end gap-2 border-t border-slate-100 pt-4"><button type="button" className="ui-btn-secondary" onClick={()=>setModal(null)}>Hủy</button><button className="ui-btn-primary">Lưu thông tin</button></div>
+      </form>
+    </Modal>
+
+    <Modal open={modal?.type==="detail"} onClose={()=>setModal(null)} size="sm" title="Thông tin phân quyền"><div className="space-y-3"><div className="rounded-xl border border-slate-200 bg-slate-50 p-4"><span className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Họ và tên</span><strong className="mt-1 block text-sm text-slate-900">{modal?.item?.name}</strong></div><div className="rounded-xl border border-slate-200 bg-slate-50 p-4"><span className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Vai trò</span><span className="mt-2 flex items-center gap-2 text-sm font-semibold text-brand"><ShieldCheck size={17}/>{modal?.item?.role}</span></div></div></Modal>
+
+    <Modal open={modal?.type==="confirmDelete"} onClose={()=>setModal(null)} size="sm" title="Xác nhận xóa phân quyền"><div className="text-center"><div className="mx-auto grid size-12 place-items-center rounded-full bg-rose-50 text-rose-600"><Trash2/></div><p className="mt-4 text-sm leading-6 text-slate-600">Bạn có chắc muốn xóa vai trò <b>{modal?.item?.role}</b> của <b>{modal?.item?.name}</b>? Thao tác này không thể hoàn tác.</p><div className="mt-5 flex gap-2"><button className="ui-btn-secondary flex-1" onClick={()=>setModal(null)}>Hủy</button><button className="ui-btn flex-1 bg-rose-600 text-white hover:bg-rose-700" onClick={removePermission}>Xóa phân quyền</button></div></div></Modal>
+  </>;
 }
 
-function CriteriaPage({onOpenForm}) { return <><PageHead title="Cấu hình bộ tiêu chí xét tuyển" description="Thiết lập điều kiện, mức đánh giá, điểm và thứ tự xét hòa." action={<button className="ui-btn-primary" onClick={()=>onOpenForm("Thêm tiêu chí")}><Plus size={16}/>Thêm tiêu chí</button>}/><section className="ui-card overflow-hidden"><div className="flex items-center justify-between border-b border-slate-100 p-4"><h2 className="text-sm font-bold">Bộ tiêu chí KSTN năm học 2026 - 2027</h2><StatusBadge>Đang áp dụng</StatusBadge></div><div className="overflow-x-auto"><table className="ui-table"><thead><tr>{["Loại","Tên tiêu chí","Mức đánh giá","Điểm","Thứ tự xét hòa",""].map(item=><th key={item}>{item}</th>)}</tr></thead><tbody>{criteriaRows.map(row=><tr key={row[1]}>{row.map((value,i)=><td key={i}>{i===0?<StatusBadge>{value}</StatusBadge>:value}</td>)}<td className="text-right"><button className="ui-icon-btn" onClick={()=>onOpenForm("Chỉnh sửa tiêu chí")}><Pencil size={14}/></button></td></tr>)}</tbody></table></div><Pagination page={1} totalPages={1} onChange={()=>{}} total={criteriaRows.length}/></section></>; }
+function RoundsPage({readonly,onToast,onOpenForm}) {
+  const [page,setPage]=useState(1);
+  const [query,setQuery]=useState("");
+  const [statusFilter,setStatusFilter]=useState("");
+  const statuses=useMemo(()=>[...new Set(roundRows.map(row=>row[4]))],[roundRows]);
+  const filteredRounds=useMemo(()=>{
+    const keyword=query.trim().toLocaleLowerCase("vi");
+    return roundRows.filter(row=>(!statusFilter||row[4]===statusFilter)&&(!keyword||`${row[1]} ${row[2]} ${row[3]}`.toLocaleLowerCase("vi").includes(keyword)));
+  },[query,statusFilter]);
+  const totalPages=Math.max(1,Math.ceil(filteredRounds.length/10));
+  const visible=filteredRounds.slice((page-1)*10,page*10);
+  useEffect(()=>setPage(1),[query,statusFilter]);
+  useEffect(()=>{if(page>totalPages)setPage(totalPages);},[page,totalPages]);
+
+  return <>
+    <section className="ui-card overflow-hidden">
+      <TableToolbar action={!readonly?<button className="ui-btn-primary" onClick={()=>onOpenForm("Tạo đợt xét tuyển")}><Plus size={16}/>Tạo đợt xét tuyển</button>:null} query={query} onQueryChange={setQuery} searchLabel="Tìm kiếm đợt xét tuyển" placeholder="Tìm theo tên đợt, đơn vị hoặc thời gian..." filterValue={statusFilter} onFilterChange={setStatusFilter} filterLabel="Lọc theo trạng thái" filterAllLabel="Tất cả trạng thái" filterOptions={statuses}/>
+      <div className="overflow-x-auto">
+        <table className="ui-table min-w-[780px]">
+          <thead><tr><th className="w-[34%]">Tên đợt</th><th className="w-[22%]">Đơn vị</th><th className="w-[24%]">Thời gian</th><th>Trạng thái</th><th className="text-right">Thao tác</th></tr></thead>
+          <tbody>
+            {visible.map(row=><tr key={row[0]}><td className="font-semibold text-slate-800">{row[1]}</td><td>{row[2]}</td><td>{row[3]}</td><td><StatusBadge>{row[4]}</StatusBadge></td><td><TableActions readonly={readonly} onView={()=>onOpenForm("Chi tiết đợt xét tuyển",true)} onEdit={()=>onOpenForm("Chỉnh sửa đợt xét tuyển")} onDelete={()=>onToast("Đã xóa đợt xét tuyển.")}/></td></tr>)}
+            {!visible.length&&<TableEmptyState colSpan={5} title="Không tìm thấy đợt xét tuyển phù hợp" description="Hãy thử thay đổi từ khóa hoặc trạng thái đang chọn."/>}
+          </tbody>
+        </table>
+      </div>
+      <Pagination page={page} totalPages={totalPages} onChange={setPage} total={filteredRounds.length}/>
+    </section>
+  </>;
+}
+
+function CriteriaPage({onOpenForm}) {
+  const [query,setQuery]=useState(""), [typeFilter,setTypeFilter]=useState(""), [page,setPage]=useState(1);
+  const types=useMemo(()=>[...new Set(criteriaRows.map(row=>row[0]))].sort((a,b)=>a.localeCompare(b,"vi")),[]);
+  const rows=useMemo(()=>{const keyword=query.trim().toLocaleLowerCase("vi");return criteriaRows.filter(row=>(!typeFilter||row[0]===typeFilter)&&(!keyword||row[1].toLocaleLowerCase("vi").includes(keyword)));},[query,typeFilter]);
+  const totalPages=Math.max(1,Math.ceil(rows.length/10));
+  const visible=rows.slice((page-1)*10,page*10);
+  useEffect(()=>setPage(1),[query,typeFilter]);
+  useEffect(()=>{if(page>totalPages)setPage(totalPages);},[page,totalPages]);
+  const action=<button className="ui-btn-primary" onClick={()=>onOpenForm("Thêm tiêu chí")}><Plus size={16}/>Thêm tiêu chí</button>;
+  return <TablePanel toolbar={<TableToolbar action={action} query={query} onQueryChange={setQuery} searchLabel="Tìm kiếm tiêu chí" placeholder="Tìm theo tên tiêu chí..." filterValue={typeFilter} onFilterChange={setTypeFilter} filterLabel="Lọc theo loại tiêu chí" filterAllLabel="Tất cả loại tiêu chí" filterOptions={types}/>} pagination={<Pagination page={page} totalPages={totalPages} onChange={setPage} total={rows.length}/>}> <div className="overflow-x-auto"><table className="ui-table min-w-[860px]"><thead><tr>{["Loại","Tên tiêu chí","Mức đánh giá","Điểm","Thứ tự xét hòa","Thao tác"].map(item=><th className={item==="Thao tác"?"text-right":undefined} key={item}>{item}</th>)}</tr></thead><tbody>{visible.map(row=><tr key={row[1]}>{row.map((value,i)=><td key={i}>{i===0?<StatusBadge>{value}</StatusBadge>:value}</td>)}<td className="text-right"><button type="button" className="ui-icon-btn" aria-label="Chỉnh sửa tiêu chí" title="Chỉnh sửa" onClick={()=>onOpenForm("Chỉnh sửa tiêu chí")}><Pencil size={14}/></button></td></tr>)}{!visible.length&&<TableEmptyState colSpan={6} title="Không tìm thấy tiêu chí phù hợp" description="Hãy thử thay đổi tên hoặc loại tiêu chí đang chọn."/>}</tbody></table></div></TablePanel>;
+}
 
 function ApprovalsPage({final,roleKey,onToast}) {
   const source=tableData.profiles.rows.filter(row=>final?row[5]==="Đã duyệt":row[5]!=="Đã duyệt");
-  const title=final?(roleKey==="head"?"Xác nhận danh sách trúng tuyển":"Duyệt danh sách trúng tuyển"):"Phê duyệt hồ sơ xét tuyển";
-  return <><PageHead title={title} description={final?"Kiểm tra và phê duyệt danh sách trước khi công bố chính thức.":"Duyệt hoặc từ chối hồ sơ trong phạm vi được phân quyền."}/><section className="ui-card overflow-hidden"><div className="overflow-x-auto"><table className="ui-table"><thead><tr>{["MSSV","Họ tên","Lớp","Loại hồ sơ","Tổng điểm","Trạng thái","Quyết định"].map(item=><th key={item}>{item}</th>)}</tr></thead><tbody>{source.map(row=><tr key={row[0]}>{row.map((value,i)=><td key={i}>{i===5?<StatusBadge>{value}</StatusBadge>:value}</td>)}<td><div className="flex justify-end gap-1"><button className="ui-btn-secondary min-h-8 px-2 text-xs">Chi tiết</button><button className="ui-btn min-h-8 bg-emerald-600 px-2 text-xs text-white" onClick={()=>onToast(final?"Đã xác nhận hồ sơ sinh viên.":"Đã phê duyệt hồ sơ sinh viên.")}>{final?"Xác nhận":"Duyệt"}</button><button className="ui-btn min-h-8 border border-rose-200 bg-white px-2 text-xs text-rose-600" onClick={()=>onToast("Đã từ chối hồ sơ và lưu lý do.")}>Từ chối</button></div></td></tr>)}</tbody></table></div></section></>;
+  const [query,setQuery]=useState(""), [typeFilter,setTypeFilter]=useState(""), [page,setPage]=useState(1);
+  const types=useMemo(()=>[...new Set(source.map(row=>row[3]))].sort((a,b)=>a.localeCompare(b,"vi")),[source]);
+  const rows=useMemo(()=>{const keyword=query.trim().toLocaleLowerCase("vi");return source.filter(row=>(!typeFilter||row[3]===typeFilter)&&(!keyword||`${row[0]} ${row[1]} ${row[2]}`.toLocaleLowerCase("vi").includes(keyword)));},[source,query,typeFilter]);
+  const totalPages=Math.max(1,Math.ceil(rows.length/10));
+  const visible=rows.slice((page-1)*10,page*10);
+  useEffect(()=>setPage(1),[query,typeFilter,final]);
+  useEffect(()=>{if(page>totalPages)setPage(totalPages);},[page,totalPages]);
+  return <TablePanel toolbar={<TableToolbar query={query} onQueryChange={setQuery} searchLabel="Tìm kiếm hồ sơ sinh viên" placeholder="Tìm theo MSSV, họ tên hoặc lớp..." filterValue={typeFilter} onFilterChange={setTypeFilter} filterLabel="Lọc theo loại hồ sơ" filterAllLabel="Tất cả loại hồ sơ" filterOptions={types}/>} pagination={<Pagination page={page} totalPages={totalPages} onChange={setPage} total={rows.length}/>}> <div className="overflow-x-auto"><table className="ui-table min-w-[980px]"><thead><tr>{["MSSV","Họ tên","Lớp","Loại hồ sơ","Tổng điểm","Trạng thái","Quyết định"].map(item=><th className={item==="Quyết định"?"text-right":undefined} key={item}>{item}</th>)}</tr></thead><tbody>{visible.map(row=><tr key={row[0]}>{row.map((value,i)=><td key={i} className={i===0?"font-semibold text-brand":undefined}>{i===5?<StatusBadge>{value}</StatusBadge>:value}</td>)}<td><div className="flex justify-end gap-1"><button type="button" className="ui-btn-secondary min-h-8 px-2 text-xs">Chi tiết</button><button type="button" className="ui-btn min-h-8 bg-emerald-600 px-2 text-xs text-white" onClick={()=>onToast(final?"Đã xác nhận hồ sơ sinh viên.":"Đã phê duyệt hồ sơ sinh viên.")}>{final?"Xác nhận":"Duyệt"}</button><button type="button" className="ui-btn min-h-8 border border-rose-200 bg-white px-2 text-xs text-rose-600" onClick={()=>onToast("Đã từ chối hồ sơ và lưu lý do.")}>Từ chối</button></div></td></tr>)}{!visible.length&&<TableEmptyState colSpan={7} title="Không tìm thấy hồ sơ phù hợp" description="Hãy thử thay đổi từ khóa hoặc loại hồ sơ đang chọn."/>}</tbody></table></div></TablePanel>;
 }
 
 function ApplicationPage({onToast}) { return <><PageHead title="Cập nhật hồ sơ xét tuyển duy trì" description="Đợt duy trì KSTN năm 3 - hạn cập nhật 25/08/2026" action={<button className="ui-btn-secondary" onClick={()=>onToast("Đã lưu bản nháp trên thiết bị.")}><Save size={16}/>Lưu nháp</button>}/><div className="mb-4 grid gap-2 md:grid-cols-3">{[["1. Thông tin cá nhân","Đã xác nhận","done"],["2. Tiêu chí & minh chứng","Đang cập nhật","current"],["3. Gửi phê duyệt","Chưa gửi",""]].map(([title,label,state])=><div key={title} className={`rounded-xl border p-4 ${state==="current"?"border-brand bg-brand-soft":state==="done"?"border-emerald-200 bg-emerald-50":"border-slate-200 bg-white"}`}><strong className="text-sm">{title}</strong><span className="mt-1 block text-xs text-slate-500">{label}</span></div>)}</div><section className="ui-card p-5"><h2 className="mb-5 text-sm font-bold">Thông tin tiêu chí xét tuyển</h2><form onSubmit={event=>{event.preventDefault();onToast("Hồ sơ đã được cập nhật và chuyển sang chờ phê duyệt.");}}><div className="grid gap-4 md:grid-cols-2">{[["Số tín chỉ đạt","42"],["Số tín chỉ không đạt","0"],["GPA năm 2","3.54"],["Điểm rèn luyện trung bình","92"],["Điểm TOEIC","610"]].map(([label,value])=><label key={label}><span className="ui-label">{label}</span><input className="ui-input" type="number" step={label.includes("GPA")?"0.01":undefined} defaultValue={value}/></label>)}<label><span className="ui-label">Thành tích chuyên ngành</span><select className="ui-input" defaultValue="Giải Ba"><option>Không có</option><option>Giải Ba</option><option>Giải Nhì</option><option>Giải Nhất</option></select></label></div><div className="mt-5 grid gap-4 border-t border-slate-100 pt-5 md:grid-cols-2"><label><span className="ui-label">Bảng điểm / kết quả học tập</span><input className="ui-input py-2" type="file" accept=".pdf,image/*"/></label><label><span className="ui-label">Chứng chỉ ngoại ngữ</span><input className="ui-input py-2" type="file" accept=".pdf,image/*"/></label></div><div className="mt-5 flex justify-end"><button className="ui-btn-primary"><Send size={16}/>Cập nhật và gửi phê duyệt</button></div></form></section></>; }
 
-function PasswordPage({onToast}) { const rows=tableData.students.rows; return <><PageHead title="Đặt lại mật khẩu sinh viên" description="Tạo mật khẩu mặc định mới và yêu cầu sinh viên đổi ở lần đăng nhập kế tiếp."/><section className="ui-card overflow-hidden"><div className="overflow-x-auto"><table className="ui-table"><thead><tr>{["MSSV","Họ tên","Lớp","Email","Thao tác"].map(item=><th key={item}>{item}</th>)}</tr></thead><tbody>{rows.map(row=><tr key={row[0]}>{row.slice(0,4).map(value=><td key={value}>{value}</td>)}<td className="text-right"><button className="ui-btn-secondary min-h-8 px-2 text-xs" onClick={()=>onToast("Đã tạo mật khẩu mặc định và yêu cầu đổi ở lần đăng nhập sau.")}>Đặt lại mật khẩu</button></td></tr>)}</tbody></table></div></section></>; }
+function PasswordPage({onToast}) {
+  const source=tableData.students.rows;
+  const [query,setQuery]=useState(""), [classFilter,setClassFilter]=useState(""), [page,setPage]=useState(1);
+  const classes=useMemo(()=>[...new Set(source.map(row=>row[2]))].sort((a,b)=>a.localeCompare(b,"vi")),[source]);
+  const rows=useMemo(()=>{const keyword=query.trim().toLocaleLowerCase("vi");return source.filter(row=>(!classFilter||row[2]===classFilter)&&(!keyword||`${row[0]} ${row[1]} ${row[3]}`.toLocaleLowerCase("vi").includes(keyword)));},[source,query,classFilter]);
+  const totalPages=Math.max(1,Math.ceil(rows.length/10));
+  const visible=rows.slice((page-1)*10,page*10);
+  useEffect(()=>setPage(1),[query,classFilter]);
+  useEffect(()=>{if(page>totalPages)setPage(totalPages);},[page,totalPages]);
+  return <TablePanel toolbar={<TableToolbar query={query} onQueryChange={setQuery} searchLabel="Tìm kiếm tài khoản sinh viên" placeholder="Tìm theo MSSV, họ tên hoặc email..." filterValue={classFilter} onFilterChange={setClassFilter} filterLabel="Lọc theo lớp" filterAllLabel="Tất cả lớp" filterOptions={classes}/>} pagination={<Pagination page={page} totalPages={totalPages} onChange={setPage} total={rows.length}/>}> <div className="overflow-x-auto"><table className="ui-table min-w-[780px]"><thead><tr>{["MSSV","Họ tên","Lớp","Email","Thao tác"].map(item=><th className={item==="Thao tác"?"text-right":undefined} key={item}>{item}</th>)}</tr></thead><tbody>{visible.map(row=><tr key={row[0]}>{row.slice(0,4).map((value,index)=><td key={value} className={index===0?"font-semibold text-brand":undefined}>{value}</td>)}<td className="text-right"><button type="button" className="ui-btn-secondary min-h-8 px-2 text-xs" onClick={()=>onToast("Đã tạo mật khẩu mặc định và yêu cầu đổi ở lần đăng nhập sau.")}>Đặt lại mật khẩu</button></td></tr>)}{!visible.length&&<TableEmptyState colSpan={5} title="Không tìm thấy tài khoản phù hợp" description="Hãy thử thay đổi từ khóa hoặc lớp đang chọn."/>}</tbody></table></div></TablePanel>;
+}
 
 function ProfilePage({role,roleKey,onToast}) { return <><PageHead title="Thông tin cá nhân" description="Thông tin hồ sơ tài khoản đang đăng nhập."/><section className="ui-card p-5"><div className="grid gap-6 lg:grid-cols-[240px_1fr]"><div className="rounded-xl bg-slate-50 p-6 text-center"><div className="mx-auto grid size-16 place-items-center rounded-2xl bg-brand text-lg font-bold text-white">{role.initials}</div><h2 className="mt-4 font-bold">{role.name}</h2><p className="mt-1 text-xs text-slate-500">{role.label}</p><div className="mt-3"><StatusBadge>Tài khoản hoạt động</StatusBadge></div></div><form onSubmit={event=>{event.preventDefault();onToast("Đã cập nhật thông tin cá nhân.");}}><div className="grid gap-4 md:grid-cols-2">{[["Họ và tên",role.name],["Mã tài khoản",roleKey==="student"?"21094501":"GV00128"],["Email",roleKey==="student"?"nam.21094501@iuh.edu.vn":"account@iuh.edu.vn"],["Số điện thoại","090 123 4567"],["Ngày sinh","12/10/2003"],["Đơn vị / Lớp",roleKey==="student"?"KSTN-K20":"Khoa Công nghệ Thông tin"]].map(([label,value])=><label key={label}><span className="ui-label">{label}</span><input className="ui-input" defaultValue={value}/></label>)}</div><div className="mt-5 flex justify-end"><button className="ui-btn-primary">Lưu thay đổi</button></div></form></div></section></>; }
 
@@ -267,6 +500,8 @@ function Dashboard({roleKey}) {
   const [active,setActive]=useState(role.menus[0][0]);
   const [majors,setMajors]=useState(createInitialMajors);
   const [classRecords,setClassRecords]=useState(createInitialClasses);
+  const [permissionRecords,setPermissionRecords]=useState(createInitialPermissions);
+  const [studentAccounts,setStudentAccounts]=useState(()=>tableData.students.rows.map(([id,name,className,gmail,status])=>({id,name,className,gmail,status})));
   const [accountOpen,setAccountOpen]=useState(false);
   const [passwordOpen,setPasswordOpen]=useState(false);
   const [dialog,setDialog]=useState(null);
@@ -275,6 +510,9 @@ function Dashboard({roleKey}) {
   const renderPage=()=>{
     if(active==="majors")return <MajorManagement majors={majors} setMajors={setMajors} onToast={setToast}/>;
     if(active==="classes")return <ClassManagement classes={classRecords} setClasses={setClassRecords} majors={majors} onToast={setToast}/>;
+    if(active==="permissions")return <PermissionManagement permissions={permissionRecords} setPermissions={setPermissionRecords} onToast={setToast}/>;
+    if(active==="teachers")return <TeacherManagement onToast={setToast} onOpenForm={openForm}/>;
+    if(active==="students")return <StudentManagement students={studentAccounts} setStudents={setStudentAccounts} classes={classRecords} onToast={setToast}/>;
     if(tableData[active])return <DataTablePage meta={tableData[active]} onToast={setToast} onOpenForm={openForm}/>;
     if(active==="rounds"||active==="roundsView")return <RoundsPage readonly={active==="roundsView"} onToast={setToast} onOpenForm={openForm}/>;
     if(active==="criteria")return <CriteriaPage onOpenForm={openForm}/>;
