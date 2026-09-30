@@ -1,56 +1,24 @@
-# IUH Talent Design System
+# IUH admissions interface
 
 ## Direction
 
-The public experience uses Airtable-like editorial restraint: white canvas, large low-weight display type, generous whitespace, near-black primary actions, and occasional full-surface color cards. The authenticated application uses Linear-like precision: dense information, compact controls, dark navigation, subtle surface steps, hairline borders, and restrained accent color.
+UI UX Pro Max's education administration dashboard minimal search recommends Minimalism & Swiss Style: functional grids, clear hierarchy, restrained effects and readable sans-serif typography. Apply these principles to this React portal. Its generic black/gold palette, monospace headings and hero/footer layout do not fit the user's requirements and are excluded.
 
-The result must still feel unmistakably IUH. IUH blue is reserved for identity, focus, active navigation, links, and selected states. It is not used as a decorative wash.
+Keep IUH blue (#003b71), deep blue (#002c55), white surfaces, a gray canvas (#f4f6f8) and readable secondary text (#526578). Use Segoe UI with Arial/system fallbacks and UTF-8 Vietnamese source. No external font requests are needed.
 
-## Tokens
-
-- Primary and interactive blue: `#153898`
-- Ink: `#172033`
-- Navy navigation: `#101c31`
-- Canvas: `#ffffff`
-- Application background: `#f6f7f9`
-- Hairline: `#dfe4ea`
-- Signature forest: `#153d35`
-- Signature coral: `#b7482e`
-- Signature cream: `#f5eddf`
-- Signature mint: `#dceee8`
-- Signature yellow: `#f5dda0`
-
-## Typography
-
-- Family: Inter with native system fallbacks.
-- Marketing display: 500-550 weight, tight tracking, 1.02-1.1 line height.
-- Application headings: 600 weight, compact negative tracking.
-- Body: 400 weight with 1.5-1.68 line height.
-- Interface labels: 500-650 weight at 11-14px.
-- Prefer size and contrast over excessive bold weight.
-
-## Geometry and spacing
-
-- Base spacing unit: 4px. Primary increments: 8, 12, 16, 24, 32, 48, 96.
-- Inputs and buttons: 8-10px radius and at least 42px high.
-- Product cards and panels: 10-14px radius.
-- Pills are reserved for status indicators only.
-- Public sections use 96px vertical rhythm; dashboards use compact 12-24px rhythm.
+All corners are square. Do not add rounded utilities or border-radius. Do not restore red decorative bars, the introductory banner, its application guide, or the public footer.
 
 ## Components
 
-- Primary button: near-black background, white label, 10px radius.
-- Secondary button: white background, ink label, hairline outline.
-- Public signature card: full forest/navy surface, white text, 14px radius, 48px padding.
-- Dashboard panel: white surface, 1px hairline, 10px radius, no default shadow.
-- Active sidebar item: lifted navy surface with a 3px IUH-blue left indicator.
-- Data table: uppercase 11px headers, 12.5px body, 10-12px cell padding.
-- Status badge: compact 5px radius with semantic tinted background.
+- Public page: admission list first, descriptive heading, actual result count, labeled search and status filter, contextual empty state.
+- Admission cards: white panels with a clear title, status, metadata and one blue application button.
+- Workspaces: white sidebar, blue active navigation, white header and light gray content canvas. Every page has one descriptive h1.
+- Small screens: collapsible vertical navigation with expanded state; tables scroll within their own panels.
+- Tables: 14px body, 12px headers, visible dividers, consistent spacing, result totals and current page.
+- Forms: visible labels, strong control boundaries, 44px control height; use 16px input text on phones.
+- Modals: contained keyboard focus, Escape dismissal, unique title/description IDs and focus restoration.
+- Feedback: semantic status text and polite live notifications, visible focus and reduced-motion support.
 
-## Guardrails
+## Verification
 
-- Do not add atmospheric gradients, glass cards, oversized shadows, or pill buttons.
-- Do not make every surface blue; blue must remain a scarce interaction signal.
-- Do not use heavy display weights. Keep marketing headlines confident through scale.
-- Keep tables readable and horizontally scrollable on smaller screens.
-- Preserve minimum 44px touch targets for mobile form controls and primary actions.
+The production build and all seven role renders must pass. Check one h1 per page, intact Vietnamese strings, labeled navigation, square corners and absence of removed public sections. Browser verification requires a connected browser; SSR checks do not establish visual layout or interactive behavior.
