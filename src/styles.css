@@ -147,7 +147,7 @@
 .sidebar-resize-handle:hover, .sidebar-resize-handle:active, .sidebar-resize-handle:focus-visible { background: #ffffff30; color: white; }
 .sidebar-resize-handle:focus-visible { outline: 2px solid #c5d7ff; outline-offset: -2px; }
 .sidebar-collapse-toggle { flex-shrink: 0; }
-.sidebar-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sidebar-label { flex: 1; min-width: 0; white-space: normal; overflow-wrap: anywhere; word-break: normal; line-height: 1.6; }
 .dashboard-logo-panel { border-bottom: 1px solid var(--hairline); min-height: 80px; padding-inline: 24px; }
 .sidebar-role { color: #c4d3f7; font-size: 12px; letter-spacing: .04em; padding: 24px 24px 14px; line-height: 1.6; }
 .sidebar-nav { padding-inline: 12px; }
@@ -393,4 +393,20 @@ body { font-feature-settings: "cv11", "ss01"; }
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
   .public-round-card:hover, .ui-btn-primary:active:not(:disabled), .ui-btn-secondary:active:not(:disabled), .ui-icon-btn:active { transform: none; }
   .public-round-card .ui-btn-primary:hover svg { transform: none; }
+}
+
+/* Let sidebar labels reflow naturally as its width changes. */
+.sidebar-role,
+.sidebar-collapse-toggle button > span,
+.sidebar-home,
+.mobile-menu-trigger > span {
+  min-width: 0;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+.sidebar-nav .dashboard-nav-item,
+.dashboard-mobile-nav .dashboard-nav-item {
+  height: auto;
+  flex-shrink: 0;
 }
