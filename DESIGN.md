@@ -2,27 +2,30 @@
 
 ## Direction
 
-UI UX Pro Max's education administration dashboard minimal search recommends Minimalism & Swiss Style: functional grids, clear hierarchy, restrained effects and readable sans-serif typography. Apply these principles to this React portal. Its generic black/gold palette, monospace headings and hero/footer layout do not fit the user's requirements and are excluded.
+The October 2026 refresh applies UI/UX Pro Max's Minimalism & Swiss Style recommendations to the existing admissions portal: clear typography, a functional grid, generous spacing and restrained motion. Generic palette/font recommendations are adapted to IUH, not substituted for the institutional identity.
 
-Use IUH website blue (#153898), deep blue (#102c79), white surfaces, a pale blue-gray canvas (#f5f7fb) and readable secondary text (#53627a). Primary blue was verified in https://iuh.edu.vn/assets/css/app.css?v=51. The public IUH site also uses pale blue surfaces and sans-serif text; translate those cues onto the existing components. Use locally hosted Inter Variable with Segoe UI/Arial/system fallbacks and UTF-8 Vietnamese source. All 92 Vietnamese extended glyphs have been verified. Package its SIL Open Font License and use font-display: swap. No runtime third-party font requests are needed.
-
-The user has explicitly delegated radius and animation decisions. Use 20px panels, 24px admission cards/dialogs, 12px controls, 14px metadata panels, and pill status badges. Keep nested radii proportional. Do not restore red decorative bars, the introductory banner, its application guide, or the public footer.
+Reference: https://iuh.edu.vn. Preserve the existing IUH Faculty of Information Technology SVG and locally hosted Inter Variable with Vietnamese support. Primary blue remains #153898, deep blue #102c79, with a #10285e sidebar, white surfaces and #f4f6fa canvas. A small #be2638 accent appears in the public section marker. Do not add decorative red bars, an introductory banner, application guide or public footer.
 
 ## Components
 
-- Public page: admission list first, descriptive heading, actual result count, labeled search and status filter, contextual empty state.
-- Admission cards: white rounded surface, pale blue code tag, navy title, inset metadata panel and one full-width blue application button. Use restrained layered shadows.
-- Workspaces: deep blue sidebar, rounded blue active state, white header and pale content canvas. Preserve existing sidebar resize and collapse controls. Every page has one descriptive h1.
-- Small screens: collapsible vertical navigation with expanded state; tables scroll within their own panels.
-- Tables: 14px body, 12px headers, visible dividers, consistent spacing, result totals and current page.
-- Forms: visible labels, strong control boundaries, 44px control height; use 16px input text on phones.
-- Modals: contained keyboard focus, Escape dismissal, unique title/description IDs and focus restoration.
-- Feedback: semantic status text and polite live notifications, visible focus and reduced-motion support.
+- Public page stays admission-list first. A compact navigation row links to admissions and the official IUH site; the existing portal title remains intact.
+- Editorial heading: 32–46px, navy/blue emphasis, a decorative academic mark on desktop and restrained program labeling.
+- Search and status filter remain explicitly labeled. Live result totals sit directly above the cards; empty states retain their reset action.
+- Admission cards retain all codes, descriptions, dates, departments and application actions. Icon treatments, pill statuses, separated metadata and primary/outlined actions clarify their hierarchy without changing behavior.
+- All six workspaces use the same deep-blue navigation, white active item, account control, contextual location text, data tables and forms. Sidebar collapse and resize remain available.
+- Shared tokens: 18px panels, 10px controls, 22px dialogs; subtle shadows, 180ms control transitions and 320ms page entrances.
+- Tables remain internally scrollable and paginated, with all original fields and actions. No changes to demo records, permissions or business rules.
+- Mobile navigation expands vertically; phone inputs are 16px, icon buttons are 44px, and dialogs scroll within the viewport.
+- Semantic headings, visible focus, dialog focus containment/restoration, Escape dismissal and reduced-motion CSS remain supported.
 
-## Verification
+## Verification — 7 October 2026
 
-The production build and all seven role renders must pass. Check one h1 per page, intact Vietnamese strings, labeled navigation, consistent radius tokens, motion preferences and absence of removed public sections. Browser verification requires a connected browser; SSR checks do not establish visual layout or interactive behavior.
+- `pnpm build`: passed for all seven HTML entry points.
+- Browser checked all 38 navigation destinations across six roles at 1440px: content present, exactly one h1 each, no page overflow.
+- Public, administrator and student pages checked at 320, 375, 768, 1024 and 1440px: no document or main-container horizontal overflow. Tables scroll inside their panels.
+- Visually reviewed public desktop/mobile, administrator desktop, student mobile and application modal mobile.
+- Exercised admission search/empty/reset, status filtering, application modal, Escape dismissal, demo login to administrator, sidebar collapse/expand, major search/detail and mobile menu selection.
+- Browser console inspection returned no warnings/errors during role-route checks.
+- Reduced motion is covered by CSS; OS-level preference and a full screen-reader audit were not exercised.
 
-## Motion
-
-Use one subtle entrance for the public card grid and one for workspace content (380ms, 8px). Menus enter in 180ms; dialogs enter in 260ms with a 10px translation and 0.98-to-1 scale. Controls use 180ms feedback, a restrained press scale and color changes. Card lift is only enabled for fine pointers with hover. Do not animate every table row or run looping decoration. Keep resizing immediate rather than animating layout width. Disable entrance animations, hover lifts and press transforms under prefers-reduced-motion.
+This remains a frontend prototype. These checks verify presentation, navigation and selected existing interactions; they do not establish backend persistence, real authentication or production admissions processing.
