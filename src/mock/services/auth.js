@@ -1,5 +1,5 @@
 import { isRoleEffective } from "../../domain/permissions.js";
-import { timestamp, addMinutes } from "../../domain/time.js";
+import { timestamp, addMinutes, formatIct } from "../../domain/time.js";
 import {
   defineService,
   requireValue,
@@ -30,7 +30,7 @@ export const login = defineService("auth.login", {
           timestamp(ctx.now) >= timestamp(user.lockedUntil)),
       "ACCOUNT_LOCKED",
       user.lockedUntil
-        ? `Tài khoản tạm khóa đến ${user.lockedUntil}.`
+        ? `Tài khoản tạm khóa đến ${formatIct(user.lockedUntil)}.`
         : "Tài khoản đã bị khóa.",
     );
     if (user.lockedUntil) {
@@ -59,7 +59,7 @@ export const login = defineService("auth.login", {
       committedFailure(
         locked ? "ACCOUNT_LOCKED" : "AUTH_INVALID",
         locked
-          ? `Tài khoản tạm khóa đến ${user.lockedUntil}.`
+          ? `Tài khoản tạm khóa đến ${formatIct(user.lockedUntil)}.`
           : `Tên đăng nhập hoặc mật khẩu chưa đúng. Còn ${ctx.config.login.maxFailures - user.failedLoginCount} lần thử trước khi tài khoản bị tạm khóa 15 phút.`,
       );
     }

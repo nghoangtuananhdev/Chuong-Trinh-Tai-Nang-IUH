@@ -52,6 +52,17 @@ export function WorkspaceLayout({ route, children }) {
         profile: "Thông tin cá nhân",
         "doi-mat-khau": "Đổi mật khẩu",
         apply: "Nộp hồ sơ",
+        maintenance: "Cập nhật hồ sơ tích lũy",
+        "open-rounds": "Đợt xét tuyển đang mở",
+        "my-applications": "Hồ sơ của tôi",
+        approvals: "Danh sách phê duyệt",
+        records: "Hồ sơ sinh viên",
+        reviews: "Duyệt hồ sơ",
+        rounds: "Đợt xét tuyển",
+        classes: "Lớp",
+        criteria: "Bộ tiêu chí",
+        "email-outbox": "Hàng đợi email",
+        notifications: "Thông báo",
       }[page] ??
       "Chi tiết";
   useEffect(() => {

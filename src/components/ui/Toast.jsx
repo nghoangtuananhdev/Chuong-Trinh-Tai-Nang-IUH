@@ -5,7 +5,8 @@ const config = {
   success: { icon: CheckCircle2, bar: "bg-success-solid", ic: "text-success-solid", ttl: 4000 },
   info: { icon: Info, bar: "bg-info-solid", ic: "text-info-solid", ttl: 4000 },
   warning: { icon: AlertTriangle, bar: "bg-warning-solid", ic: "text-warning-solid", ttl: 6000 },
-  error: { icon: AlertCircle, bar: "bg-danger-solid", ic: "text-danger-solid", ttl: 0 }
+  // Lỗi tự ẩn sau 8 giây (rê chuột để giữ lại) để không che nút thao tác của hộp thoại.
+  error: { icon: AlertCircle, bar: "bg-danger-solid", ic: "text-danger-solid", ttl: 8000 }
 };
 
 function ToastItem({ toast, onClose }) {
@@ -55,7 +56,7 @@ function ToastItem({ toast, onClose }) {
 export function ToastStack({ toasts, onClose }) {
   if (!toasts || toasts.length === 0) return null;
   return (
-    <div className="pointer-events-none fixed inset-x-4 top-4 z-60 flex flex-col gap-2 sm:inset-x-auto sm:bottom-6 sm:right-6 sm:top-auto sm:w-[400px] sm:flex-col-reverse">
+    <div className="pointer-events-none fixed inset-x-4 top-4 z-60 flex flex-col gap-2 sm:inset-x-auto sm:right-6 sm:top-20 sm:w-[400px]">
       {toasts.map((t) => (
         <ToastItem key={t.id} toast={t} onClose={onClose} />
       ))}

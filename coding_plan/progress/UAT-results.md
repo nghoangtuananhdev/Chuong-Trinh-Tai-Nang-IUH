@@ -40,3 +40,11 @@ Ngày 10/11/2026. Dữ liệu được khởi tạo mới cho từng kịch bả
 3. Kiểm console, Tab/Shift+Tab, Esc đóng đúng overlay, trả focus, focus H1 và skip link; thử reduced motion.
 4. Tải PDF/JPG/PNG thật, xem/tải xuống/xóa, refresh và đa tab; reset xóa IndexedDB. Chạy thử CSV trong Excel và In/Lưu PDF.
 5. Ghi kết quả quan sát và ảnh trước khi ký Definition of Done toàn dự án. Hiện chưa ký nghiệm thu UI.
+
+## Cập nhật 10/11/2026 — đã chạy trên trình duyệt (tự động hóa)
+
+Các kịch bản U1–U15 và các cổng P3–P10 đã được chạy trên giao diện thật bằng Chromium headless (Playwright) với server dev, ở 1440px; kiểm tra tràn ngang thêm ở 1024px và 390px. Kết quả: **ĐẠT** sau khi sửa các lỗi ghi ở `DECISIONS-ADDENDUM.md` mục A-15. Console không có lỗi/cảnh báo của ứng dụng (chỉ một yêu cầu 404 cho favicon).
+
+Vẫn **chưa xác minh bằng mắt người**: mở CSV bằng Excel, In/Lưu PDF, điều hướng bàn phím/focus, reduced motion, đồng bộ đa tab. Hướng dẫn nghiệm thu thủ công từng bước: `coding_plan/UAT-TEST-GUIDE.md`.
+
+`npm test`: 245 pass, 0 fail (thêm 5 test hồi quy).

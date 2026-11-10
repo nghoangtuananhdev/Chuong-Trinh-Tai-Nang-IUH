@@ -177,7 +177,17 @@ export const decide = defineService("reviews.decide", {
       body: p.note ?? "",
       link: `/app/my-applications/${app.id}`,
     });
-    applicationHistory(db, ctx, app, p.decision, p.note);
+    applicationHistory(
+      db,
+      ctx,
+      app,
+      {
+        APPROVED: "Đạt điều kiện",
+        REJECTED: "Không đạt",
+        NEEDS_UPDATE: "Yêu cầu bổ sung",
+      }[p.decision],
+      p.note,
+    );
     audit(db, ctx, {
       action: `APPLICATION_${p.decision}`,
       entity: "application",

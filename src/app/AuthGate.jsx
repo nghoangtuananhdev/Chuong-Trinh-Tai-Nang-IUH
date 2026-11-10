@@ -26,7 +26,7 @@ export function AuthGate({ route, children }) {
   if (
     (permission && !can(permission)) ||
     (page === "approvals" &&
-      !["HEAD", "DEAN", "TRAINING"].includes(activeRole.role))
+      !["HEAD", "DEAN", "TRAINING", "LECTURER"].includes(activeRole.role))
   )
     return (
       <Callout tone="danger" title="Không có quyền truy cập">

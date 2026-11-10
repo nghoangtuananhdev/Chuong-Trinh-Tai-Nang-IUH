@@ -20,7 +20,11 @@ import { CriterionField } from "../../components/domain-ui/CriterionField.jsx";
 import { EvidenceViewer } from "../../components/domain-ui/EvidenceViewer.jsx";
 import { classifyFlow } from "../../domain/flows.js";
 import { scoreApplication } from "../../domain/scoring.js";
-import { maintenanceRounds, studentProfile } from "../../domain/selectors.js";
+import {
+  maintenanceRounds,
+  studentProfile,
+  latestMemberships,
+} from "../../domain/selectors.js";
 import { formatIct } from "../../domain/time.js";
 import { FLOW_LABEL } from "../../domain/constants.js";
 import { navigate } from "../../app/router.js";
@@ -435,7 +439,13 @@ export function StudentPortal({ page, id }) {
       {page === "dashboard" && (
         <Callout title={me.fullName}>
           {profile?.isKSTN
-            ? "Sinh viên CN/KSTN"
+            ? `Sinh viên CN/KSTN${latestMemberships(db, me.id)
+                .filter((m) => m.status === "ACTIVE")
+                .map(
+                  (m) =>
+                    ` – Lớp ${db.classes.find((c) => c.id === m.classId)?.code} (năm ${m.studyYear})`,
+                )
+                .join("")}`
             : "Ứng viên (chưa thuộc lớp CN/KSTN)"}
         </Callout>
       )}

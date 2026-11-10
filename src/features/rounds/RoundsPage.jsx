@@ -33,7 +33,7 @@ import {
 import { FilterTabs } from "../../components/ui/FilterTabs.jsx";
 import { navigate } from "../../app/router.js";
 export function RoundsPage({ id, publicView = false }) {
-  const { db, can, activeRole } = useBackend(),
+  const { db, can, activeRole, me } = useBackend(),
     action = useAction();
   const [view, setView] = useState("rounds"),
     [file, setFile] = useState(null),
@@ -407,6 +407,31 @@ export function RoundsPage({ id, publicView = false }) {
         }
       />
       <div className="flex flex-wrap gap-2">
+        {publicView && (
+          <>
+            <Button variant="secondary" onClick={() => navigate("/")}>
+              Về trang chủ
+            </Button>
+            {round.status === "open" && (
+              <Button
+                onClick={() =>
+                  navigate(
+                    me
+                      ? `/app/apply/${id}`
+                      : `/dang-nhap?returnTo=${encodeURIComponent(`/app/apply/${id}`)}`,
+                  )
+                }
+              >
+                Nộp hồ sơ
+              </Button>
+            )}
+            {round.status === "published" && (
+              <Button onClick={() => navigate(`/ket-qua/${id}`)}>
+                Xem kết quả
+              </Button>
+            )}
+          </>
+        )}
         {!publicView &&
           can("round.editTimeline", { type: "round", id }) &&
           editableFields(round.status, activeRole.role).length > 0 && (

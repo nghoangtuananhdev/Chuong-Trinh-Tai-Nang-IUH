@@ -6,7 +6,7 @@ import { Field, Input, Select, Textarea } from "../../components/ui/Form.jsx";
 import { Callout, CodeTag } from "../../components/ui/Display.jsx";
 import { Drawer } from "../../components/ui/Drawer.jsx";
 import { StatusBadge } from "../../components/ui/StatusBadge.jsx";
-import { APPLICATION_STATUSES } from "../../domain/constants.js";
+import { APPLICATION_STATUSES, ROLE_LABEL } from "../../domain/constants.js";
 import { formatIct } from "../../domain/time.js";
 import { navigate } from "../../app/router.js";
 export function OperationsPage({ page, roundId }) {
@@ -191,7 +191,8 @@ export function OperationsPage({ page, roundId }) {
             {
               key: "actor",
               header: "Người thực hiện / Vai trò",
-              cell: (l) => `${l.actorName} · ${l.actorRole ?? "Hệ thống"}`,
+              cell: (l) =>
+                `${l.actorName} · ${ROLE_LABEL[l.actorRole] ?? l.actorRole ?? "Hệ thống"}`,
             },
             { key: "action", header: "Hành động", cell: (l) => l.action },
             {

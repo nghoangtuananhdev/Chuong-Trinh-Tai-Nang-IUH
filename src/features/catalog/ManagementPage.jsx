@@ -13,7 +13,13 @@ import { Drawer } from "../../components/ui/Drawer.jsx";
 import { ConfirmDialog } from "../../components/ui/ConfirmDialog.jsx";
 import { Field, Textarea, Select } from "../../components/ui/Form.jsx";
 import { ROLE_LABEL, ROLE_SCOPE } from "../../domain/constants.js";
-import { classView, latestMemberships } from "../../domain/selectors.js";
+import { ASSIGNABLE_ROLES } from "../../domain/permissions.js";
+import {
+  classView,
+  latestMemberships,
+  scopeLabel,
+} from "../../domain/selectors.js";
+import { formatIct } from "../../domain/time.js";
 import { resolveScopeChain } from "../../domain/scope.js";
 import { isRoleEffective } from "../../domain/permissions.js";
 import { navigate } from "../../app/router.js";
@@ -339,7 +345,11 @@ export function ManagementPage({ page, id }) {
                   label: "Vai trò",
                   type: "select",
                   options: Object.entries(ROLE_LABEL)
-                    .filter(([r]) => r !== "STUDENT")
+                    .filter(
+                      ([r]) =>
+                        r !== "STUDENT" &&
+                        ASSIGNABLE_ROLES[activeRole.role]?.includes(r),
+                    )
                     .map(([value, label]) => ({ value, label })),
                   required: true,
                 },
@@ -382,8 +392,10 @@ export function ManagementPage({ page, id }) {
           Gán vai trò
         </Button>
         <DataList
-          rows={db.userRoles.filter((r) =>
-            can("role.assign", { type: "user", id: r.userId }),
+          rows={db.userRoles.filter(
+            (r) =>
+              r.role !== "STUDENT" &&
+              can("role.assign", { type: "user", id: r.userId }),
           )}
           columns={[
             {
@@ -395,12 +407,13 @@ export function ManagementPage({ page, id }) {
             {
               key: "scope",
               header: "Phạm vi",
-              cell: (r) => r.scopeId ?? "Toàn trường",
+              cell: (r) => scopeLabel(db, r),
             },
             {
               key: "valid",
               header: "Hiệu lực",
-              cell: (r) => `${r.validFrom} – ${r.validTo ?? "Vô hạn"}`,
+              cell: (r) =>
+                `${formatIct(r.validFrom)} – ${r.validTo ? formatIct(r.validTo) : "Vô hạn"}`,
             },
             {
               key: "state",
@@ -481,7 +494,7 @@ export function ManagementPage({ page, id }) {
                 .filter((r) => r.userId === detail?.id)
                 .map((r) => (
                   <p key={r.id}>
-                    {ROLE_LABEL[r.role]} · {r.scopeId ?? "Toàn trường"}
+                    {ROLE_LABEL[r.role]} · {scopeLabel(db, r)}
                   </p>
                 ))}
             </div>
@@ -491,7 +504,29 @@ export function ManagementPage({ page, id }) {
           open={Boolean(edit)}
           onClose={() => setEdit(null)}
           title={edit?.title}
-          fields={edit?.fields ?? []}
+          fields={(edit?.fields ?? []).map((f) =>
+            // Phạm vi phụ thuộc vai trò: Khoa cho BLĐ khoa, Ngành cho CNN, Lớp cho GVPT.
+            edit.name === "roles.assign" && f.key === "scopeId"
+              ? {
+                  ...f,
+                  label:
+                    {
+                      FACULTY: "Phạm vi: Khoa",
+                      MAJOR: "Phạm vi: Ngành",
+                      CLASS: "Phạm vi: Lớp",
+                      SCHOOL: "Phạm vi: Toàn trường (không cần chọn)",
+                    }[ROLE_SCOPE[form.role]] ?? "Phạm vi (chọn vai trò trước)",
+                  options: f.options.filter(
+                    (o) =>
+                      ({
+                        FACULTY: db.faculties,
+                        MAJOR: db.majors,
+                        CLASS: db.classes,
+                      })[ROLE_SCOPE[form.role]]?.some((x) => x.id === o.value),
+                  ),
+                }
+              : f,
+          )}
           values={form}
           onChange={setForm}
           busy={action.busy}
@@ -601,7 +636,12 @@ export function ManagementPage({ page, id }) {
             {
               key: "source",
               header: "Nguồn hồ sơ",
-              cell: (r) => <CodeTag>{r.sourceApplicationId}</CodeTag>,
+              cell: (r) => (
+                <CodeTag>
+                  {db.applications.find((a) => a.id === r.sourceApplicationId)
+                    ?.code ?? "—"}
+                </CodeTag>
+              ),
             },
           ]}
           actions={(r) =>

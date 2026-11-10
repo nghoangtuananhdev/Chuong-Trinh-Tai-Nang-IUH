@@ -137,6 +137,13 @@ export function assertCan(ctx, permission, resource) {
       "Bạn không có quyền thực hiện thao tác này trong phạm vi hiện tại.",
     );
 }
+// BR-14: vai trò mà mỗi vai trò được phép gán (dùng chung cho service và form gán quyền).
+export const ASSIGNABLE_ROLES = {
+  ADMIN: ["ADMIN", "TRAINING", "DEAN", "HEAD", "LECTURER", "STUDENT"],
+  TRAINING: ["TRAINING", "DEAN", "HEAD", "LECTURER", "STUDENT"],
+  DEAN: ["DEAN", "HEAD", "LECTURER"],
+  HEAD: ["HEAD", "LECTURER"],
+};
 export function canAssignRole(ctx, targetRole, targetScope) {
   if (
     !can(ctx, "role.assign") ||
@@ -144,13 +151,7 @@ export function canAssignRole(ctx, targetRole, targetScope) {
   )
     return false;
   const actorRole = ctx.actor.roleAssignment;
-  const allowed = {
-    ADMIN: ["ADMIN", "TRAINING", "DEAN", "HEAD", "LECTURER", "STUDENT"],
-    TRAINING: ["TRAINING", "DEAN", "HEAD", "LECTURER", "STUDENT"],
-    DEAN: ["DEAN", "HEAD", "LECTURER"],
-    HEAD: ["HEAD", "LECTURER"],
-  };
-  if (!allowed[actorRole.role]?.includes(targetRole)) return false;
+  if (!ASSIGNABLE_ROLES[actorRole.role]?.includes(targetRole)) return false;
   if (targetScope.scopeType === "SCHOOL")
     return !targetScope.scopeId && actorRole.scopeType === "SCHOOL";
   if (targetScope.scopeType === "SELF")

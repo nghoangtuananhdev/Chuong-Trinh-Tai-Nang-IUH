@@ -1,3 +1,5 @@
+import { ROLE_LABEL } from "./constants.js";
+import { formatIct } from "./time.js";
 // Pure event writers shared by scheduled tasks and the mock-service kernel.
 export function nextId(db, prefix) {
   db.counters ??= {};
@@ -50,7 +52,13 @@ export function queueEmail(
     body: "{{message}}",
   };
   const render = (text) =>
-    String(text).replace(/{{(\w+)}}/g, (_, key) => String(vars[key] ?? ""));
+    String(text).replace(/{{(\w+)}}/g, (_, key) => {
+      const value = String(vars[key] ?? "");
+      // Mốc thời gian ISO được đổi sang dạng dễ đọc theo giờ Việt Nam.
+      return /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(value)
+        ? formatIct(value)
+        : value;
+    });
   db.emailOutbox.push({
     id: nextId(db, "email"),
     to,
@@ -71,7 +79,10 @@ export function applicationHistory(db, ctx, application, action, note = "") {
     at: ctx.now,
     actorId: ctx.actor?.user?.id ?? null,
     actorName: ctx.actor?.user?.fullName ?? "Hệ thống",
-    actorRoleLabel: ctx.actor?.roleAssignment?.role ?? "Hệ thống",
+    actorRoleLabel:
+      ROLE_LABEL[ctx.actor?.roleAssignment?.role] ??
+      ctx.actor?.roleAssignment?.role ??
+      "Hệ thống",
     action,
     note,
   });

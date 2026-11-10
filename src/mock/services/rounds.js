@@ -87,7 +87,15 @@ export const create = defineService("rounds.create", {
     const id = nextId(db, "round");
     const round = {
       id,
-      code: `DXT-${ctx.now.slice(0, 4)}-${String(db.counters.round).padStart(4, "0")}`,
+      // Mã ĐXT nối tiếp dãy hiện có của năm (kể cả dữ liệu mẫu) để không trùng.
+      code: `DXT-${ctx.now.slice(0, 4)}-${String(
+        Math.max(
+          0,
+          ...db.rounds
+            .filter((r) => r.code?.startsWith(`DXT-${ctx.now.slice(0, 4)}-`))
+            .map((r) => Number(r.code.split("-")[2]) || 0),
+        ) + 1,
+      ).padStart(2, "0")}`,
       ...Object.fromEntries(
         editableFields("draft")
           .filter((k) => p[k] !== undefined)

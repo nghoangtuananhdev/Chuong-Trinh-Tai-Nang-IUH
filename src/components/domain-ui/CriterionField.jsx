@@ -1,6 +1,7 @@
 import { Field, Input, Select } from "../ui/Form.jsx";
 import { Button } from "../ui/Button.jsx";
 import { EvidenceUploader } from "./EvidenceUploader.jsx";
+import { OPERATOR } from "../../domain/constants.js";
 export function CriterionField({
   criterion: c,
   item = {},
@@ -18,6 +19,16 @@ export function CriterionField({
           {c.kind === "REQUIRED" ? "BB" : "UT"} · {c.unit}
         </span>
       </h3>
+      <p className="text-body-sm text-ink-700">
+        Mức điểm:{" "}
+        {c.levels
+          .map((l) =>
+            c.valueType === "ACCUMULATIVE_ENUM"
+              ? `${l.label}: ${l.points} điểm`
+              : `${OPERATOR[l.operator]} ${l.valueFrom}${l.operator === "BETWEEN" ? `–${l.valueTo}` : ""} → ${l.points} điểm`,
+          )
+          .join(" · ")}
+      </p>
       <p className="text-body-sm text-ink-600">{c.evidenceGuide}</p>
       {c.refCriterionId ? (
         <p className="text-body-sm">

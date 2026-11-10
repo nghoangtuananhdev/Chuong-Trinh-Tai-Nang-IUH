@@ -43,3 +43,16 @@ Dùng CLI Prettier 3.5.3 qua npm exec để định dạng các tệp mới/thay
 
 ## A-14 — Khôi phục bộ đếm ID cũ
 nextId kiểm tra ID đã tồn tại trước khi cấp mã mới, ngoài tăng db.counters. Tránh va chạm với ID seed hoặc db v3 đã lưu từ checkpoint trước khi counters được khởi tạo đầy đủ; có test regression.
+
+## A-15 — Sửa lỗi sau nghiệm thu giao diện bằng trình duyệt (10/11/2026)
+Chạy các luồng U1–U15 trên Chromium (Playwright, headless) vì browser host cũ không khả dụng. Các lỗi phát hiện và cách xử lý:
+- Ô OTP: gõ đè đúng chữ số đang có không nhảy ô, xóa giữa chừng để lại dấu cách ⇒ xử lý phím số trực tiếp, không hiển thị dấu cách.
+- Mã hồ sơ/mã ĐXT mới sinh từ bộ đếm riêng nên có thể trùng mã của dữ liệu mẫu (HS-2026-000003, DXT-2026-0001) ⇒ nối tiếp số lớn nhất hiện có.
+- Màn duyệt hồ sơ giữ lại ý kiến, hạn bổ sung và giá trị điều chỉnh khi chuyển sang hồ sơ khác (có thể ghi nhầm lý do/điểm cho SV khác) ⇒ gắn key theo hồ sơ và xóa trường sau mỗi quyết định.
+- Toast lỗi không tự tắt và che nút "Xác nhận" của hộp thoại ⇒ chuyển lên góc trên phải, lỗi tự ẩn sau 8 giây.
+- GVPT bị "Không có quyền" khi mở danh sách phê duyệt sau khi chốt hoặc từ thông báo trả về ⇒ cho GVPT xem danh sách ở chế độ chỉ đọc.
+- Form gán vai trò liệt kê cả vai trò/phạm vi không được phép ⇒ lọc theo `ASSIGNABLE_ROLES` và kiểu phạm vi của vai trò; ẩn dòng vai trò Sinh viên.
+- Hiển thị mã nội bộ và chuỗi ISO (phạm vi `fac_cntt`, giờ khóa tài khoản, giờ trong email, vai trò trong lịch sử/nhật ký, nguồn hồ sơ của thành viên lớp) ⇒ đổi sang nhãn tiếng Việt và giờ GMT+7.
+- Trang chi tiết ĐXT công khai không có lối quay lại/nộp hồ sơ ⇒ thêm "Về trang chủ", "Nộp hồ sơ", "Xem kết quả".
+- Bổ sung: hiển thị các mức điểm trong form hồ sơ, lớp và năm đào tạo ở tổng quan SV, ẩn bản nháp khỏi danh sách duyệt, tiêu đề trang cho các route chi tiết.
+Có test hồi quy ở `src/mock/services/regression.test.js`.

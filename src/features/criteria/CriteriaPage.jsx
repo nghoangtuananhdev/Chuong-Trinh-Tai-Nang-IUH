@@ -102,7 +102,11 @@ export function CriteriaPage({ id }) {
             {
               key: "scope",
               header: "Phạm vi",
-              cell: (s) => s.majorId ?? s.facultyId,
+              cell: (s) =>
+                s.majorId
+                  ? `Ngành ${db.majors.find((m) => m.id === s.majorId)?.name ?? s.majorId}`
+                  : (db.faculties.find((f) => f.id === s.facultyId)?.name ??
+                    s.facultyId),
             },
             {
               key: "status",

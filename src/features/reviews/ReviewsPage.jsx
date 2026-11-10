@@ -42,7 +42,10 @@ export function ReviewsPage({ id, roundId, readOnly = false }) {
     [due, setDue] = useState(""),
     [values, setValues] = useState({});
   const round = db.rounds.find((r) => r.id === selectedRound),
-    apps = db.applications.filter((a) => a.roundId === selectedRound);
+    // Bản nháp chưa nộp không thuộc danh sách xét duyệt của giảng viên.
+    apps = db.applications.filter(
+      (a) => a.roundId === selectedRound && a.status !== "draft",
+    );
   const app = db.applications.find((a) => a.id === id);
   if (!id) {
     const waiting = apps.filter((a) =>
@@ -209,6 +212,25 @@ export function ReviewsPage({ id, roundId, readOnly = false }) {
         ["VALID", "INVALID"].includes(e.verifyStatus),
       ),
   );
+  const decide = async (decision, extra = {}) => {
+    const r = await action.run(
+      decision === "REOPEN" ? "reviews.reopen" : "reviews.decide",
+      decision === "REOPEN"
+        ? { applicationId: app.id, reason: note }
+        : { applicationId: app.id, decision, note, ...extra },
+      {
+        APPROVED: "Đã ghi nhận hồ sơ đạt điều kiện.",
+        REJECTED: "Đã ghi nhận hồ sơ không đạt.",
+        NEEDS_UPDATE: "Đã gửi yêu cầu bổ sung cho sinh viên.",
+        REOPEN: "Đã mở lại hồ sơ để xét duyệt.",
+      }[decision],
+    );
+    if (r.ok) {
+      setNote("");
+      setDue("");
+      setValues({});
+    }
+  };
   const verify = (item, status, entry) =>
     action.run("reviews.verifyItem", {
       applicationId: app.id,
@@ -391,13 +413,7 @@ export function ReviewsPage({ id, roundId, readOnly = false }) {
               <div className="flex flex-wrap gap-2">
                 <Button
                   disabled={!score.eligible || !allVerified || action.busy}
-                  onClick={() =>
-                    action.run("reviews.decide", {
-                      applicationId: app.id,
-                      decision: "APPROVED",
-                      note,
-                    })
-                  }
+                  onClick={() => decide("APPROVED")}
                 >
                   Đạt điều kiện
                 </Button>
@@ -405,10 +421,7 @@ export function ReviewsPage({ id, roundId, readOnly = false }) {
                   variant="secondary"
                   disabled={action.busy}
                   onClick={() =>
-                    action.run("reviews.decide", {
-                      applicationId: app.id,
-                      decision: "NEEDS_UPDATE",
-                      note,
+                    decide("NEEDS_UPDATE", {
                       dueAt: due ? `${due}:00+07:00` : null,
                     })
                   }
@@ -418,13 +431,7 @@ export function ReviewsPage({ id, roundId, readOnly = false }) {
                 <Button
                   variant="dangerOutline"
                   disabled={action.busy}
-                  onClick={() =>
-                    action.run("reviews.decide", {
-                      applicationId: app.id,
-                      decision: "REJECTED",
-                      note,
-                    })
-                  }
+                  onClick={() => decide("REJECTED")}
                 >
                   Không đạt
                 </Button>
@@ -434,12 +441,7 @@ export function ReviewsPage({ id, roundId, readOnly = false }) {
             ["approved", "rejected"].includes(app.status) && (
               <Button
                 variant="secondary"
-                onClick={() =>
-                  action.run("reviews.reopen", {
-                    applicationId: app.id,
-                    reason: note,
-                  })
-                }
+                onClick={() => decide("REOPEN")}
               >
                 Mở lại để xét duyệt
               </Button>

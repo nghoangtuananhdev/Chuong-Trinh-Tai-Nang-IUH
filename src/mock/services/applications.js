@@ -171,9 +171,15 @@ export const createDraft = defineService("applications.createDraft", {
     const profile = studentProfile(db, user.id),
       prior = inheritApplication(db, user.id, round, round.criteriaSnapshot),
       id = nextId(db, "app");
+    // Mã hồ sơ phải duy nhất kể cả với dữ liệu mẫu (đánh số theo dãy riêng của seed).
+    const sequence =
+      Math.max(
+        0,
+        ...db.applications.map((a) => Number(a.code?.split("-")[2]) || 0),
+      ) + 1;
     const app = {
       id,
-      code: `HS-${ctx.now.slice(0, 4)}-${String(db.counters.app).padStart(6, "0")}`,
+      code: `HS-${ctx.now.slice(0, 4)}-${String(sequence).padStart(6, "0")}`,
       roundId: round.id,
       studentUserId: user.id,
       studentCode: profile.studentCode,

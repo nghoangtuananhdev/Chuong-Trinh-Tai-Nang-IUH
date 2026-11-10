@@ -39,10 +39,16 @@ function WorkspacePage({ route }) {
   if (page === "records" && route.segments[2] !== "application")
     return <RecordsPage id={route.segments[2]} />;
   if (page === "reviews")
-    return <ReviewsPage id={route.segments[2]} roundId={route.query.round} />;
+    return (
+      <ReviewsPage
+        key={route.segments[2] ?? "list"}
+        id={route.segments[2]}
+        roundId={route.query.round}
+      />
+    );
   if (page === "approvals") return <ApprovalsPage id={route.segments[2]} />;
   if (page === "records" && route.segments[2] === "application")
-    return <ReviewsPage id={route.segments[3]} readOnly />;
+    return <ReviewsPage key={route.segments[3]} id={route.segments[3]} readOnly />;
   if (
     activeRole?.role === "STUDENT" &&
     [
