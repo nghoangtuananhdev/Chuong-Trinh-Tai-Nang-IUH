@@ -46,7 +46,7 @@ export function SidebarBrand({ role, collapsed = false }) {
     <div className="academic-grid shrink-0">
       <div className={`px-3 pt-4 ${collapsed ? "px-2" : ""}`}>
         <a
-          href="index.html"
+          href="#/"
           aria-label="Về trang chủ"
           className={`flex items-center justify-center rounded-card bg-white shadow-raised ${collapsed ? "h-11 p-1.5" : "p-2.5"}`}
         >

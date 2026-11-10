@@ -1,4 +1,4 @@
-import { getStatusMeta } from "../../data/status-definitions.js";
+import { getStatusMeta } from "../../domain/constants.js";
 
 const soft = {
   success: "text-success-fg bg-success-bg border-success-border",

@@ -57,30 +57,21 @@ src/
 
 ---
 
-## 3. Các nghiệp vụ & Tương tác cốt lõi
+## 3. Các nghiệp vụ và tương tác của prototype v3
 
-1. **Trang công khai tuyển sinh:**
-   - Header một tầng (72px, thu còn 60px khi cuộn, blur nhẹ), hero navy có Academic Grid, ô tìm kiếm lớn, thanh `FilterTabs` có đếm số nổi chồng lên hero.
-   - Thẻ đợt: CodeTag + badge trạng thái, khối lịch tách `round.time` (parse an toàn), vạch trái chỉ ở đợt “Đang mở”; Đang mở: “Nộp hồ sơ” + “Xem chi tiết”; trạng thái khác: “Xem chi tiết” + ghi chú trạng thái.
-   - Modal chi tiết đợt (DescriptionList, danh sách điều kiện có icon, minh chứng đánh số) và modal nộp hồ sơ (nhóm trường, `FileDropzone`, PDF ≤ 5MB, phản hồi “đang xử lý” khi gửi).
-   - Đăng nhập: chọn vai trò bằng radio card (Avatar + tên vai trò + người dùng thử), ô mật khẩu hiện/ẩn.
+Nguồn nghiệp vụ là `coding_plan/KSTN-PROTOTYPE-IMPLEMENTATION-PLAN.md` và các quyết định đã chốt trong Master Plan. Giữ token và chữ ký thị giác ở mục 1; nội dung nghiệp vụ đã chuyển sang mô hình v3.
 
-2. **Luồng sinh viên (Wizard 3 bước):**
-   - `Stepper` ngang (mobile: thanh tiến độ + “Bước n/3”); chỉ sang bước kế tiếp khi trường bắt buộc của bước hiện tại hợp lệ; quay lại tự do.
-   - Bước 2: chỉ báo trực tiếp ✓/⚠ so với “Yêu cầu chuẩn” (không chặn nộp); cột phải sticky “Kết quả tự khai” từ 1280px; minh chứng PDF bằng dropzone/`FileItem` (kéo-thả, thay thế, xóa; giữ thông điệp lỗi gốc).
-   - Bước 3: nút nộp bị vô hiệu cho tới khi tích cam kết; thanh hành động dính đáy.
-   - Lưu nháp thủ công + tự lưu sau 1.5s không gõ (không toast), chỉ báo “Đang lưu… / Đã lưu nháp”; cảnh báo rời trang khi còn thay đổi chưa lưu.
-   - Sau khi gửi: theo dõi hồ sơ (thanh tiến độ suy ra từ lịch sử, Timeline sticky ở cột phải), cảnh báo `needs_update` kèm nút cập nhật minh chứng.
-
-3. **Luồng xét duyệt hồ sơ:**
-   - Danh sách: `FilterTabs` có đếm số (nhãn tiếng Việt), hàng “Chờ duyệt” có vạch cảnh báo, bấm cả hàng để mở.
-   - Review Workspace toàn màn hình (`FullscreenDialog`): cột nội dung (trạng thái, thông tin SV, bảng đối chiếu, minh chứng, Timeline) + cột quyết định cố định 360px (ý kiến thẩm định, Phê duyệt / Yêu cầu bổ sung / Từ chối). Dưới 1024px: thanh quyết định dính đáy, ô ý kiến nằm cuối nội dung.
-   - “Yêu cầu bổ sung” khi chưa có ý kiến: cảnh báo tại chỗ + trong hộp xác nhận (chỉ cảnh báo, không chặn); hộp xác nhận hiển thị lại ý kiến đã nhập. Chế độ `readonly` (Hồ sơ sinh viên) ẩn hoàn toàn cột quyết định.
-   - Xem minh chứng bằng Drawer; “Xác nhận trúng tuyển” dùng icon `Award` (nhấn màu accent).
-
-4. **Quản lý chuyên ngành:** giữ đúng 4 cột `Khoa | Chuyên ngành | Số lượng lớp | Thao tác`; trùng Khoa+Ngành → hộp cảnh báo “Quay lại kiểm tra” (focus quay về ô tên ngành); chuyên ngành còn lớp bị chặn xóa kèm minh họa `Khoa → Ngành → Lớp`.
-
-5. **Quản lý lớp, tài khoản & phân quyền:** sĩ số hiện tại ≤ tối đa (lỗi tại chỗ + toast), chặn xóa lớp gắn đợt đang mở, phân trang tối đa 10 dòng/bảng; chi tiết trong Drawer; sidebar thu gọn/mở rộng (248 ↔ 72px), kéo đổi 200–360px, lưu tùy chọn vào `localStorage`, tooltip khi thu gọn; bộ chuyển vai trò nhanh trong menu tài khoản (điều hướng ↑↓/Home/End/Esc).
+1. **Trang công khai:** hash route cho trang chủ, chi tiết ĐXT, kết quả che MSSV/tên và tra cứu cá nhân bằng MSSV + OTP. Bộ lọc trạng thái/năm học/học kỳ/khoa. Không có form nộp ẩn danh; nút nộp dẫn qua đăng nhập/đăng ký và giữ returnTo.
+2. **Xác thực:** đăng ký ba bước email IUH → OTP → tài khoản, dữ liệu cá nhân khóa từ danh bạ; đăng nhập MSSV/mã GV/email; khóa tạm sau 5 lần sai. Tài khoản có mustChangePassword bị chặn cho tới khi đổi MK. Một phiên dùng một vai trò có phạm vi thật.
+3. **Workspace:** sidebar theo vai trò, chọn vai trò, chuông thông báo, menu tài khoản hỗ trợ bàn phím. Route không hợp lệ/ngoài quyền có thông báo riêng. Focus về tiêu đề khi đổi trang; skip link không bị hash router coi là đổi trang.
+4. **Hồ sơ sinh viên:** wizard thông tin cá nhân → tiêu chí và minh chứng → kiểm tra và nộp. Tiêu chí render từ snapshot, hỗ trợ NUMBER_THRESHOLD/COUNT/ACCUMULATIVE_ENUM; minh chứng riêng từng tiêu chí/thành tích, PDF/JPG/PNG theo giới hạn cấu hình (tối đa 10 MB). Điểm tự khai tính trực tiếp bằng domain scoring. Nháp là Application, tự lưu sau 1.5 giây; có sửa/rút/hủy/bổ sung theo trạng thái và hạn. Luồng B/C kế thừa giá trị và yêu cầu minh chứng mới.
+5. **Duyệt:** thông tin/tiêu chí bên trái và panel minh chứng bên phải, thành tích xác minh riêng. Chỉnh giá trị hoặc đánh dấu sai phải có lý do. Chọn Đạt cần xác minh đủ và đạt BB. Hạn bổ sung không vượt reviewEnd; có mở lại approved/rejected trong review.
+6. **Chốt và phê duyệt:** xem trước xếp hạng hai chế độ, đồng hạng vẫn được gửi CNN. Mỗi lần chốt tạo phiên bản mới; chuỗi CNN → BLĐ khoa → PĐT duyệt đúng phiên bản. Trả về có lý do, bắt đầu lại từ CNN. Hộp công bố hiển thị số trúng tuyển, DROPPED và email; công bố tự cập nhật tư cách/thành viên, không có bước SV xác nhận nhập học.
+7. **Tiêu chí và ĐXT:** bộ tiêu chí DRAFT/PUBLISHED/ARCHIVED, owner CRUD của GV, CRUD ngành/khoa của CNN/BLĐ. Bộ published tạo phiên bản mới; ĐXT dùng snapshot lúc open. ĐXT đúng 6 trạng thái, phát hành và chuyển thời gian theo đồng hồ mô phỏng; sửa trường theo giai đoạn và vai trò, published bất biến.
+8. **Danh mục và tài khoản:** chuyên ngành giữ bốn cột Khoa/Chuyên ngành/Số lượng lớp/Thao tác. Xóa con trước cha. Lớp tính sĩ số từ membership theo năm, không nhập tay. GV khóa/mở thay xóa; reset MK tạm theo phạm vi. Gán vai trò có phạm vi/thời hạn và chặn BR-14 tại service.
+9. **Vận hành:** báo cáo số liệu thật, phổ điểm khoảng 20, CSV UTF-8 BOM và in/lưu PDF. Nhật ký chỉ đọc, xem before/after. Outbox mô phỏng gửi lỗi/thử lại; cấu hình SMTP/file/OTP/nhắc việc/mẫu email. Thông báo cho mọi vai trò.
+10. **Demo:** Drawer bốn tab đồng hồ/hộp thư/đăng nhập nhanh/dữ liệu, reset có ConfirmDialog; dữ liệu và minh chứng chỉ lưu trong trình duyệt. Canvas minh chứng seed ghi rõ dữ liệu demo.
+11. **Quy ước chung:** bảng ResponsiveTable phân trang tối đa 10; Field cho nhãn và lỗi; Modal/Drawer/ConfirmDialog giữ useDialogA11y. Giao diện dùng tiếng Việt có dấu và semantic token. Kiểm browser responsive/focus/console là bước nghiệm thu riêng, chưa được thay bằng kiểm SSR.
 
 ---
 

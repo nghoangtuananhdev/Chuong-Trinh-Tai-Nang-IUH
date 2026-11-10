@@ -34,7 +34,7 @@ export function PublicHeader({ onOpenLogin }) {
         className={`mx-auto flex max-w-[1200px] items-center justify-between gap-4 px-4 transition-[height] duration-180 sm:px-6 lg:px-8 ${scrolled ? "h-[60px]" : "h-[72px]"}`}
       >
         <div className="flex min-w-0 items-center gap-4">
-          <a href="index.html" className="flex shrink-0 items-center" aria-label="IUH - Về trang chủ">
+          <a href="#/" className="flex shrink-0 items-center" aria-label="IUH - Về trang chủ">
             <img src={logo} alt="IUH - Khoa Công nghệ Thông tin" className="h-10 w-auto object-contain sm:h-11" />
           </a>
           <div className="hidden min-w-0 border-l border-ink-200 pl-4 lg:block">
@@ -46,7 +46,7 @@ export function PublicHeader({ onOpenLogin }) {
         </div>
 
         <nav aria-label="Điều hướng cổng tuyển sinh" className="flex shrink-0 items-center gap-1">
-          <a href="#cac-dot-xet-tuyen" className={`${linkCls} hidden md:inline-flex`}>
+          <a href="#dot-xet-tuyen" className={`${linkCls} hidden md:inline-flex`}>
             <GraduationCap size={16} aria-hidden="true" />
             <span>Thông tin xét tuyển</span>
           </a>
@@ -68,7 +68,7 @@ export function PublicHeader({ onOpenLogin }) {
             />
             {menuOpen && (
               <div className="popover-in absolute right-0 top-[calc(100%+8px)] z-50 w-64 rounded-card border border-ink-200 bg-white p-1.5 shadow-overlay">
-                <a href="#cac-dot-xet-tuyen" onClick={() => setMenuOpen(false)} className={`${linkCls} flex w-full`}>
+                <a href="#dot-xet-tuyen" onClick={() => setMenuOpen(false)} className={`${linkCls} flex w-full`}>
                   <GraduationCap size={16} aria-hidden="true" />
                   <span>Thông tin xét tuyển</span>
                 </a>

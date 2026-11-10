@@ -1,9 +1,10 @@
-import { useDemoStore } from "../../data/demo-store.jsx";
+import { useBackend } from "../../mock/backend.jsx";
+import { ROLE_LABEL } from "../../domain/constants.js";
 
 /** Tiêu đề trang: Honor Rule + eyebrow (vai trò) + H1 + mô tả + hành động cấp trang. */
 export function PageHeader({ title, description, eyebrow, action = null, meta = null }) {
-  const { currentRole } = useDemoStore();
-  const label = eyebrow ?? currentRole?.label;
+  const { activeRole } = useBackend();
+  const label = eyebrow ?? ROLE_LABEL[activeRole?.role];
 
   return (
     <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between lg:mb-8">

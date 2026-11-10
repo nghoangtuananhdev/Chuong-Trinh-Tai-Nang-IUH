@@ -1,209 +1,598 @@
-import { useState, useMemo } from "react";
-import { Plus, Pencil } from "lucide-react";
-import { PageHeader } from "../../components/layout/PageHeader.jsx";
-import { TablePanel } from "../../components/data/TablePanel.jsx";
-import { TableToolbar } from "../../components/data/TableToolbar.jsx";
-import { ResponsiveTable } from "../../components/data/ResponsiveTable.jsx";
-import { StatusBadge } from "../../components/ui/StatusBadge.jsx";
-import { EmptyState } from "../../components/ui/EmptyState.jsx";
-import { Modal } from "../../components/ui/Modal.jsx";
+import { useState } from "react";
+import { assignmentChain } from "../../domain/scope.js";
+import { useBackend } from "../../mock/backend.jsx";
+import {
+  DataList,
+  FormDialog,
+  useAction,
+  choices,
+} from "../shared/FeatureKit.jsx";
+import { ConfirmDialog } from "../../components/ui/ConfirmDialog.jsx";
 import { Button } from "../../components/ui/Button.jsx";
-import { IconButton } from "../../components/ui/IconButton.jsx";
-import { Field, Input, Select } from "../../components/ui/Form.jsx";
-import { useDemoStore } from "../../data/demo-store.jsx";
-import { pageMeta } from "../../data/page-meta.js";
-import { usePagedFilter } from "../../hooks/usePagedFilter.js";
-
-const TYPES = ["Bắt buộc", "Ưu tiên"];
-
-/** Trọng số dạng "50 / 40 / 30" → các chip nhỏ. */
-function WeightChips({ value }) {
-  const parts = String(value).split(" / ");
-  return (
-    <span className="inline-flex flex-wrap items-center justify-center gap-1">
-      {parts.map((p, i) => (
-        <span key={`${p}-${i}`} className="rounded-xs bg-brand-50 px-1.5 py-0.5 font-semibold tabular-nums text-brand-700">
-          {p}
-        </span>
-      ))}
-    </span>
+import {
+  Field,
+  Input,
+  Select,
+  Textarea,
+  Checkbox,
+} from "../../components/ui/Form.jsx";
+import { Callout } from "../../components/ui/Display.jsx";
+import { StatusBadge } from "../../components/ui/StatusBadge.jsx";
+import { CriterionField } from "../../components/domain-ui/CriterionField.jsx";
+import { CriteriaTable } from "../../components/domain-ui/CriteriaTable.jsx";
+import { scoreApplication } from "../../domain/scoring.js";
+import { VALUE_TYPE, OPERATOR } from "../../domain/constants.js";
+import { navigate } from "../../app/router.js";
+export function CriteriaPage({ id }) {
+  const { db, can, me, activeRole } = useBackend(),
+    action = useAction();
+  const [create, setCreate] = useState(false),
+    [form, setForm] = useState({}),
+    [editing, setEditing] = useState(null),
+    [criterion, setCriterion] = useState(null),
+    [items, setItems] = useState([]),
+    [mode, setMode] = useState("all"),
+    [operation, setOperation] = useState(null);
+  const sets = db.criteriaSets.filter((s) =>
+    can("criteria.view", { type: "criteriaSet", entity: s }),
   );
-}
-
-function OrderBadge({ value }) {
-  return (
-    <span className="inline-flex size-6 items-center justify-center rounded-full bg-ink-100 font-mono text-caption font-semibold tabular-nums text-ink-700">
-      {value}
-    </span>
-  );
-}
-
-const matchCriterion = ({ row }, keyword, type) =>
-  (!type || row[0] === type) && (!keyword || `${row[0]} ${row[1]} ${row[2]}`.toLowerCase().includes(keyword));
-
-export function CriteriaPage({ pageKey = "criteria" }) {
-  const { criteria, setCriteria, showToast } = useDemoStore();
-  const [formModal, setFormModal] = useState(null);
-
-  // Gắn chỉ số gốc để sửa đúng dòng khi đang lọc (lỗi 11.3).
-  const items = useMemo(() => criteria.map((row, originalIndex) => ({ row, originalIndex })), [criteria]);
-  const table = usePagedFilter(items, { match: matchCriterion });
-
-  const handleSaveCriterion = (e) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    const type = formData.get("type");
-    const name = formData.get("name").trim();
-    const condition = formData.get("condition").trim();
-    const points = formData.get("points").trim();
-    const tieOrder = formData.get("tieOrder").trim();
-
-    if (formModal.index !== null) {
-      setCriteria((prev) => prev.map((item, idx) => (idx === formModal.index ? [type, name, condition, points, tieOrder] : item)));
-      showToast("Đã cập nhật tiêu chí xét tuyển.", "success");
-    } else {
-      setCriteria((prev) => [...prev, [type, name, condition, points, tieOrder]]);
-      showToast("Đã thêm tiêu chí xét tuyển mới.", "success");
-    }
-    setFormModal(null);
-  };
-
-  const editAction = ({ row, originalIndex }) => (
-    <IconButton
-      icon={Pencil}
-      label="Chỉnh sửa tiêu chí"
-      size="sm"
-      variant="tertiary"
-      onClick={() =>
-        setFormModal({ index: originalIndex, type: row[0], name: row[1], condition: row[2], points: row[3], tieOrder: row[4] })
-      }
-    />
-  );
-
-  const columns = [
-    { key: "type", header: "Phân loại", width: "13%", cell: ({ row }) => <StatusBadge domain="criteria">{row[0]}</StatusBadge> },
-    {
-      key: "name",
-      header: "Tên tiêu chí",
-      width: "32%",
-      cell: ({ row }) => (
-        <>
-          <span className="font-semibold text-ink-900">{row[1]}</span>
-          <span className="mt-0.5 block text-body-sm text-ink-600 md:hidden">{row[2]}</span>
-        </>
-      )
-    },
-    { key: "condition", header: "Mức đánh giá / Điều kiện", width: "24%", hideBelow: "md", cell: ({ row }) => <span className="text-ink-600">{row[2]}</span> },
-    { key: "points", header: "Trọng số điểm", width: "14%", align: "center", cell: ({ row }) => <WeightChips value={row[3]} /> },
-    { key: "order", header: "Thứ tự", width: "9%", align: "center", cell: ({ row }) => <OrderBadge value={row[4]} /> },
-    { key: "actions", header: "Thao tác", width: "8%", align: "right", cell: editAction }
-  ];
-
-  return (
-    <>
-      <PageHeader
-        title={pageMeta[pageKey].title}
-        description={pageMeta[pageKey].desc}
-        action={
-          <Button
-            variant="primary"
-            icon={Plus}
-            onClick={() =>
-              setFormModal({ index: null, type: "Bắt buộc", name: "", condition: "", points: "10", tieOrder: String(criteria.length + 1) })
-            }
-          >
-            Thêm tiêu chí
+  const set = sets.find((s) => s.id === id);
+  const local = editing ?? set;
+  const addCriterion = () =>
+    setCriterion({
+      id: crypto.randomUUID(),
+      name: "",
+      kind: "REQUIRED",
+      valueType: "NUMBER_THRESHOLD",
+      unit: "",
+      evidenceRequired: false,
+      evidenceGuide: "",
+      sortOrder: (local?.criteria.length ?? 0) + 1,
+      tieBreakOrder: null,
+      refCriterionId: null,
+      countMode: "LEVEL",
+      maxPoints: null,
+      levels: [
+        {
+          id: crypto.randomUUID(),
+          label: "Đạt",
+          operator: "GTE",
+          valueFrom: 0,
+          points: 0,
+        },
+      ],
+    });
+  if (!id)
+    return (
+      <div className="space-y-4">
+        <div className="flex flex-wrap gap-2">
+          <Button variant="secondary" onClick={() => setMode("all")}>
+            Tất cả trong khoa
           </Button>
-        }
-      />
-
-      <TablePanel
-        toolbar={
-          <TableToolbar
-            searchQuery={table.query}
-            onSearchChange={table.setQuery}
-            searchPlaceholder="Tìm theo tên tiêu chí..."
-            filterValue={table.filter}
-            onFilterChange={table.setFilter}
-            filterLabel="Lọc theo loại tiêu chí"
-            filterAllLabel="Tất cả các loại"
-            filterOptions={TYPES}
-          />
-        }
-        pagination={{ page: table.page, totalPages: table.totalPages, onChange: table.setPage, total: table.total, pageSize: table.pageSize }}
-      >
-        <ResponsiveTable
-          columns={columns}
-          rows={table.rows}
-          rowKey={(it) => it.originalIndex}
-          caption={pageMeta[pageKey].title}
-          empty={
-            <EmptyState
-              title="Không tìm thấy tiêu chí phù hợp"
-              description="Hãy thử thay đổi từ khóa hoặc bộ lọc loại tiêu chí."
-              actionLabel="Đặt lại bộ lọc"
-              onAction={table.reset}
-            />
-          }
-          mobileCard={(it) => (
-            <div className="space-y-2.5">
-              <div className="flex items-start justify-between gap-3">
-                <StatusBadge domain="criteria">{it.row[0]}</StatusBadge>
-                <OrderBadge value={it.row[4]} />
-              </div>
-              <p className="font-semibold text-ink-900">{it.row[1]}</p>
-              <p className="text-body-sm text-ink-600">{it.row[2]}</p>
-              <WeightChips value={it.row[3]} />
-              <div className="flex justify-end border-t border-ink-200 pt-2">{editAction(it)}</div>
-            </div>
+          <Button variant="secondary" onClick={() => setMode("own")}>
+            Do tôi tạo
+          </Button>
+          <Button variant="secondary" onClick={() => setMode("archive")}>
+            Lưu trữ
+          </Button>
+          {can("criteria.create") && (
+            <Button onClick={() => setCreate(true)}>Tạo bộ tiêu chí</Button>
+          )}
+        </div>
+        <DataList
+          rows={sets.filter((s) =>
+            mode === "own"
+              ? s.createdBy === me.id
+              : mode === "archive"
+                ? s.status === "ARCHIVED"
+                : true,
+          )}
+          columns={[
+            { key: "name", header: "Tên bộ", cell: (s) => s.name },
+            {
+              key: "version",
+              header: "Phiên bản",
+              cell: (s) => `v${s.version}`,
+            },
+            {
+              key: "owner",
+              header: "Người tạo",
+              cell: (s) => db.users.find((u) => u.id === s.createdBy)?.fullName,
+            },
+            {
+              key: "scope",
+              header: "Phạm vi",
+              cell: (s) => s.majorId ?? s.facultyId,
+            },
+            {
+              key: "status",
+              header: "Trạng thái",
+              cell: (s) => (
+                <StatusBadge domain="criteriaSet">{s.status}</StatusBadge>
+              ),
+            },
+            {
+              key: "used",
+              header: "Đang dùng bởi",
+              cell: (s) =>
+                db.rounds.filter((r) => r.criteriaSetId === s.id).length,
+            },
+          ]}
+          actions={(s) => (
+            <Button
+              size="sm"
+              variant="link"
+              onClick={() => {
+                setEditing(null);
+                navigate(`/app/criteria/${s.id}`);
+              }}
+            >
+              Xem / Chỉnh sửa
+            </Button>
           )}
         />
-      </TablePanel>
-
-      <Modal
-        open={Boolean(formModal)}
-        onClose={() => setFormModal(null)}
-        closeOnBackdrop={false}
-        title={formModal?.index !== null ? "Chỉnh sửa tiêu chí xét tuyển" : "Thêm tiêu chí xét tuyển mới"}
-        description="Quy định trọng số và thứ tự ưu tiên khi xét tuyển."
-        footer={
-          <>
-            <Button variant="secondary" onClick={() => setFormModal(null)}>
-              Hủy
+        <FormDialog
+          open={create}
+          onClose={() => setCreate(false)}
+          title="Tạo bộ tiêu chí"
+          fields={[
+            { key: "name", label: "Tên bộ", required: true },
+            {
+              key: "facultyId",
+              label: "Khoa",
+              type: "select",
+              options: choices(
+                db.faculties.filter(
+                  (f) =>
+                    activeRole.role === "ADMIN" ||
+                    f.id === assignmentChain(db, activeRole)?.facultyId,
+                ),
+              ),
+            },
+          ]}
+          values={form}
+          onChange={setForm}
+          error={action.error}
+          busy={action.busy}
+          onSubmit={async () => {
+            const r = await action.run("criteria.create", form);
+            if (r.ok) {
+              setCreate(false);
+              navigate(`/app/criteria/${r.result.id}`);
+            }
+          }}
+        />
+      </div>
+    );
+  if (!set)
+    return (
+      <Callout tone="danger">
+        Không tìm thấy bộ tiêu chí hoặc không có quyền.
+      </Callout>
+    );
+  const writable =
+      set.status === "DRAFT" &&
+      can("criteria.update", { type: "criteriaSet", entity: set }),
+    preview = scoreApplication(local, items);
+  const save = async () => {
+    const r = await action.run("criteria.update", {
+      id: set.id,
+      name: local.name,
+      description: local.description,
+      criteria: local.criteria,
+    });
+    if (r.ok) setEditing(null);
+    return r;
+  };
+  return (
+    <div className="space-y-5">
+      <h2 className="text-title-2">
+        {set.name} · v{set.version}
+      </h2>
+      <StatusBadge domain="criteriaSet">{set.status}</StatusBadge>
+      {db.rounds.some(
+        (r) => r.criteriaSetId === set.id && r.criteriaSnapshot,
+      ) && (
+        <Callout>
+          ĐXT đang chạy dùng bản snapshot; phiên bản mới không ảnh hưởng điểm
+          của ĐXT.
+        </Callout>
+      )}
+      {writable ? (
+        <>
+          <Field label="Tên bộ">
+            <Input
+              value={local.name}
+              onChange={(e) => setEditing({ ...local, name: e.target.value })}
+            />
+          </Field>
+          <Field label="Mô tả">
+            <Textarea
+              value={local.description}
+              onChange={(e) =>
+                setEditing({ ...local, description: e.target.value })
+              }
+            />
+          </Field>
+          <Button variant="secondary" onClick={addCriterion}>
+            Thêm tiêu chí
+          </Button>
+        </>
+      ) : null}
+      <CriteriaTable snapshot={local} />
+      {writable &&
+        local.criteria.map((c, i) => (
+          <div key={c.id} className="flex flex-wrap gap-2">
+            <span className="text-body">{c.name}</span>
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={() => setCriterion(structuredClone(c))}
+            >
+              Sửa
             </Button>
-            <Button variant="primary" type="submit" form="criteria-form">
-              {formModal?.index !== null ? "Lưu thay đổi" : "Thêm tiêu chí"}
+            <Button
+              size="sm"
+              variant="secondary"
+              disabled={i === 0}
+              onClick={() => {
+                const copy = [...local.criteria];
+                [copy[i - 1], copy[i]] = [copy[i], copy[i - 1]];
+                setEditing({
+                  ...local,
+                  criteria: copy.map((c, i) => ({ ...c, sortOrder: i + 1 })),
+                });
+              }}
+            >
+              Lên
+            </Button>
+            <Button
+              size="sm"
+              variant="secondary"
+              disabled={i === local.criteria.length - 1}
+              onClick={() => {
+                const copy = [...local.criteria];
+                [copy[i], copy[i + 1]] = [copy[i + 1], copy[i]];
+                setEditing({
+                  ...local,
+                  criteria: copy.map((c, i) => ({ ...c, sortOrder: i + 1 })),
+                });
+              }}
+            >
+              Xuống
+            </Button>
+            <Button
+              size="sm"
+              variant="dangerOutline"
+              onClick={() =>
+                setEditing({
+                  ...local,
+                  criteria: local.criteria.filter((x) => x.id !== c.id),
+                })
+              }
+            >
+              Xóa tiêu chí
+            </Button>
+          </div>
+        ))}
+      <section className="rounded-card border border-ink-200 bg-white p-5">
+        <h3 className="text-title-3">Xem trước điểm</h3>
+        <Button
+          variant="secondary"
+          className="my-3"
+          onClick={() =>
+            setItems(
+              local.criteria.map((c) => ({
+                criterionId: c.id,
+                declaredValue:
+                  c.sampleValue ??
+                  (c.refCriterionId
+                    ? null
+                    : Math.max(
+                        ...c.levels.map((l) => Number(l.valueFrom) || 0),
+                      )),
+                declaredCount: c.sampleValue ?? 1,
+                declaredEntries:
+                  c.valueType === "ACCUMULATIVE_ENUM"
+                    ? [c.levels[0], c.levels[2]].filter(Boolean).map((l) => ({
+                        id: crypto.randomUUID(),
+                        levelId: l.id,
+                      }))
+                    : [],
+              })),
+            )
+          }
+        >
+          Điền dữ liệu mẫu Assessment
+        </Button>
+        {local.criteria.map((c) => (
+          <CriterionField
+            key={c.id}
+            criterion={c}
+            item={
+              items.find((i) => i.criterionId === c.id) ?? { criterionId: c.id }
+            }
+            withEvidence={false}
+            onChange={(item) =>
+              setItems((previous) => [
+                ...previous.filter((i) => i.criterionId !== c.id),
+                item,
+              ])
+            }
+          />
+        ))}
+        <p aria-live="polite" className="mt-4 text-title-2">
+          {preview.total} điểm · {preview.eligible ? "Đạt BB" : "Chưa đạt BB"}
+        </p>
+      </section>
+      <div className="flex flex-wrap gap-2">
+        {writable && (
+          <>
+            <Button loading={action.busy} onClick={save}>
+              Lưu nháp
+            </Button>
+            <Button
+              onClick={async () => {
+                if (editing && !(await save()).ok) return;
+                await action.run("criteria.publish", { id: set.id });
+              }}
+            >
+              Ban hành
             </Button>
           </>
-        }
-      >
-        {formModal && (
-          <form id="criteria-form" onSubmit={handleSaveCriterion} className="space-y-4" autoComplete="off">
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <Field label="Phân loại tiêu chí" required>
-                <Select name="type" defaultValue={formModal.type}>
-                  <option value="Bắt buộc">Bắt buộc</option>
-                  <option value="Ưu tiên">Ưu tiên</option>
-                </Select>
-              </Field>
-              <Field label="Thứ tự xét hòa (Tie-break)" required>
-                <Input name="tieOrder" type="number" min="1" defaultValue={formModal.tieOrder} />
-              </Field>
-            </div>
-            <Field label="Tên tiêu chí đánh giá" required>
-              <Input name="name" defaultValue={formModal.name} placeholder="Ví dụ: Điểm trung bình tích lũy GPA" />
-            </Field>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <Field label="Điều kiện / Mức ngưỡng" required>
-                <Input name="condition" defaultValue={formModal.condition} placeholder="Ví dụ: ≥ 3.2" />
-              </Field>
-              <Field label="Điểm / Trọng số" required>
-                <Input name="points" defaultValue={formModal.points} placeholder="Ví dụ: 30 điểm" />
-              </Field>
-            </div>
-          </form>
         )}
-      </Modal>
-    </>
+        {can("criteria.update", { type: "criteriaSet", entity: set }) && (
+          <>
+            <Button
+              variant="secondary"
+              onClick={async () => {
+                const r = await action.run("criteria.newVersion", {
+                  id: set.id,
+                });
+                if (r.ok) {
+                  setEditing(null);
+                  navigate(`/app/criteria/${r.result.id}`);
+                }
+              }}
+            >
+              Tạo phiên bản mới
+            </Button>
+            <Button variant="secondary" onClick={() => setOperation("archive")}>
+              Lưu trữ
+            </Button>
+            {set.status === "DRAFT" && (
+              <Button
+                variant="dangerOutline"
+                onClick={() => setOperation("delete")}
+              >
+                Xóa bộ nháp
+              </Button>
+            )}
+          </>
+        )}
+      </div>
+      <ConfirmDialog
+        open={Boolean(operation)}
+        title={
+          operation === "delete"
+            ? "Xóa bộ tiêu chí nháp?"
+            : "Lưu trữ bộ tiêu chí?"
+        }
+        description="Bộ lưu trữ không còn được chọn cho ĐXT mới. Snapshot của các ĐXT đã mở được giữ nguyên."
+        confirmLabel="Xác nhận"
+        loading={action.busy}
+        onCancel={() => setOperation(null)}
+        onConfirm={async () => {
+          const r = await action.run(`criteria.${operation}`, { id: set.id });
+          if (r.ok) {
+            setOperation(null);
+            setEditing(null);
+            if (operation === "delete") navigate("/app/criteria");
+          }
+        }}
+      />
+      <FormDialog
+        open={Boolean(criterion)}
+        onClose={() => setCriterion(null)}
+        title="Chỉnh sửa tiêu chí"
+        values={criterion ?? {}}
+        onChange={setCriterion}
+        fields={[
+          { key: "name", label: "Tên tiêu chí", required: true },
+          {
+            key: "kind",
+            label: "Nhóm",
+            type: "select",
+            options: [
+              { value: "REQUIRED", label: "Bắt buộc (BB)" },
+              { value: "PRIORITY", label: "Ưu tiên (UT)" },
+            ],
+          },
+          {
+            key: "valueType",
+            label: "Kiểu tính điểm",
+            type: "select",
+            options: Object.entries(VALUE_TYPE).map(([value, label]) => ({
+              value,
+              label,
+            })),
+          },
+          { key: "unit", label: "Đơn vị" },
+          {
+            key: "evidenceGuide",
+            label: "Mô tả yêu cầu minh chứng",
+            type: "textarea",
+          },
+          { key: "tieBreakOrder", label: "Thứ tự xét hòa", type: "number" },
+          {
+            key: "refCriterionId",
+            label: "Tham chiếu giá trị",
+            type: "select",
+            options: local.criteria
+              .filter(
+                (c) =>
+                  c.id !== criterion?.id &&
+                  c.valueType === "NUMBER_THRESHOLD" &&
+                  !c.refCriterionId,
+              )
+              .map((c) => ({ value: c.id, label: c.name })),
+          },
+          {
+            key: "countMode",
+            label: "Chế độ đếm",
+            type: "select",
+            options: [
+              { value: "LEVEL", label: "Điểm theo mức" },
+              { value: "PER_ITEM", label: "Điểm × số lượng" },
+            ],
+          },
+          {
+            key: "maxPoints",
+            label: "Điểm trần (không áp dụng tích lũy)",
+            type: "number",
+          },
+        ]}
+        onSubmit={() => {
+          const copy = {
+            ...criterion,
+            tieBreakOrder: criterion.tieBreakOrder
+              ? Number(criterion.tieBreakOrder)
+              : null,
+            maxPoints:
+              criterion.valueType === "ACCUMULATIVE_ENUM"
+                ? null
+                : criterion.maxPoints
+                  ? Number(criterion.maxPoints)
+                  : null,
+            refCriterionId: criterion.refCriterionId || null,
+          };
+          setEditing({
+            ...local,
+            criteria: [
+              ...local.criteria.filter((c) => c.id !== copy.id),
+              copy,
+            ].sort((a, b) => a.sortOrder - b.sortOrder),
+          });
+          setCriterion(null);
+        }}
+      >
+        {criterion && (
+          <>
+            <Checkbox
+              checked={criterion.evidenceRequired}
+              onChange={(e) =>
+                setCriterion({
+                  ...criterion,
+                  evidenceRequired: e.target.checked,
+                })
+              }
+            >
+              Bắt buộc minh chứng
+            </Checkbox>
+            {criterion.levels.map((l, i) => (
+              <div
+                key={l.id}
+                className="grid grid-cols-2 gap-2 rounded-control border border-ink-200 p-3"
+              >
+                {[
+                  "label",
+                  ...(criterion.valueType === "ACCUMULATIVE_ENUM"
+                    ? []
+                    : ["operator", "valueFrom", "valueTo"]),
+                  "points",
+                ].map((key) => (
+                  <Field
+                    key={key}
+                    label={
+                      {
+                        label: "Nhãn mức",
+                        operator: "Toán tử",
+                        valueFrom: "Từ",
+                        valueTo: "Đến",
+                        points: "Điểm",
+                      }[key]
+                    }
+                  >
+                    {key === "operator" ? (
+                      <Select
+                        value={l[key]}
+                        onChange={(e) =>
+                          setCriterion({
+                            ...criterion,
+                            levels: criterion.levels.map((x, j) =>
+                              j === i ? { ...x, [key]: e.target.value } : x,
+                            ),
+                          })
+                        }
+                      >
+                        {Object.entries(OPERATOR).map(([v, t]) => (
+                          <option key={v} value={v}>
+                            {t}
+                          </option>
+                        ))}
+                      </Select>
+                    ) : (
+                      <Input
+                        type={key === "label" ? "text" : "number"}
+                        step="any"
+                        value={l[key] ?? ""}
+                        onChange={(e) =>
+                          setCriterion({
+                            ...criterion,
+                            levels: criterion.levels.map((x, j) =>
+                              j === i
+                                ? {
+                                    ...x,
+                                    [key]:
+                                      key === "label"
+                                        ? e.target.value
+                                        : Number(e.target.value),
+                                  }
+                                : x,
+                            ),
+                          })
+                        }
+                      />
+                    )}
+                  </Field>
+                ))}
+                <Button
+                  size="sm"
+                  variant="dangerOutline"
+                  onClick={() =>
+                    setCriterion({
+                      ...criterion,
+                      levels: criterion.levels.filter((x) => x.id !== l.id),
+                    })
+                  }
+                >
+                  Xóa mức
+                </Button>
+              </div>
+            ))}
+            <Button
+              variant="secondary"
+              onClick={() =>
+                setCriterion({
+                  ...criterion,
+                  levels: [
+                    ...criterion.levels,
+                    {
+                      id: crypto.randomUUID(),
+                      label: "Mức mới",
+                      operator: "GTE",
+                      valueFrom: 0,
+                      points: 0,
+                    },
+                  ],
+                })
+              }
+            >
+              Thêm mức
+            </Button>
+          </>
+        )}
+      </FormDialog>
+    </div>
   );
 }
