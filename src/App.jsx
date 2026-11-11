@@ -24,7 +24,7 @@ import { ProfilePage } from "./features/profile/ProfilePage.jsx";
 import { AuthGate } from "./app/AuthGate.jsx";
 import { WorkspaceLayout } from "./app/WorkspaceLayout.jsx";
 import { useHashRoute, navigate } from "./app/router.js";
-import { Callout } from "./components/ui/Display.jsx";
+import { StatePage } from "./components/ui/StatePage.jsx";
 function WorkspacePage({ route }) {
   const { activeRole } = useBackend();
   const page = route.segments[1];
@@ -32,7 +32,7 @@ function WorkspacePage({ route }) {
     return <Dashboard />;
   if (["reports", "audit", "email-outbox", "settings"].includes(page))
     return (
-      <Suspense fallback={<Callout>Đang tải màn hình vận hành…</Callout>}>
+      <Suspense fallback={<StatePage>Đang tải màn hình vận hành…</StatePage>}>
         <OperationsPage key={page} page={page} roundId={route.query.round} />
       </Suspense>
     );
@@ -81,7 +81,7 @@ function WorkspacePage({ route }) {
   if (page === "profile") return <ProfilePage />;
   if (page === "doi-mat-khau")
     return <AuthPage route={{ ...route, segments: ["doi-mat-khau"] }} />;
-  return <Callout tone="danger">Không tìm thấy trang.</Callout>;
+  return <StatePage tone="danger">Không tìm thấy trang.</StatePage>;
 }
 function Prototype({ roleKey, initialHash }) {
   const [demoOpen, setDemoOpen] = useState(false);
@@ -109,9 +109,9 @@ function Prototype({ roleKey, initialHash }) {
   let content;
   if (!isKnownRoute(route))
     content = (
-      <Callout tone="danger" title="Không tìm thấy trang">
+      <StatePage tone="danger" title="Không tìm thấy trang">
         Vui lòng kiểm tra đường dẫn.
-      </Callout>
+      </StatePage>
     );
   else if (route.segments[0] === "dot")
     content = (

@@ -92,7 +92,7 @@ export function Drawer({
         )}
 
         {footer && (
-          <footer className="flex shrink-0 flex-wrap items-center justify-end gap-2.5 border-t border-ink-200 bg-ink-25 px-5 py-3.5 sm:px-6">
+          <footer className="flex shrink-0 flex-wrap items-center justify-end gap-2.5 border-t border-ink-200 bg-white px-5 py-3.5 sm:px-6">
             {footer}
           </footer>
         )}

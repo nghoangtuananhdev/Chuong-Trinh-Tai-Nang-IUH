@@ -67,7 +67,7 @@ export function ConfirmDialog({
           </div>
         </div>
         {note && <div className={`mx-5 mb-5 rounded-control px-3 py-2 text-body-sm font-medium sm:mx-6 ${t.note}`}>{note}</div>}
-        <footer className="flex flex-wrap items-center justify-end gap-2.5 rounded-b-modal border-t border-ink-200 bg-ink-25 px-5 py-3.5 sm:px-6">
+        <footer className="flex flex-wrap items-center justify-end gap-2.5 rounded-b-modal border-t border-ink-200 bg-white px-5 py-3.5 sm:px-6">
           <Button variant="secondary" onClick={onCancel} data-autofocus={focusConfirm ? undefined : ""}>
             {cancelLabel}
           </Button>

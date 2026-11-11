@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useId, useState } from "react";
+import { Search } from "lucide-react";
 import { useBackend } from "../../mock/backend.jsx";
 import { useToast } from "../../components/ui/ToastProvider.jsx";
 import { TablePanel } from "../../components/data/TablePanel.jsx";
@@ -14,6 +15,7 @@ import {
 import { Button } from "../../components/ui/Button.jsx";
 import { Modal } from "../../components/ui/Modal.jsx";
 import { Callout } from "../../components/ui/Display.jsx";
+import { EmptyState } from "../../components/ui/EmptyState.jsx";
 import { usePagedFilter } from "../../hooks/usePagedFilter.js";
 export function useAction() {
   const { call } = useBackend(),
@@ -47,18 +49,26 @@ export function DataList({
   const list = usePagedFilter(rows, {
     match: (r, q) => !q || JSON.stringify(r).toLowerCase().includes(q),
   });
+  const searchLabel = `Tìm kiếm ${caption.toLowerCase()}`;
   return (
     <div className="space-y-3">
-      {search && (
-        <Field label={`Tìm kiếm ${caption.toLowerCase()}`}>
-          <Input
-            type="search"
-            value={list.query}
-            onChange={(e) => list.setQuery(e.target.value)}
-          />
-        </Field>
-      )}
-      <TablePanel>
+      <TablePanel
+        toolbar={
+          search && (
+            <div className="border-b border-ink-200 p-3">
+              <Input
+                type="search"
+                leadingIcon={Search}
+                aria-label={searchLabel}
+                placeholder={searchLabel}
+                className="w-full sm:max-w-sm"
+                value={list.query}
+                onChange={(e) => list.setQuery(e.target.value)}
+              />
+            </div>
+          )
+        }
+      >
         <ResponsiveTable
           caption={caption}
           rows={list.rows}
@@ -66,25 +76,43 @@ export function DataList({
           columns={[
             ...columns,
             ...(actions
-              ? [{ key: "actions", header: "Thao tác", cell: actions }]
+              ? [
+                  {
+                    key: "actions",
+                    header: "Thao tác",
+                    align: "right",
+                    className: "whitespace-nowrap",
+                    cell: (r) => (
+                      <div className="flex justify-end gap-1">{actions(r)}</div>
+                    ),
+                  },
+                ]
               : []),
           ]}
           mobileCard={(r) => (
-            <div className="space-y-2">
-              {columns.map((c) => (
-                <div key={c.key}>
-                  <span className="text-caption text-ink-500">
-                    {c.header}:{" "}
-                  </span>
-                  {c.cell(r)}
-                </div>
-              ))}
+            <div>
+              <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5">
+                {columns.map((c) => (
+                  <div key={c.key} className="contents">
+                    <dt className="text-body-sm text-ink-600">{c.header}:</dt>
+                    <dd className="min-w-0 break-words">{c.cell(r)}</dd>
+                  </div>
+                ))}
+              </dl>
               {actions && (
-                <div className="flex flex-wrap gap-2 pt-2">{actions(r)}</div>
+                <div className="mt-3 flex flex-wrap gap-2 border-t border-ink-200 pt-3">
+                  {actions(r)}
+                </div>
               )}
             </div>
           )}
-          empty={<p className="p-6 text-ink-600">Không có dữ liệu phù hợp.</p>}
+          empty={
+            <EmptyState
+              compact
+              title="Không có dữ liệu phù hợp."
+              description={null}
+            />
+          }
         />
         <Pagination {...list} onChange={list.setPage} />
       </TablePanel>
@@ -103,6 +131,7 @@ export function FormDialog({
   error,
   children,
 }) {
+  const formId = useId();
   return (
     <Modal
       open={open}
@@ -110,8 +139,19 @@ export function FormDialog({
       title={title}
       closeOnBackdrop={false}
       size="lg"
+      footer={
+        <>
+          <Button variant="secondary" onClick={onClose}>
+            Hủy
+          </Button>
+          <Button type="submit" form={formId} loading={busy}>
+            Xác nhận
+          </Button>
+        </>
+      }
     >
       <form
+        id={formId}
         className="space-y-4"
         onSubmit={(e) => {
           e.preventDefault();
@@ -123,9 +163,11 @@ export function FormDialog({
             {error.message}
           </Callout>
         )}
+        <div className={fields.length > 4 ? "grid gap-4 sm:grid-cols-2" : "space-y-4"}>
         {fields.map((f) => (
           <Field
             key={f.key}
+            className={fields.length > 4 && (f.type === "textarea" || (f.hint && String(f.hint).length > 40)) ? "sm:col-span-2" : undefined}
             label={f.label}
             required={f.required}
             hint={f.hint}
@@ -165,15 +207,8 @@ export function FormDialog({
             )}
           </Field>
         ))}
-        {children}
-        <div className="flex justify-end gap-2">
-          <Button variant="secondary" onClick={onClose}>
-            Hủy
-          </Button>
-          <Button type="submit" loading={busy}>
-            Xác nhận
-          </Button>
         </div>
+        {children}
       </form>
     </Modal>
   );

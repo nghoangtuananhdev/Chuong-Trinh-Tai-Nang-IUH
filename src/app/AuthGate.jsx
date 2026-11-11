@@ -1,24 +1,22 @@
 import { useBackend } from "../mock/backend.jsx";
 import { AuthPage } from "../features/auth/AuthPages.jsx";
-import { Callout } from "../components/ui/Display.jsx";
+import { StatePage } from "../components/ui/StatePage.jsx";
 import { buildHref } from "./router.js";
 import { PAGE_PERMISSION } from "./menus.js";
 export function AuthGate({ route, children }) {
   const { me, activeRole, can } = useBackend();
   if (!me)
     return (
-      <div className="mx-auto max-w-xl p-8">
-        <Callout title="Vui lòng đăng nhập">
-          <a
-            href={buildHref(
-              `/dang-nhap?returnTo=${encodeURIComponent(route.path)}`,
-            )}
-            className="text-brand-600 underline"
-          >
-            Đăng nhập để tiếp tục
-          </a>
-        </Callout>
-      </div>
+      <StatePage title="Vui lòng đăng nhập">
+        <a
+          href={buildHref(
+            `/dang-nhap?returnTo=${encodeURIComponent(route.path)}`,
+          )}
+          className="text-link"
+        >
+          Đăng nhập để tiếp tục
+        </a>
+      </StatePage>
     );
   if (me.mustChangePassword) return <AuthPage route={route} forced />;
   const page = route.segments[1],
@@ -29,9 +27,9 @@ export function AuthGate({ route, children }) {
       !["HEAD", "DEAN", "TRAINING", "LECTURER"].includes(activeRole.role))
   )
     return (
-      <Callout tone="danger" title="Không có quyền truy cập">
+      <StatePage tone="danger" title="Không có quyền truy cập">
         Bạn không có quyền thực hiện thao tác này trong phạm vi hiện tại.
-      </Callout>
+      </StatePage>
     );
   return children;
 }
