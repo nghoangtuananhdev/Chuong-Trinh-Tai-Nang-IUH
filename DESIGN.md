@@ -1,26 +1,38 @@
 # IUH Talent Admissions Interface Design Specification
 
-> Phiên bản 2 — triển khai theo `UI-UX-UPGRADE-PLAN-V2.md`. Nguyên tắc: **nâng cấp hình thức và trải nghiệm, giữ nguyên nội dung** (chuỗi hiển thị, tên/thứ tự cột, menu, dữ liệu mẫu, nghiệp vụ).
+> Phiên bản 3 — triển khai theo `ULTRA_FABLE_UI_UX_UPGRADE.md`. Nguyên tắc: **nâng cấp hình thức và trải nghiệm, giữ nguyên nội dung** (chuỗi hiển thị, tên/thứ tự cột, menu, dữ liệu mẫu, nghiệp vụ).
 
-## 1. Hướng thiết kế: “Academic Prestige × Operational Calm”
+## 1. Hướng thiết kế: “IUH Blue — Rõ tiến trình”
 
-Cổng thông tin của chương trình đào tạo tài năng: cảm giác được tuyển chọn, chuẩn mực, đáng tin; khi làm việc thì êm, rõ, không gây áp lực.
+Cổng hành chính học vụ của một trường đại học lớn: chính xác, sáng sủa, dứt khoát. Workspace là chế độ *Operate* (người dùng đến để xong việc); trang công khai và xác thực là Operate có điểm nhấn thương hiệu. Không “startup SaaS”, không “luxury học thuật”.
 
-### Ba chữ ký thị giác
-1. **Honor Rule** — vạch 32×2px màu đồng (`accent-500`, `accent-300` trên nền navy) đặt trên eyebrow của tiêu đề trang (`.honor-rule`). Chỉ dùng ở tiêu đề cấp trang.
-2. **CodeTag** — mã định danh (mã đợt, MSSV, mã lớp, mã hồ sơ) hiển thị bằng font mono tabular, chữ `brand-700`, nền `brand-50`, viền hairline (`<CodeTag>`; biến thể `plain`, `neutral`).
-3. **Academic Grid** — lưới chấm tĩnh, opacity 0.04–0.08 trên hero công khai, đầu sidebar, thẻ danh tính và empty state (`.academic-grid`). Không animate.
+### Màu — lấy từ logo IUH chính thức
+- **Xanh `brand-600` = `#153898`**: nút chính, liên kết, lựa chọn hiện tại, nền sidebar, hero công khai, khung thương hiệu trang xác thực.
+- **Vàng `accent-500` = `#F9B200`**: chỉ trên nền xanh (nút `variant="accent"` ở hero, dòng nhãn chương trình). Không dùng làm chữ/viền trên nền trắng, không làm màu trạng thái.
+- **Trung tính `ink-*`** (xám ánh lam): canvas `ink-50`, bề mặt `ink-0`, viền `ink-200`. `info` gộp về tông brand, `neutral` về tông ink; `warning` là cam, tách khỏi vàng thương hiệu.
+- Chữ nhỏ dùng `ink-600` trở lên (`ink-500` chỉ khi ≥ 13px trên nền trắng); `ink-400` chỉ cho icon trang trí/placeholder.
+
+### Chữ ký thị giác: thanh tiến trình (`ProcessTrack`)
+Mọi chuỗi tuần tự có thứ tự và có người chịu trách nhiệm đều dùng cùng một ngữ pháp: các đoạn thanh ngang nối liền (đã qua/hiện tại `brand-600`, chưa tới `ink-200`, nhãn hiện tại đậm + chấm cuối đoạn). Xuất hiện ở: hàng đợt xét tuyển (`RoundTrack`, 5 giai đoạn), chi tiết ĐXT, dashboard (đếm ĐXT theo giai đoạn), phê duyệt 3 cấp (`ApprovalStepper`), wizard nộp hồ sơ và đăng ký 3 bước (`Stepper`).
+
+### Hình khối
+- Bo góc gọn: `xs` 4, `control` 8, `card` 12, `modal` 16.
+- Chiều sâu bằng viền, không bằng bóng: bề mặt tĩnh (`.surface`, `Panel`, bảng) là nền trắng + viền `ink-200`. Bóng chỉ cho lớp nổi thật: popover, modal/drawer, toast, thanh hành động dính đáy (`shadow-bar`).
+- Số liệu luôn `tabular-nums`; mã định danh (`CodeTag`) dùng mono; tiêu đề cột và nhãn mô tả không in hoa.
 
 ### Danh sách cấm
-Chữ/viền/nút gradient, glow/pulse, glassmorphism nặng (chỉ header khi cuộn: `backdrop-blur-md`), emoji, ảnh stock, số liệu bịa, bóng đen đậm, card lồng card, thêm marketing copy.
+Gradient, glow/pulse, glassmorphism/blur trang trí, emoji, ảnh stock, số liệu bịa, thẻ lồng thẻ, eyebrow/kicker in hoa mới, `border-left`/`border-right` màu > 1px, sparkline/progress ring trang trí, dark mode, marketing copy, màu Tailwind mặc định, mã hex và `text-[..px]` trong JSX.
 
 ### Token (tất cả nằm trong `src/styles/theme.css`, khối `@theme` của Tailwind v4)
-- **Màu:** `brand-25…950` (600 = `#153898`, 900 = nền sidebar/hero `#10285E`), `ink-0…900` (xám ánh lam; 50 = canvas, 200 = hairline, 600/900 = chữ phụ/chính), `accent-*` (chỉ dùng cực tiết chế, không bao giờ cho nút/trạng thái/link), `success|warning|danger|info|neutral` × `fg|bg|border|solid`, `focus`.
-- **Chữ:** Inter Variable cục bộ, root 16px, `font-optical-sizing: auto`, `cv11`/`ss03`. Thang: `text-display`, `title-1/2/3`, `body-lg`, `body`, `body-sm`, `caption`, `overline`. Không dùng chữ < 12px.
-- **Bo góc:** `rounded-xs` 6, `control` 10, `card` 14, `modal` 18. **Bóng nhuộm navy:** `shadow-raised | card | overlay | modal | focus`.
-- **Chuyển động:** `--ease-standard`, `--ease-emphasized`, `--duration-fast|base|slow` (120/180/260ms); chỉ animate `opacity`/`transform`; tắt hoàn toàn khi `prefers-reduced-motion`.
+- **Màu:** `brand-25…950`, `ink-0…900`, `accent-50…700`, `success|warning|danger|info|neutral` × `fg|bg|border|solid`, `focus`.
+- **Chữ:** Inter Variable cục bộ, root 16px. Thang: `text-display`, `title-1/2/3`, `metric`, `body-lg`, `body`, `body-sm`, `caption`. Không dùng chữ < 12px.
+- **Bóng nhuộm xanh:** `shadow-raised | card | overlay | modal | focus | bar`.
+- **Chuyển động:** `--ease-standard`, `--ease-emphasized`, `--duration-fast|base|slow` (120/180/260ms); chỉ animate `opacity`/`transform`; tắt khi `prefers-reduced-motion`.
 - Không còn mã hex hay `text-[..px]` trong JSX (kiểm tra bằng `grep`).
 - CSS tự viết nằm trong `@layer base` / `@layer components` để utility của Tailwind luôn thắng.
+
+### Tài sản thương hiệu
+`assets/img/brand/`: `iuh-logo.svg` (nền sáng), `iuh-logo-white.svg` (nền xanh: sidebar, khung xác thực), favicon và apple-touch-icon. Logo Khoa CNTT trên header công khai được giữ nguyên.
 
 ---
 
@@ -31,9 +43,11 @@ src/
   components/
     ui/          -> Button, IconButton, Tooltip, Form (Field/Input/Textarea/Select/Checkbox/RadioCard),
                     PasswordInput, Display (CodeTag/Avatar/Callout/Capacity/DescriptionList/Timeline),
+                    Panel, ProcessTrack, MetricTile (StatCard), IdentityHeader, StatePage,
                     StatusBadge, FilterTabs, Stepper, FileDropzone (+FileItem), EmptyState, Pagination,
                     Modal, Drawer, FullscreenDialog, ConfirmDialog, Toast (ToastStack), useDialogA11y
-    layout/      -> PublicHeader, WorkspaceHeader, Sidebar (+SidebarBrand/SidebarNav), PageHeader
+    layout/      -> PublicHeader, PublicShell, AuthShell, WorkspaceHeader, Sidebar (+SidebarBrand/SidebarNav),
+                    RoleSwitcher, NotificationBell, ActionBar, PageHeader
     data/        -> TablePanel, TableToolbar, TableActions, ResponsiveTable
   hooks/         -> usePagedFilter (tìm kiếm + lọc + phân trang 10 dòng), useMediaQuery
   features/      -> public, majors, classes, teachers, students, permissions, rounds, criteria,

@@ -1,7 +1,10 @@
 import { useBackend } from "../../mock/backend.jsx";
 import { DataList } from "../shared/FeatureKit.jsx";
 import { Button } from "../../components/ui/Button.jsx";
-import { Callout, CodeTag, Timeline } from "../../components/ui/Display.jsx";
+import { CodeTag, Timeline } from "../../components/ui/Display.jsx";
+import { Panel } from "../../components/ui/Panel.jsx";
+import { IdentityHeader } from "../../components/ui/IdentityHeader.jsx";
+import { StatePage } from "../../components/ui/StatePage.jsx";
 import { StatusBadge } from "../../components/ui/StatusBadge.jsx";
 import { formatIct } from "../../domain/time.js";
 import { navigate } from "../../app/router.js";
@@ -21,7 +24,7 @@ export function RecordsPage({ id }) {
     const user = students.find((u) => u.id === id);
     if (!user)
       return (
-        <Callout tone="danger">Không có quyền xem hồ sơ sinh viên.</Callout>
+        <StatePage tone="danger">Không có quyền xem hồ sơ sinh viên.</StatePage>
       );
     const apps = db.applications.filter(
       (a) =>
@@ -30,9 +33,13 @@ export function RecordsPage({ id }) {
     );
     return (
       <div className="space-y-5">
-        <Callout title={user.fullName}>
-          {user.username} · {user.email}
-        </Callout>
+        <Panel>
+          <IdentityHeader
+            name={user.fullName}
+            meta={`${user.username} · ${user.email}`}
+          />
+        </Panel>
+        <Panel>
         <Timeline
           items={apps
             .filter((a) => a.submittedAt)
@@ -44,6 +51,7 @@ export function RecordsPage({ id }) {
               note: a.decisionNote,
             }))}
         />
+        </Panel>
         <DataList
           rows={apps}
           columns={[
@@ -62,6 +70,8 @@ export function RecordsPage({ id }) {
             {
               key: "score",
               header: "Điểm chính thức",
+              align: "right",
+              className: "tabular-nums",
               cell: (a) => a.officialScore ?? "Chưa có",
             },
           ]}

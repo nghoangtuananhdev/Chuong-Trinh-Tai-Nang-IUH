@@ -280,4 +280,5 @@
   main { max-width: none !important; padding: 0 !important; }
   body { background: white !important; }
   .print-report { display: block; }
+  .print-report header { display: block !important; }
 }

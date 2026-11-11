@@ -8,6 +8,9 @@ import {
 } from "../shared/FeatureKit.jsx";
 import { Button } from "../../components/ui/Button.jsx";
 import { CodeTag, Callout } from "../../components/ui/Display.jsx";
+import { Panel } from "../../components/ui/Panel.jsx";
+import { StatePage } from "../../components/ui/StatePage.jsx";
+import { ActionBar } from "../../components/layout/ActionBar.jsx";
 import { StatusBadge } from "../../components/ui/StatusBadge.jsx";
 import { Drawer } from "../../components/ui/Drawer.jsx";
 import { ConfirmDialog } from "../../components/ui/ConfirmDialog.jsx";
@@ -130,6 +133,8 @@ export function ManagementPage({ page, id }) {
       {
         key: "count",
         header: "Số lượng lớp",
+        align: "right",
+        className: "tabular-nums",
         cell: (r) => db.classes.filter((c) => c.programId === r.id).length,
       },
     ];
@@ -314,11 +319,15 @@ export function ManagementPage({ page, id }) {
   ) {
     return (
       <div className="space-y-4">
-        {page === "lecturers" && (
-          <Button variant="secondary" onClick={() => setTab("faculty")}>
-            Quay lại tài khoản
-          </Button>
-        )}
+        <ActionBar
+          start={
+            page === "lecturers" && (
+              <Button variant="secondary" onClick={() => setTab("faculty")}>
+                Quay lại tài khoản
+              </Button>
+            )
+          }
+        >
         <Button
           onClick={() =>
             open(
@@ -391,6 +400,7 @@ export function ManagementPage({ page, id }) {
         >
           Gán vai trò
         </Button>
+        </ActionBar>
         <DataList
           rows={db.userRoles.filter(
             (r) =>
@@ -580,25 +590,32 @@ export function ManagementPage({ page, id }) {
   if (page === "classes" && id) {
     const cls = rows.find((r) => r.id === id);
     if (!cls)
-      return <Callout tone="danger">Không có quyền truy cập lớp này.</Callout>;
+      return (
+        <StatePage tone="danger">Không có quyền truy cập lớp này.</StatePage>
+      );
     const members = db.memberships.filter((m) => m.classId === id);
     return (
       <div className="space-y-5">
-        <p className="text-title-3">{cls.code}</p>
-        <p>{cls.description}</p>
-        {can("class.updateOwn", { type: "class", id }) && (
-          <Button
-            onClick={() =>
-              open(
-                "classes.updateOwn",
-                [{ key: "description", label: "Mô tả lớp", type: "textarea" }],
-                cls,
-              )
-            }
-          >
-            Sửa mô tả lớp
-          </Button>
-        )}
+        <Panel>
+          <p className="text-title-3">{cls.code}</p>
+          <p className="mt-1 text-body text-ink-700">{cls.description}</p>
+          {can("class.updateOwn", { type: "class", id }) && (
+            <div className="mt-4">
+              <Button
+                variant="secondary"
+                onClick={() =>
+                  open(
+                    "classes.updateOwn",
+                    [{ key: "description", label: "Mô tả lớp", type: "textarea" }],
+                    cls,
+                  )
+                }
+              >
+                Sửa mô tả lớp
+              </Button>
+            </div>
+          )}
+        </Panel>
         <Field label="Thành viên theo năm đào tạo">
           <Select
             value={memberYear}
@@ -625,7 +642,13 @@ export function ManagementPage({ page, id }) {
               cell: (r) =>
                 db.users.find((u) => u.id === r.studentUserId)?.fullName,
             },
-            { key: "year", header: "Năm đào tạo", cell: (r) => r.studyYear },
+            {
+              key: "year",
+              header: "Năm đào tạo",
+              align: "right",
+              className: "tabular-nums",
+              cell: (r) => r.studyYear,
+            },
             {
               key: "status",
               header: "Trạng thái",
@@ -690,68 +713,100 @@ export function ManagementPage({ page, id }) {
           )}
         />
         {can("class.manage", { type: "class", id }) && (
-          <Button
-            variant="dangerOutline"
-            onClick={() =>
-              setConfirmation({
-                name: "classes.end",
-                payload: { id },
-                title: "Kết thúc lớp?",
-              })
+          <ActionBar
+            start={
+              <Button
+                variant="dangerOutline"
+                onClick={() =>
+                  setConfirmation({
+                    name: "classes.end",
+                    payload: { id },
+                    title: "Kết thúc lớp?",
+                  })
+                }
+              >
+                Kết thúc lớp
+              </Button>
             }
-          >
-            Kết thúc lớp
-          </Button>
+          />
         )}
         {dialogs()}
       </div>
     );
   }
+  const showCreate =
+    !["students", "student-passwords"].includes(page) && can(permission);
+  const segment = (value, label, current) => (
+    <button
+      key={value}
+      type="button"
+      aria-pressed={current === value}
+      onClick={() => setTab(value)}
+      className={`h-8 rounded-xs px-3 text-body-sm font-medium max-sm:h-10 ${current === value ? "bg-white text-ink-900 shadow-raised" : "text-ink-600 hover:text-ink-900"}`}
+    >
+      {label}
+    </button>
+  );
   return (
     <div className="space-y-4">
-      {page === "catalog" && (
-        <div className="flex gap-2">
-          <Button variant="secondary" onClick={() => setTab("faculty")}>
-            Khoa
-          </Button>
-          <Button variant="secondary" onClick={() => setTab("major")}>
-            Ngành
-          </Button>
-        </div>
-      )}
-      {page === "lecturers" && (
-        <Button variant="secondary" onClick={() => setTab("permissions")}>
-          Phân quyền
-        </Button>
-      )}
-      {temporary && (
-        <Callout title="Mật khẩu tạm (hiển thị trong phiên này)">
-          {temporary}
-          <Button variant="link" onClick={() => setTemporary("")}>
-            Ẩn
-          </Button>
-        </Callout>
-      )}
-      {!["students", "student-passwords"].includes(page) && can(permission) && (
-        <Button
-          onClick={() =>
-            open(
-              userPage ? "lecturers.create" : `${base}.create`,
-              fields,
-              {},
-              newLabel,
-            )
+      {(page === "catalog" || page === "lecturers" || showCreate) && (
+        <ActionBar
+          start={
+            page === "catalog" ? (
+              <div
+                role="group"
+                className="inline-flex rounded-control bg-ink-100 p-0.5"
+              >
+                {segment("faculty", "Khoa", tab)}
+                {segment("major", "Ngành", tab)}
+              </div>
+            ) : page === "lecturers" ? (
+              <div
+                role="group"
+                className="inline-flex rounded-control bg-ink-100 p-0.5"
+              >
+                {segment("permissions", "Phân quyền", tab)}
+              </div>
+            ) : null
           }
         >
-          {userPage ? "Tạo tài khoản GV" : newLabel}
-        </Button>
+          {showCreate && (
+            <Button
+              onClick={() =>
+                open(
+                  userPage ? "lecturers.create" : `${base}.create`,
+                  fields,
+                  {},
+                  newLabel,
+                )
+              }
+            >
+              {userPage ? "Tạo tài khoản GV" : newLabel}
+            </Button>
+          )}
+        </ActionBar>
+      )}
+      {temporary && (
+        <Callout
+          tone="warning"
+          title="Mật khẩu tạm (hiển thị trong phiên này)"
+          action={
+            <Button variant="link" onClick={() => setTemporary("")}>
+              Ẩn
+            </Button>
+          }
+        >
+          <CodeTag tone="neutral" className="text-body">
+            {temporary}
+          </CodeTag>
+        </Callout>
       )}
       <DataList
         rows={rows}
         caption="Danh sách"
         columns={columns}
         actions={(r) => (
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap justify-end gap-1">
             {page === "classes" && (
               <Button
                 size="sm"

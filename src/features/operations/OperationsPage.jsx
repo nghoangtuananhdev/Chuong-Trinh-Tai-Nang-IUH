@@ -6,6 +6,8 @@ import { Field, Input, Select, Textarea } from "../../components/ui/Form.jsx";
 import { Callout, CodeTag } from "../../components/ui/Display.jsx";
 import { Drawer } from "../../components/ui/Drawer.jsx";
 import { StatusBadge } from "../../components/ui/StatusBadge.jsx";
+import { Panel } from "../../components/ui/Panel.jsx";
+import { ActionBar } from "../../components/layout/ActionBar.jsx";
 import { APPLICATION_STATUSES, ROLE_LABEL } from "../../domain/constants.js";
 import { formatIct } from "../../domain/time.js";
 import { navigate } from "../../app/router.js";
@@ -34,94 +36,28 @@ export function OperationsPage({ page, roundId }) {
   }, [page, selected, db.applications]);
   if (page === "reports")
     return (
-      <div className="space-y-5 print-report">
-        <h2 className="text-title-3">
-          {db.rounds.find((r) => r.id === selected)?.name}
-        </h2>
-        <Field label="Đợt xét tuyển">
-          <Select
-            value={selected}
-            onChange={(e) => setSelected(e.target.value)}
-          >
-            {rounds.map((r) => (
-              <option key={r.id} value={r.id}>
-                {r.code} · {r.name}
-              </option>
-            ))}
-          </Select>
-        </Field>
-        {summary && (
-          <>
-            <div className="grid gap-3 sm:grid-cols-3">
-              <Callout title={`Tổng hồ sơ: ${summary.total}`}>
-                Trúng tuyển: {summary.confirmed.length}/{summary.quota}
-              </Callout>
-              <Callout title="Theo luồng">
-                {Object.entries(summary.flowCounts).map(([key, n]) => (
-                  <p key={key}>
-                    Luồng {key}: {n}
-                  </p>
+      <div className="space-y-6 print-report">
+        <ActionBar
+          start={
+            <Field label="Đợt xét tuyển" className="w-full sm:w-96">
+              <Select
+                value={selected}
+                onChange={(e) => setSelected(e.target.value)}
+              >
+                {rounds.map((r) => (
+                  <option key={r.id} value={r.id}>
+                    {r.code} · {r.name}
+                  </option>
                 ))}
-              </Callout>
-              <Callout title="Theo trạng thái">
-                {Object.entries(summary.statusCounts).map(([key, n]) => (
-                  <p key={key}>
-                    {APPLICATION_STATUSES[key]?.label}: {n}
-                  </p>
-                ))}
-              </Callout>
-            </div>
-            <h2 className="text-title-3">Phổ điểm (khoảng 20 điểm)</h2>
-            <svg
-              viewBox="0 0 640 240"
-              role="img"
-              aria-label="Phổ điểm chính thức"
-              className="max-h-72 w-full rounded-card bg-white"
-            >
-              <title>Phổ điểm chính thức theo khoảng 20 điểm</title>
-              {Object.entries(summary.histogram).map(([bin, n], i, all) => {
-                const height =
-                  (n / Math.max(1, ...Object.values(summary.histogram))) * 170;
-                return (
-                  <g key={bin}>
-                    <rect
-                      x={30 + (i * 580) / all.length}
-                      y={200 - height}
-                      width={Math.max(5, 500 / all.length)}
-                      height={height}
-                      className="fill-brand-600"
-                    />
-                    <text
-                      x={30 + (i * 580) / all.length}
-                      y={225}
-                      className="fill-ink-700 text-caption"
-                    >
-                      {bin}–{Number(bin) + 19}
-                    </text>
-                    <text
-                      x={30 + (i * 580) / all.length}
-                      y={190 - height}
-                      className="fill-ink-900 text-caption"
-                    >
-                      {n}
-                    </text>
-                  </g>
-                );
-              })}
-            </svg>
-            <DataList
-              rows={summary.confirmed}
-              columns={[
-                {
-                  key: "code",
-                  header: "MSSV",
-                  cell: (r) => <CodeTag>{r.studentCode}</CodeTag>,
-                },
-                { key: "name", header: "Họ tên", cell: (r) => r.name },
-                { key: "score", header: "Điểm", cell: (r) => r.score },
-              ]}
-            />
-            <div className="flex gap-3">
+              </Select>
+            </Field>
+          }
+        >
+          {summary && (
+            <>
+              <Button variant="secondary" onClick={() => window.print()}>
+                In / Lưu PDF
+              </Button>
               <Button
                 onClick={async () => {
                   const r = await action.run(
@@ -143,10 +79,137 @@ export function OperationsPage({ page, roundId }) {
               >
                 Xuất CSV (Excel)
               </Button>
-              <Button variant="secondary" onClick={() => window.print()}>
-                In / Lưu PDF
-              </Button>
+            </>
+          )}
+        </ActionBar>
+        <h2 className="text-title-3">
+          {db.rounds.find((r) => r.id === selected)?.name}
+        </h2>
+        {summary && (
+          <>
+            <div className="grid gap-4 lg:grid-cols-3">
+              <div className="surface p-4">
+                <p className="text-body-sm text-ink-600">Tổng hồ sơ:</p>
+                <p className="text-metric tabular-nums text-ink-900">
+                  {summary.total}
+                </p>
+                <p className="mt-1 text-body-sm text-ink-600">
+                  Trúng tuyển: {summary.confirmed.length}/{summary.quota}
+                </p>
+              </div>
+              <Panel title="Theo luồng" titleAs="h3">
+                <dl>
+                  {Object.entries(summary.flowCounts).map(([key, n]) => (
+                    <div
+                      key={key}
+                      className="flex justify-between border-b border-ink-100 py-1.5 last:border-0"
+                    >
+                      <dt>Luồng {key}:</dt>
+                      <dd className="font-semibold tabular-nums">{n}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </Panel>
+              <Panel title="Theo trạng thái" titleAs="h3">
+                <dl>
+                  {Object.entries(summary.statusCounts).map(([key, n]) => (
+                    <div
+                      key={key}
+                      className="flex justify-between border-b border-ink-100 py-1.5 last:border-0"
+                    >
+                      <dt>{APPLICATION_STATUSES[key]?.label}:</dt>
+                      <dd className="font-semibold tabular-nums">{n}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </Panel>
             </div>
+            <Panel title="Phổ điểm (khoảng 20 điểm)">
+              <svg
+                viewBox="0 0 640 260"
+                role="img"
+                aria-label="Phổ điểm chính thức"
+                className="max-h-72 w-full"
+              >
+                <title>Phổ điểm chính thức theo khoảng 20 điểm</title>
+                {[210 - 56, 210 - 113, 210 - 170].map((y) => (
+                  <line
+                    key={y}
+                    x1="30"
+                    x2="610"
+                    y1={y}
+                    y2={y}
+                    className="stroke-ink-100"
+                  />
+                ))}
+                <line x1="30" x2="610" y1="210" y2="210" className="stroke-ink-300" />
+                {Object.entries(summary.histogram).map(([bin, n], i, all) => {
+                  const height =
+                    (n / Math.max(1, ...Object.values(summary.histogram))) *
+                    170;
+                  const slot = 580 / all.length;
+                  const width = Math.min(48, 440 / all.length);
+                  const center = 30 + i * slot + slot / 2;
+                  return (
+                    <g key={bin}>
+                      {n === 0 ? (
+                        <rect
+                          x={center - width / 2}
+                          y={208}
+                          width={width}
+                          height={2}
+                          className="fill-ink-200"
+                        />
+                      ) : (
+                        <rect
+                          x={center - width / 2}
+                          y={210 - height}
+                          width={width}
+                          height={height}
+                          rx="3"
+                          className="fill-brand-600"
+                        />
+                      )}
+                      <text
+                        x={center}
+                        y={232}
+                        textAnchor="middle"
+                        className="fill-ink-600 text-caption"
+                      >
+                        {bin}–{Number(bin) + 19}
+                      </text>
+                      <text
+                        x={center}
+                        y={200 - height}
+                        textAnchor="middle"
+                        fontWeight="600"
+                        className="fill-ink-900 text-caption"
+                      >
+                        {n}
+                      </text>
+                    </g>
+                  );
+                })}
+              </svg>
+            </Panel>
+            <DataList
+              rows={summary.confirmed}
+              columns={[
+                {
+                  key: "code",
+                  header: "MSSV",
+                  cell: (r) => <CodeTag>{r.studentCode}</CodeTag>,
+                },
+                { key: "name", header: "Họ tên", cell: (r) => r.name },
+                {
+                  key: "score",
+                  header: "Điểm",
+                  align: "right",
+                  className: "tabular-nums",
+                  cell: (r) => r.score,
+                },
+              ]}
+            />
           </>
         )}
       </div>
@@ -154,7 +217,8 @@ export function OperationsPage({ page, roundId }) {
   if (page === "audit")
     return (
       <div className="space-y-4">
-        <div className="grid gap-3 sm:grid-cols-3">
+        <Panel>
+        <div className="grid gap-4 sm:grid-cols-3">
           <Field label="Hành động / đối tượng / người thực hiện">
             <Input value={filter} onChange={(e) => setFilter(e.target.value)} />
           </Field>
@@ -173,6 +237,7 @@ export function OperationsPage({ page, roundId }) {
             />
           </Field>
         </div>
+        </Panel>
         <DataList
           rows={db.auditLogs
             .filter(
@@ -213,7 +278,7 @@ export function OperationsPage({ page, roundId }) {
           onClose={() => setDetail(null)}
           title="Chi tiết nhật ký"
         >
-          <pre className="whitespace-pre-wrap break-words text-caption">
+          <pre className="overflow-auto whitespace-pre-wrap break-words rounded-control bg-ink-50 p-3 font-mono text-body-sm">
             {JSON.stringify(detail, null, 2)}
           </pre>
         </Drawer>
@@ -222,14 +287,16 @@ export function OperationsPage({ page, roundId }) {
   if (page === "email-outbox")
     return (
       <div className="space-y-4">
-        <Field label="Trạng thái email">
-          <Select value={filter} onChange={(e) => setFilter(e.target.value)}>
-            <option value="">Tất cả</option>
-            <option value="SENT">Đã gửi</option>
-            <option value="FAILED">Gửi lỗi</option>
-            <option value="QUEUED">Đang chờ</option>
-          </Select>
-        </Field>
+        <Panel>
+          <Field label="Trạng thái email" className="sm:max-w-xs">
+            <Select value={filter} onChange={(e) => setFilter(e.target.value)}>
+              <option value="">Tất cả</option>
+              <option value="SENT">Đã gửi</option>
+              <option value="FAILED">Gửi lỗi</option>
+              <option value="QUEUED">Đang chờ</option>
+            </Select>
+          </Field>
+        </Panel>
         <DataList
           rows={db.emailOutbox
             .filter(
@@ -301,6 +368,8 @@ export function OperationsPage({ page, roundId }) {
         <Callout>
           SMTP và email là mô phỏng; dữ liệu chỉ lưu trong trình duyệt.
         </Callout>
+        <Panel>
+        <div className="space-y-4">
         {[
           ["files", "maxMb", "Dung lượng tối đa mỗi tệp (MB)"],
           ["otp", "ttlMinutes", "Hiệu lực OTP (phút)"],
@@ -395,25 +464,33 @@ export function OperationsPage({ page, roundId }) {
             />
           </Field>
         ))}
-        <Button
-          loading={action.busy}
-          onClick={() => action.run("system.updateConfig", { config })}
-        >
-          Lưu cấu hình
-        </Button>
-        <Field label="Email nhận thử">
-          <Input
-            type="email"
-            value={target}
-            onChange={(e) => setTarget(e.target.value)}
-          />
-        </Field>
-        <Button
-          variant="secondary"
-          onClick={() => action.run("system.testEmail", { to: target })}
-        >
-          Gửi email thử
-        </Button>
+        </div>
+        </Panel>
+        <Panel>
+          <div className="space-y-4">
+            <Field label="Email nhận thử" className="sm:max-w-md">
+              <Input
+                type="email"
+                value={target}
+                onChange={(e) => setTarget(e.target.value)}
+              />
+            </Field>
+            <ActionBar>
+              <Button
+                variant="secondary"
+                onClick={() => action.run("system.testEmail", { to: target })}
+              >
+                Gửi email thử
+              </Button>
+              <Button
+                loading={action.busy}
+                onClick={() => action.run("system.updateConfig", { config })}
+              >
+                Lưu cấu hình
+              </Button>
+            </ActionBar>
+          </div>
+        </Panel>
       </div>
     );
   }

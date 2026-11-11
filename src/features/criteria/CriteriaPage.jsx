@@ -362,7 +362,7 @@ export function CriteriaPage({ id }) {
       </section>
       <ActionBar
         sticky
-        className="sm:pr-52"
+        className="sm:pr-60! max-sm:pb-16!"
         start={
           can("criteria.update", { type: "criteriaSet", entity: set }) &&
           set.status === "DRAFT" && (

@@ -7,7 +7,8 @@ import { ConfirmDialog } from "../../components/ui/ConfirmDialog.jsx";
 import { Button } from "../../components/ui/Button.jsx";
 import { Field, Input, Select } from "../../components/ui/Form.jsx";
 import { FilterTabs } from "../../components/ui/FilterTabs.jsx";
-import { CodeTag, Callout } from "../../components/ui/Display.jsx";
+import { CodeTag } from "../../components/ui/Display.jsx";
+import { Panel } from "../../components/ui/Panel.jsx";
 import { StatusBadge } from "../../components/ui/StatusBadge.jsx";
 import { Pagination } from "../../components/ui/Pagination.jsx";
 import { usePagedFilter } from "../../hooks/usePagedFilter.js";
@@ -93,11 +94,11 @@ export function DemoPanel({ open, onOpenChange, onLogin }) {
         <div className="mt-5 space-y-4">
           {tab === "clock" && (
             <>
-              <Callout title="Giờ mô phỏng (GMT+7)">
-                <p className="mt-1 font-mono" aria-live="polite">
+              <Panel title="Giờ mô phỏng (GMT+7)" titleAs="h3">
+                <p className="font-mono" aria-live="polite">
                   {formatIct(now)}
                 </p>
-              </Callout>
+              </Panel>
               <Field label="Đặt ngày giờ mô phỏng">
                 <Input
                   type="datetime-local"
@@ -215,7 +216,7 @@ export function DemoPanel({ open, onOpenChange, onLogin }) {
                         <a
                           href={link}
                           onClick={() => onOpenChange(false)}
-                          className="mt-3 block break-all text-brand-600 underline"
+                          className="text-link mt-3 block break-all"
                         >
                           Mở liên kết đặt lại mật khẩu
                         </a>
@@ -280,19 +281,23 @@ export function DemoPanel({ open, onOpenChange, onLogin }) {
                 ))}
               </ul>
               <Pagination {...accounts} onChange={accounts.setPage} />
-              <Callout title="Dùng để đăng ký mới">
-                26019999 · khang.26019999@student.iuh.edu.vn
-                <br />
-                26018888 · 26018888@student.iuh.edu.vn
-              </Callout>
+              <Panel title="Dùng để đăng ký mới" titleAs="h3">
+                <p className="text-body">
+                  26019999 · khang.26019999@student.iuh.edu.vn
+                  <br />
+                  26018888 · 26018888@student.iuh.edu.vn
+                </p>
+              </Panel>
             </>
           )}
           {tab === "data" && (
             <>
-              <Callout title={`Phiên bản dữ liệu: ${db.schemaVersion}`}>
-                Dữ liệu được lưu trên trình duyệt. Khôi phục sẽ xóa cả minh
-                chứng bạn đã tải.
-              </Callout>
+              <Panel title={`Phiên bản dữ liệu: ${db.schemaVersion}`} titleAs="h3">
+                <p className="text-body text-ink-700">
+                  Dữ liệu được lưu trên trình duyệt. Khôi phục sẽ xóa cả minh
+                  chứng bạn đã tải.
+                </p>
+              </Panel>
               <Button variant="secondary" onClick={exportDb}>
                 Xuất JSON db
               </Button>

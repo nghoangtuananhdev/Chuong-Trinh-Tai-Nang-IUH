@@ -300,7 +300,7 @@ export function ApplicationForm({ roundId, applicationId }) {
       </div>
       <ActionBar
         sticky
-        className="sm:pr-52"
+        className="sm:pr-60! max-sm:pb-16!"
         start={
           <>
             {persisted.status === "pending" && round.status === "open" && (

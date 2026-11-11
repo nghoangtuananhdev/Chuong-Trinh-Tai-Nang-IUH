@@ -3,6 +3,8 @@ import { useBackend } from "../../mock/backend.jsx";
 import { useToast } from "../../components/ui/ToastProvider.jsx";
 import { Field, Input } from "../../components/ui/Form.jsx";
 import { Button } from "../../components/ui/Button.jsx";
+import { Panel } from "../../components/ui/Panel.jsx";
+import { IdentityHeader } from "../../components/ui/IdentityHeader.jsx";
 export function ProfilePage() {
   const { me, call, db } = useBackend(),
     { showToast } = useToast();
@@ -24,23 +26,34 @@ export function ProfilePage() {
     }
   };
   return (
-    <div className="max-w-xl space-y-4">
-      <p className="text-title-3">{me.fullName}</p>
-      <Field label="Tên đăng nhập">
-        <Input value={me.username} readOnly />
-      </Field>
-      <Field label="Số điện thoại">
-        <Input value={phone} onChange={(e) => setPhone(e.target.value)} />
-      </Field>
-      <Field label="Email IUH">
-        <Input
-          readOnly={me.kind !== "STUDENT"}
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-      </Field>
+    <Panel
+      className="max-w-2xl"
+      footer={
+        <div className="flex justify-end">
+          <Button onClick={run}>Lưu thông tin</Button>
+        </div>
+      }
+    >
+      <div className="mb-5 border-b border-ink-200 pb-4">
+        <IdentityHeader name={me.fullName} size={40} />
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Field label="Tên đăng nhập">
+          <Input value={me.username} readOnly />
+        </Field>
+        <Field label="Số điện thoại">
+          <Input value={phone} onChange={(e) => setPhone(e.target.value)} />
+        </Field>
+        <Field label="Email IUH" className="sm:col-span-2">
+          <Input
+            readOnly={me.kind !== "STUDENT"}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </Field>
+      </div>
       {email !== me.email && (
-        <>
+        <div className="mt-4 space-y-4 rounded-control bg-ink-25 p-4">
           <Button
             variant="secondary"
             onClick={async () => {
@@ -63,9 +76,8 @@ export function ProfilePage() {
           <Field label="Mã OTP">
             <Input value={code} onChange={(e) => setCode(e.target.value)} />
           </Field>
-        </>
+        </div>
       )}
-      <Button onClick={run}>Lưu thông tin</Button>
-    </div>
+    </Panel>
   );
 }
