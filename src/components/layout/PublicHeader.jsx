@@ -26,12 +26,12 @@ export function PublicHeader({ onOpenLogin }) {
 
   return (
     <header
-      className={`sticky top-0 z-40 border-b transition-[background-color,box-shadow,border-color] duration-180 ${
-        scrolled ? "border-ink-200 bg-white/90 shadow-raised backdrop-blur-md" : "border-ink-200 bg-white"
+      className={`sticky top-0 z-40 border-b border-ink-200 bg-white transition-shadow duration-180 ${
+        scrolled ? "shadow-raised" : ""
       }`}
     >
       <div
-        className={`mx-auto flex max-w-[1200px] items-center justify-between gap-4 px-4 transition-[height] duration-180 sm:px-6 lg:px-8 ${scrolled ? "h-[60px]" : "h-[72px]"}`}
+        className={`mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 transition-[height] duration-180 sm:px-6 lg:px-8 ${scrolled ? "h-15" : "h-18"}`}
       >
         <div className="flex min-w-0 items-center gap-4">
           <a href="#/" className="flex shrink-0 items-center" aria-label="IUH - Về trang chủ">

@@ -10,8 +10,11 @@ import {
 } from "../../components/ui/PasswordInput.jsx";
 import { OtpInput } from "../../components/ui/OtpInput.jsx";
 import { Callout } from "../../components/ui/Display.jsx";
+import { Panel } from "../../components/ui/Panel.jsx";
+import { IdentityHeader } from "../../components/ui/IdentityHeader.jsx";
+import { AuthShell } from "../../components/layout/AuthShell.jsx";
 import { navigate, buildHref } from "../../app/router.js";
-export function AuthPage({ route, forced = false }) {
+export function AuthPage({ route, forced = false, embedded = false }) {
   const { call, db, now } = useBackend();
   const [form, setForm] = useState({
     username: "",
@@ -137,24 +140,19 @@ export function AuthPage({ route, forced = false }) {
       setBusy(false);
     }
   };
-  return (
-    <section className="mx-auto max-w-xl space-y-5 px-4 py-10">
-      <a href={buildHref("/")} className="text-brand-600">
-        Về trang chủ
-      </a>
-      <h1 data-page-heading tabIndex={-1} className="text-title-1">
-        {title}
-      </h1>
+  const feedback = (
+    <>
       {message && <Callout>{message}</Callout>}
       {error && (
         <Callout tone="danger" role="alert">
           {error.message}
         </Callout>
       )}
-      <form
-        onSubmit={submit}
-        className="space-y-5 rounded-card border border-ink-200 bg-white p-5"
-      >
+    </>
+  );
+  const formPanel = (
+    <Panel>
+      <form onSubmit={submit} className="space-y-5">
         {page === "dang-nhap" && (
           <>
             {input("username", "Tên đăng nhập (MSSV / mã GV / email)")}
@@ -163,18 +161,20 @@ export function AuthPage({ route, forced = false }) {
         )}
         {page === "dang-ky" && (
           <>
-            <Stepper
-              steps={[
-                { title: "Xác thực email IUH" },
-                { title: "Nhập mã OTP" },
-                { title: "Hoàn tất tài khoản" },
-              ]}
-              current={step - 1}
-              onStep={(i) => {
-                if (i === 0) setStep(1);
-              }}
-              canGoTo={(i) => i === 0}
-            />
+            <div className="border-b border-ink-200 pb-5">
+              <Stepper
+                steps={[
+                  { title: "Xác thực email IUH" },
+                  { title: "Nhập mã OTP" },
+                  { title: "Hoàn tất tài khoản" },
+                ]}
+                current={step - 1}
+                onStep={(i) => {
+                  if (i === 0) setStep(1);
+                }}
+                canGoTo={(i) => i === 0}
+              />
+            </div>
             {step === 1 && (
               <>
                 {input("studentCode", "MSSV")}
@@ -186,21 +186,26 @@ export function AuthPage({ route, forced = false }) {
             )}
             {step === 2 && (
               <>
-                {db.otpChallenges.find((c) => c.id === challenge) && (
-                  <Countdown
-                    now={now}
-                    until={
-                      db.otpChallenges.find((c) => c.id === challenge).expiresAt
-                    }
-                  />
-                )}
-                <Field label="Mã xác thực OTP">
-                  <OtpInput
-                    value={form.code}
-                    onChange={(v) => set("code", v)}
-                  />
-                </Field>
-                <Button variant="secondary" onClick={() => setStep(1)}>
+                <div className="relative">
+                  {db.otpChallenges.find((c) => c.id === challenge) && (
+                    <div className="absolute right-0 top-0">
+                      <Countdown
+                        now={now}
+                        until={
+                          db.otpChallenges.find((c) => c.id === challenge)
+                            .expiresAt
+                        }
+                      />
+                    </div>
+                  )}
+                  <Field label="Mã xác thực OTP">
+                    <OtpInput
+                      value={form.code}
+                      onChange={(v) => set("code", v)}
+                    />
+                  </Field>
+                </div>
+                <Button variant="tertiary" onClick={() => setStep(1)}>
                   Yêu cầu mã mới
                 </Button>
               </>
@@ -213,9 +218,12 @@ export function AuthPage({ route, forced = false }) {
             )}
             {step === 3 && !verified?.accountExists && (
               <>
-                <Callout title={verified?.profile?.fullName}>
-                  {verified?.profile?.dob} · {verified?.profile?.homeClass}
-                </Callout>
+                <div className="rounded-control bg-ink-25 p-3">
+                  <IdentityHeader
+                    name={verified?.profile?.fullName}
+                    meta={`${verified?.profile?.dob} · ${verified?.profile?.homeClass}`}
+                  />
+                </div>
                 {input("phone", "Số điện thoại", "tel", false)}
                 {input(
                   "password",
@@ -243,6 +251,8 @@ export function AuthPage({ route, forced = false }) {
         )}
         <Button
           type="submit"
+          fullWidth
+          size="lg"
           loading={busy}
           disabled={page === "dang-ky" && step === 3 && verified?.accountExists}
         >
@@ -255,8 +265,19 @@ export function AuthPage({ route, forced = false }) {
             : "Xác nhận"}
         </Button>
       </form>
-      <div className="flex flex-wrap gap-4 text-body-sm text-brand-600">
+    </Panel>
+  );
+  if (embedded)
+    return (
+      <div className="max-w-xl space-y-5">
+        {feedback}
+        {formPanel}
+      </div>
+    );
+  const footerLinks = (
+      <div className="flex flex-wrap gap-x-5 gap-y-2 text-body-sm">
         <a
+          className="text-link"
           href={buildHref(
             `/dang-nhap${route.query.returnTo ? "?returnTo=" + encodeURIComponent(route.query.returnTo) : ""}`,
           )}
@@ -264,14 +285,20 @@ export function AuthPage({ route, forced = false }) {
           Đăng nhập
         </a>
         <a
+          className="text-link"
           href={buildHref(
             `/dang-ky${route.query.returnTo ? "?returnTo=" + encodeURIComponent(route.query.returnTo) : ""}`,
           )}
         >
           Đăng ký bằng email IUH
         </a>
-        <a href={buildHref("/quen-mat-khau")}>Quên mật khẩu?</a>
+        <a className="text-link" href={buildHref("/quen-mat-khau")}>Quên mật khẩu?</a>
       </div>
-    </section>
+  );
+  return (
+    <AuthShell title={title} footer={footerLinks}>
+      {feedback}
+      {formPanel}
+    </AuthShell>
   );
 }

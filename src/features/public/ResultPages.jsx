@@ -7,6 +7,9 @@ import { OtpInput } from "../../components/ui/OtpInput.jsx";
 import { Callout } from "../../components/ui/Display.jsx";
 import { StatusBadge } from "../../components/ui/StatusBadge.jsx";
 import { buildHref } from "../../app/router.js";
+import { ArrowLeft } from "lucide-react";
+import { Panel } from "../../components/ui/Panel.jsx";
+import { PublicShell } from "../../components/layout/PublicShell.jsx";
 export function ResultPages({ roundId }) {
   const { call, db } = useBackend(),
     action = useAction();
@@ -26,16 +29,22 @@ export function ResultPages({ roundId }) {
       });
   }, [roundId]);
   return (
-    <main className="mx-auto max-w-5xl space-y-5 px-4 py-10">
-      <a href={buildHref("/")} className="text-brand-600">
+    <PublicShell>
+      <a
+        href={buildHref("/")}
+        className="inline-flex items-center gap-1.5 text-body-sm font-medium text-brand-600 hover:text-brand-700"
+      >
+        <ArrowLeft size={14} aria-hidden="true" />
         Về trang chủ
       </a>
-      <h1 data-page-heading tabIndex={-1} className="text-title-1">
+      <h1 data-page-heading tabIndex={-1} className="text-title-1 text-ink-900 outline-none">
         {roundId ? "Kết quả công khai" : "Tra cứu kết quả cá nhân"}
       </h1>
       {roundId ? (
         <>
-          <p>{db.rounds.find((r) => r.id === roundId)?.name}</p>
+          <p className="text-body-lg text-ink-700">
+            {db.rounds.find((r) => r.id === roundId)?.name}
+          </p>
           <Callout>
             Danh sách hiển thị tối thiểu để bảo vệ dữ liệu cá nhân. Tra cứu cá
             nhân bằng MSSV và OTP.
@@ -50,8 +59,9 @@ export function ResultPages({ roundId }) {
         </>
       ) : (
         <>
+          <Panel className="max-w-xl">
           <form
-            className="max-w-xl space-y-4"
+            className="space-y-4"
             onSubmit={async (e) => {
               e.preventDefault();
               if (!challenge) {
@@ -102,21 +112,24 @@ export function ResultPages({ roundId }) {
                 <OtpInput value={code} onChange={setCode} />
               </Field>
             )}
-            <Button type="submit" loading={action.busy}>
-              {challenge ? "Xác nhận và tra cứu" : "Gửi mã OTP"}
-            </Button>
-            {challenge && (
-              <Button
-                variant="secondary"
-                onClick={() => {
-                  setChallenge(null);
-                  setCode("");
-                }}
-              >
-                Gửi lại mã
+            <div className="flex flex-wrap items-center justify-end gap-2">
+              {challenge && (
+                <Button
+                  variant="secondary"
+                  onClick={() => {
+                    setChallenge(null);
+                    setCode("");
+                  }}
+                >
+                  Gửi lại mã
+                </Button>
+              )}
+              <Button type="submit" loading={action.busy}>
+                {challenge ? "Xác nhận và tra cứu" : "Gửi mã OTP"}
               </Button>
-            )}
+            </div>
           </form>
+          </Panel>
           {looked && (
             <DataList
               rows={rows}
@@ -142,7 +155,9 @@ export function ResultPages({ roundId }) {
               ]}
               actions={(r) =>
                 r.status === "needs_update" && (
-                  <a href={buildHref("/dang-nhap")}>Đăng nhập để bổ sung</a>
+                  <a className="text-link" href={buildHref("/dang-nhap")}>
+                    Đăng nhập để bổ sung
+                  </a>
                 )
               }
             />
@@ -154,6 +169,6 @@ export function ResultPages({ roundId }) {
           {action.error.message}
         </Callout>
       )}
-    </main>
+    </PublicShell>
   );
 }

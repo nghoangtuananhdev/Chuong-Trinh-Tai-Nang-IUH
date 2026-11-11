@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CalendarClock, Users } from "lucide-react";
+import { CalendarClock, Search, SearchX, Users } from "lucide-react";
 import { useBackend } from "../../mock/backend.jsx";
 import { PublicHeader } from "../../components/layout/PublicHeader.jsx";
 import { Button } from "../../components/ui/Button.jsx";
@@ -9,6 +9,9 @@ import { StatusBadge } from "../../components/ui/StatusBadge.jsx";
 import { CodeTag, DescriptionList } from "../../components/ui/Display.jsx";
 import { Modal } from "../../components/ui/Modal.jsx";
 import { Pagination } from "../../components/ui/Pagination.jsx";
+import { Panel } from "../../components/ui/Panel.jsx";
+import { EmptyState } from "../../components/ui/EmptyState.jsx";
+import { RoundTrack } from "../../components/domain-ui/RoundTrack.jsx";
 import { CriteriaTable } from "../../components/domain-ui/CriteriaTable.jsx";
 import { usePagedFilter } from "../../hooks/usePagedFilter.js";
 import { ROUND_STATUSES } from "../../domain/constants.js";
@@ -52,48 +55,53 @@ export function PublicHome({
         Đến danh sách đợt xét tuyển
       </a>
       <PublicHeader onOpenLogin={onLogin} />
-      <section className="bg-brand-900 px-4 py-12 text-white sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-6xl">
-          <p className="text-overline text-accent-300">
+      <section className="bg-brand-600 text-white">
+        <div className="mx-auto max-w-6xl px-4 pb-20 pt-10 sm:px-6 lg:px-8">
+          <p className="text-body-sm font-semibold text-accent-400">
             CHƯƠNG TRÌNH CỬ NHÂN &amp; KỸ SƯ TÀI NĂNG
           </p>
           <h1
             data-page-heading
             tabIndex={-1}
-            className="mt-3 text-title-1 sm:text-display"
+            className="mt-2 text-title-1 sm:text-display"
           >
             Các đợt xét tuyển
           </h1>
-          <p className="mt-3 max-w-2xl text-body-lg text-white/80">
+          <p className="mt-3 max-w-2xl text-body-lg text-brand-100">
             Tìm đợt xét tuyển phù hợp, xem điều kiện tham gia và theo dõi kết
             quả hồ sơ của bạn.
           </p>
-          <div className="mt-6 max-w-xl">
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-end">
             <Field
               label="Tìm theo tên đợt, mã đợt hoặc chuyên ngành"
               labelClassName="!text-white"
+              className="sm:max-w-xl sm:flex-1"
             >
               <Input
                 type="search"
+                leadingIcon={Search}
+                className="h-11"
                 value={list.query}
                 onChange={(e) => list.setQuery(e.target.value)}
                 placeholder="Nhập từ khóa tìm kiếm…"
               />
             </Field>
+            <Button
+              variant="accent"
+              size="md"
+              className="h-11"
+              onClick={onLookup ?? onLogin}
+            >
+              Tra cứu kết quả
+            </Button>
           </div>
-          <Button
-            variant="secondary"
-            className="mt-4"
-            onClick={onLookup ?? onLogin}
-          >
-            Tra cứu kết quả
-          </Button>
         </div>
       </section>
       <main
         id="dot-xet-tuyen"
-        className="mx-auto max-w-6xl space-y-6 px-4 py-6 sm:px-6 lg:px-8"
+        className="mx-auto max-w-6xl space-y-6 px-4 pb-6 sm:px-6 lg:px-8"
       >
+        <Panel className="relative -mt-12">
         <FilterTabs
           label="Trạng thái ĐXT"
           options={[
@@ -109,7 +117,7 @@ export function PublicHome({
           value={list.filter}
           onChange={list.setFilter}
         />
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="mt-4 grid gap-4 border-t border-ink-200 pt-4 sm:grid-cols-3">
           <Field label="Năm học">
             <Select
               value={academicYear}
@@ -158,82 +166,100 @@ export function PublicHome({
             </Select>
           </Field>
         </div>
+        </Panel>
         <p className="text-body-sm text-ink-600" role="status">
           {list.total} đợt xét tuyển phù hợp
         </p>
-        <div className="grid gap-5 lg:grid-cols-2">
-          {list.rows.map((r) => (
-            <article
-              key={r.id}
-              className="flex min-w-0 flex-col rounded-card border border-ink-200 bg-white p-5 shadow-card"
-            >
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <CodeTag>{r.code}</CodeTag>
-                <StatusBadge domain="round">{r.status}</StatusBadge>
-              </div>
-              <h2 className="mt-4 text-title-3">{r.name}</h2>
-              <p className="mt-2 text-body-sm font-semibold text-brand-700">
-                {r.typeLabel}
-              </p>
-              <p className="mt-2 text-body-sm text-ink-600">
-                {r.class.code} · {r.program?.name} · {r.faculty?.name}
-              </p>
-              <p className="mt-2 text-body-sm text-ink-600">
-                Năm học {r.academicYear} · {r.semester}
-              </p>
-              <p className="mt-4 flex items-start gap-2 text-body-sm">
-                <CalendarClock
-                  size={17}
-                  aria-hidden="true"
-                  className="shrink-0 text-brand-600"
-                />
-                <span>
-                  Tiếp nhận: {formatIct(r.intakeStart)} –{" "}
-                  {formatIct(r.intakeEnd)}
-                </span>
-              </p>
-              <p className="mt-2 flex items-center gap-2 text-body-sm">
-                <Users
-                  size={17}
-                  aria-hidden="true"
-                  className="text-brand-600"
-                />
-                Sĩ số tối đa: {r.quota}
-              </p>
-              <div className="mt-auto flex flex-wrap gap-2 pt-5">
-                <Button variant="secondary" onClick={() => openDetail(r)}>
-                  Xem chi tiết
-                </Button>
-                {r.status === "open" &&
-                  !allowed(r) &&
-                  me?.kind === "STUDENT" && (
-                    <p className="text-body-sm text-ink-600">
-                      Bạn đang học lớp CN/KSTN khác.
-                    </p>
-                  )}
-                {r.status === "open" && allowed(r) && (
-                  <Button
-                    onClick={() => (onApply ? onApply(r.id) : onLogin?.())}
-                  >
-                    {maintaining ? "Cập nhật hồ sơ tích lũy" : "Nộp hồ sơ"}
-                  </Button>
-                )}
-                {r.status === "published" && onResults && (
-                  <Button onClick={() => onResults(r.id)}>Xem kết quả</Button>
-                )}
-              </div>
-            </article>
-          ))}
+        <div className="surface overflow-hidden">
+          {list.total > 0 && (
+            <ul className="divide-y divide-ink-200">
+              {list.rows.map((r) => (
+                <li key={r.id}>
+                  <article className="grid min-w-0 gap-4 p-5 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)_auto] lg:items-center">
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <CodeTag>{r.code}</CodeTag>
+                        <StatusBadge domain="round">{r.status}</StatusBadge>
+                      </div>
+                      <h2 className="mt-2 text-title-2">{r.name}</h2>
+                      <p className="mt-1 text-body-sm font-medium text-brand-700">
+                        {r.typeLabel}
+                      </p>
+                      <p className="mt-1 text-body-sm text-ink-600">
+                        {r.class.code} · {r.program?.name} · {r.faculty?.name}
+                      </p>
+                      <p className="mt-1 text-body-sm text-ink-600">
+                        Năm học {r.academicYear} · {r.semester}
+                      </p>
+                    </div>
+                    <div className="min-w-0 space-y-2">
+                      <RoundTrack
+                        status={r.status}
+                        size="sm"
+                        showLabels={false}
+                        decorative
+                      />
+                      <p className="flex items-start gap-2 text-body-sm tabular-nums">
+                        <CalendarClock
+                          size={16}
+                          aria-hidden="true"
+                          className="mt-0.5 shrink-0 text-ink-500"
+                        />
+                        <span>
+                          Tiếp nhận: {formatIct(r.intakeStart)} –{" "}
+                          {formatIct(r.intakeEnd)}
+                        </span>
+                      </p>
+                      <p className="flex items-center gap-2 text-body-sm tabular-nums">
+                        <Users
+                          size={16}
+                          aria-hidden="true"
+                          className="shrink-0 text-ink-500"
+                        />
+                        Sĩ số tối đa: {r.quota}
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2 lg:justify-end">
+                      <Button variant="secondary" onClick={() => openDetail(r)}>
+                        Xem chi tiết
+                      </Button>
+                      {r.status === "open" &&
+                        !allowed(r) &&
+                        me?.kind === "STUDENT" && (
+                          <p className="text-body-sm text-ink-600">
+                            Bạn đang học lớp CN/KSTN khác.
+                          </p>
+                        )}
+                      {r.status === "open" && allowed(r) && (
+                        <Button
+                          onClick={() => (onApply ? onApply(r.id) : onLogin?.())}
+                        >
+                          {maintaining ? "Cập nhật hồ sơ tích lũy" : "Nộp hồ sơ"}
+                        </Button>
+                      )}
+                      {r.status === "published" && onResults && (
+                        <Button onClick={() => onResults(r.id)}>Xem kết quả</Button>
+                      )}
+                    </div>
+                  </article>
+                </li>
+              ))}
+            </ul>
+          )}
+          {!list.total && (
+            <EmptyState
+              icon={SearchX}
+              title="Không có ĐXT phù hợp. Vui lòng đổi bộ lọc."
+              description={null}
+            />
+          )}
+          <Pagination {...list} onChange={list.setPage} />
         </div>
-        {!list.total && (
-          <p className="rounded-card border border-ink-200 bg-white p-8 text-center text-ink-600">
-            Không có ĐXT phù hợp. Vui lòng đổi bộ lọc.
-          </p>
-        )}
-        <Pagination {...list} onChange={list.setPage} />
       </main>
-      <footer className="mx-auto max-w-6xl px-4 py-6 text-body-sm text-ink-600">
-        Đại học Công nghiệp TP. Hồ Chí Minh · Bản prototype – dữ liệu minh họa
+      <footer className="mx-auto mt-10 max-w-6xl px-4 sm:px-6 lg:px-8">
+        <p className="border-t border-ink-200 py-6 text-body-sm text-ink-600">
+          Đại học Công nghiệp TP. Hồ Chí Minh · Bản prototype – dữ liệu minh họa
+        </p>
       </footer>
       <Modal
         open={Boolean(selected)}
@@ -271,13 +297,16 @@ export function PublicHome({
                 },
               ]}
             />
+            <RoundTrack status={selected.status} />
             <p className="text-body">{selected.description}</p>
-            <CriteriaTable
-              snapshot={
-                selected.criteriaSnapshot ??
-                db.criteriaSets.find((c) => c.id === selected.criteriaSetId)
-              }
-            />
+            <div className="surface overflow-hidden">
+              <CriteriaTable
+                snapshot={
+                  selected.criteriaSnapshot ??
+                  db.criteriaSets.find((c) => c.id === selected.criteriaSetId)
+                }
+              />
+            </div>
             <p className="text-body-sm text-ink-600">
               Minh chứng PDF/JPG/PNG, tối đa {db.config.files.maxMb} MB/tệp.
             </p>

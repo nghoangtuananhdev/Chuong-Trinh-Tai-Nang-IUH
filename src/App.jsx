@@ -80,7 +80,9 @@ function WorkspacePage({ route }) {
   if (page === "notifications") return <NotificationsPage />;
   if (page === "profile") return <ProfilePage />;
   if (page === "doi-mat-khau")
-    return <AuthPage route={{ ...route, segments: ["doi-mat-khau"] }} />;
+    return (
+      <AuthPage route={{ ...route, segments: ["doi-mat-khau"] }} embedded />
+    );
   return <StatePage tone="danger">Không tìm thấy trang.</StatePage>;
 }
 function Prototype({ roleKey, initialHash }) {

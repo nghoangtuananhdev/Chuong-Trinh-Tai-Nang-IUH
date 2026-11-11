@@ -1,4 +1,5 @@
 import { ResponsiveTable } from "../data/ResponsiveTable.jsx";
+import { EmptyState } from "../ui/EmptyState.jsx";
 import { VALUE_TYPE, OPERATOR } from "../../domain/constants.js";
 export function CriteriaTable({ snapshot }) {
   const criteria = snapshot?.criteria ?? [];
@@ -19,7 +20,14 @@ export function CriteriaTable({ snapshot }) {
         {
           key: "kind",
           header: "Loại",
-          cell: (c) => (c.kind === "REQUIRED" ? "BB" : "UT"),
+          width: 64,
+          cell: (c) => (
+            <span
+              className={`inline-block rounded-full px-2 text-caption font-semibold ${c.kind === "REQUIRED" ? "bg-brand-50 text-brand-700" : "bg-ink-100 text-ink-700"}`}
+            >
+              {c.kind === "REQUIRED" ? "BB" : "UT"}
+            </span>
+          ),
         },
         {
           key: "name",
@@ -27,20 +35,24 @@ export function CriteriaTable({ snapshot }) {
           cell: (c) => (
             <>
               <p className="font-semibold">{c.name}</p>
-              <p className="text-body-sm text-ink-500">
+              <p className="text-body-sm text-ink-600">
                 {VALUE_TYPE[c.valueType]}
               </p>
             </>
           ),
         },
-        { key: "levels", header: "Các mức điểm", cell: levels },
+        {
+          key: "levels",
+          header: "Các mức điểm",
+          cell: (c) => <span className="text-body-sm">{levels(c)}</span>,
+        },
         {
           key: "evidence",
           header: "Minh chứng",
           cell: (c) => (
             <>
               <p>{c.evidenceRequired ? "Bắt buộc" : "Không bắt buộc"}</p>
-              <p className="text-body-sm text-ink-500">{c.evidenceGuide}</p>
+              <p className="text-body-sm text-ink-600">{c.evidenceGuide}</p>
             </>
           ),
         },
@@ -54,7 +66,7 @@ export function CriteriaTable({ snapshot }) {
           <p className="text-body-sm text-ink-600">{c.evidenceGuide}</p>
         </div>
       )}
-      empty={<p>Chưa có tiêu chí.</p>}
+      empty={<EmptyState compact title="Chưa có tiêu chí." description={null} />}
     />
   );
 }
