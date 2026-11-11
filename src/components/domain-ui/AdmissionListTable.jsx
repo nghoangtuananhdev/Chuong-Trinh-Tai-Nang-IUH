@@ -13,7 +13,14 @@ export function AdmissionListTable({
     <DataList
       rows={payload?.rows ?? []}
       columns={[
-        { key: "rank", header: "Hạng", cell: (r) => r.rank },
+        {
+          key: "rank",
+          header: "Hạng",
+          align: "right",
+          width: 64,
+          className: "tabular-nums",
+          cell: (r) => r.rank,
+        },
         {
           key: "code",
           header: "MSSV",
@@ -28,6 +35,8 @@ export function AdmissionListTable({
         {
           key: "score",
           header: "Điểm chính thức",
+          align: "right",
+          className: "tabular-nums",
           cell: (r) => r.officialScore,
         },
         {
@@ -49,9 +58,13 @@ export function AdmissionListTable({
                 Đồng hạng {r.tieGroup}
               </Checkbox>
             ) : r.proposed ? (
-              "Đề xuất"
+              <span className="inline-block rounded-full bg-success-bg px-2 text-caption font-medium text-success-fg">
+                Đề xuất
+              </span>
             ) : (
-              "Ngoài chỉ tiêu"
+              <span className="inline-block rounded-full bg-neutral-bg px-2 text-caption font-medium text-neutral-fg">
+                Ngoài chỉ tiêu
+              </span>
             ),
         },
         { key: "note", header: "Ghi chú", cell: (r) => r.note },

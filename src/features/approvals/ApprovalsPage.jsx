@@ -8,6 +8,9 @@ import { useAction, DataList } from "../shared/FeatureKit.jsx";
 import { Button } from "../../components/ui/Button.jsx";
 import { Field, Select, Textarea } from "../../components/ui/Form.jsx";
 import { Callout, Timeline, CodeTag } from "../../components/ui/Display.jsx";
+import { Panel } from "../../components/ui/Panel.jsx";
+import { StatePage } from "../../components/ui/StatePage.jsx";
+import { ActionBar } from "../../components/layout/ActionBar.jsx";
 import { ConfirmDialog } from "../../components/ui/ConfirmDialog.jsx";
 import { AdmissionListTable } from "../../components/domain-ui/AdmissionListTable.jsx";
 import { EvidenceUploader } from "../../components/domain-ui/EvidenceUploader.jsx";
@@ -88,14 +91,14 @@ export function ApprovalsPage({ id }) {
   const round = rounds.find((r) => r.id === id);
   if (!round)
     return (
-      <Callout tone="danger">Không có quyền truy cập danh sách này.</Callout>
+      <StatePage tone="danger">Không có quyền truy cập danh sách này.</StatePage>
     );
   const lists = db.admissionLists
       .filter((l) => l.roundId === id)
       .sort((a, b) => b.version - a.version),
     latest = lists[0],
     list = lists.find((l) => l.id === version) ?? latest;
-  if (!list) return <Callout>ĐXT chưa được chốt danh sách.</Callout>;
+  if (!list) return <StatePage>ĐXT chưa được chốt danh sách.</StatePage>;
   const myTurn =
     list.id === latest.id &&
     list.status === "PENDING" &&
@@ -106,11 +109,13 @@ export function ApprovalsPage({ id }) {
   const tie = list.payload.rows.some((r) => r.tieGroup),
     selection = list.tieResolution?.selectedApplicationIds ?? selected;
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
+      <Panel>
       <h2 className="text-title-2">
         {round.name} · Chỉ tiêu {list.payload.quota}
       </h2>
-      <Field label="Phiên bản danh sách">
+      <div className="mt-4">
+      <Field label="Phiên bản danh sách" className="sm:max-w-xs">
         <Select
           value={list.id}
           onChange={(e) => {
@@ -130,7 +135,11 @@ export function ApprovalsPage({ id }) {
           ))}
         </Select>
       </Field>
-      <ApprovalStepper round={round} list={list} steps={steps} />
+      </div>
+      <div className="mt-5 border-t border-ink-200 pt-5">
+        <ApprovalStepper round={round} list={list} steps={steps} />
+      </div>
+      </Panel>
       {list.payload.warnings.map((w) => (
         <Callout key={w} tone="warning">
           {w}
@@ -150,17 +159,20 @@ export function ApprovalsPage({ id }) {
         }
         readOnly={!myTurn || activeRole.role !== "HEAD"}
       />
-      <Timeline
-        items={steps.map((s) => ({
-          date: formatIct(s.decidedAt),
-          actor: db.users.find((u) => u.id === s.decidedBy)?.fullName,
-          role: `${ROLE_LABEL[s.level]} · v${lists.find((l) => l.id === s.listId)?.version}`,
-          action: s.decision === "RETURNED" ? "Trả về" : "Phê duyệt",
-          note: s.comment,
-        }))}
-      />
+      <Panel>
+        <Timeline
+          items={steps.map((s) => ({
+            date: formatIct(s.decidedAt),
+            actor: db.users.find((u) => u.id === s.decidedBy)?.fullName,
+            role: `${ROLE_LABEL[s.level]} · v${lists.find((l) => l.id === s.listId)?.version}`,
+            action: s.decision === "RETURNED" ? "Trả về" : "Phê duyệt",
+            note: s.comment,
+          }))}
+        />
+      </Panel>
       {myTurn && (
-        <>
+        <Panel>
+          <div className="space-y-4">
           <Field label="Ý kiến (bắt buộc khi trả về)">
             <Textarea
               value={comment}
@@ -172,13 +184,17 @@ export function ApprovalsPage({ id }) {
             onChange={(refs) => setFiles(refs.slice(-1))}
             onView={setViewFile}
           />
-          <div className="flex flex-wrap gap-2">
-            <Button
-              variant="dangerOutline"
-              onClick={() => setOperation("return")}
-            >
-              Trả về
-            </Button>
+          <ActionBar
+            className="border-t border-ink-200 pt-4"
+            start={
+              <Button
+                variant="dangerOutline"
+                onClick={() => setOperation("return")}
+              >
+                Trả về
+              </Button>
+            }
+          >
             <Button
               disabled={
                 activeRole.role === "HEAD" &&
@@ -208,8 +224,9 @@ export function ApprovalsPage({ id }) {
                   ? "Xác nhận danh sách"
                   : "Phê duyệt danh sách"}
             </Button>
+          </ActionBar>
           </div>
-        </>
+        </Panel>
       )}
       {round.status === "published" && (
         <Callout tone="success" title="ĐXT đã công bố và bất biến">

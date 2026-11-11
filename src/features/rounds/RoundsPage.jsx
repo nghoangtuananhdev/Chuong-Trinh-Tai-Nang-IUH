@@ -18,6 +18,11 @@ import {
   DescriptionList,
 } from "../../components/ui/Display.jsx";
 import { StatusBadge } from "../../components/ui/StatusBadge.jsx";
+import { FileText } from "lucide-react";
+import { Panel } from "../../components/ui/Panel.jsx";
+import { StatePage } from "../../components/ui/StatePage.jsx";
+import { ActionBar } from "../../components/layout/ActionBar.jsx";
+import { RoundTrack } from "../../components/domain-ui/RoundTrack.jsx";
 import { ConfirmDialog } from "../../components/ui/ConfirmDialog.jsx";
 import { Field, Textarea, Select } from "../../components/ui/Form.jsx";
 import { CriteriaTable } from "../../components/domain-ui/CriteriaTable.jsx";
@@ -272,23 +277,31 @@ export function RoundsPage({ id, publicView = false }) {
   if (!id)
     return (
       <div className="space-y-4">
-        {activeRole?.role === "TRAINING" && (
-          <Button variant="secondary" onClick={() => setView("classes")}>
-            Tra cứu lớp
-          </Button>
-        )}
-        <FilterTabs
-          label="Trạng thái ĐXT"
-          value={status}
-          onChange={setStatus}
-          options={[
-            { value: "", label: "Tất cả" },
-            ...Object.entries(ROUND_STATUSES).map(([value, m]) => ({
-              value,
-              label: m.label,
-            })),
-          ]}
-        />
+        <ActionBar
+          start={
+            <FilterTabs
+              label="Trạng thái ĐXT"
+              value={status}
+              onChange={setStatus}
+              options={[
+                { value: "", label: "Tất cả" },
+                ...Object.entries(ROUND_STATUSES).map(([value, m]) => ({
+                  value,
+                  label: m.label,
+                })),
+              ]}
+            />
+          }
+        >
+          {activeRole?.role === "TRAINING" && (
+            <Button variant="secondary" onClick={() => setView("classes")}>
+              Tra cứu lớp
+            </Button>
+          )}
+          {can("round.manage") && (
+            <Button onClick={() => showForm()}>Tạo đợt xét tuyển</Button>
+          )}
+        </ActionBar>
         <div className="flex flex-wrap gap-3">
           <Field label="Năm học">
             <Select value={year} onChange={(e) => setYear(e.target.value)}>
@@ -309,9 +322,6 @@ export function RoundsPage({ id, publicView = false }) {
               ))}
             </Select>
           </Field>
-          {can("round.manage") && (
-            <Button onClick={() => showForm()}>Tạo đợt xét tuyển</Button>
-          )}
         </div>
         <DataList
           rows={rows.filter(
@@ -361,93 +371,147 @@ export function RoundsPage({ id, publicView = false }) {
     );
   if (!round)
     return (
-      <Callout tone="danger">
+      <StatePage tone="danger">
         Không tìm thấy ĐXT hoặc không có quyền truy cập.
-      </Callout>
+      </StatePage>
     );
-  return (
-    <div className="space-y-5">
-      <h2 className="text-title-2">{round.name}</h2>
-      <CodeTag>{round.code}</CodeTag>
-      <StatusBadge domain="round">{round.status}</StatusBadge>
-      <DescriptionList
-        items={[
-          { label: "Lớp", value: round.class.code },
-          { label: "Phân loại", value: round.typeLabel },
-          {
-            label: "Năm học",
-            value: `${round.academicYear} · ${round.semester}`,
-          },
-          { label: "Sĩ số tối đa", value: round.quota },
-          {
-            label: "Chế độ",
-            value: round.isFirstRound
-              ? "Xếp hạng chung"
-              : RANKING_MODE[round.rankingMode],
-          },
-        ]}
-      />
-      <RoundMilestones round={round} now={db.clock.now} />
-      <p>{round.description}</p>
-      {(round.attachments ?? []).map((f, i) => (
-        <Button key={i} variant="link" onClick={() => setFile(f)}>
-          {f.name}
+  const actionsPrimary = [
+    publicView && round.status === "open" && (
+      <Button
+        key="apply"
+        onClick={() =>
+          navigate(
+            me
+              ? `/app/apply/${id}`
+              : `/dang-nhap?returnTo=${encodeURIComponent(`/app/apply/${id}`)}`,
+          )
+        }
+      >
+        Nộp hồ sơ
+      </Button>
+    ),
+    publicView && round.status === "published" && (
+      <Button key="results" onClick={() => navigate(`/ket-qua/${id}`)}>
+        Xem kết quả
+      </Button>
+    ),
+    !publicView &&
+      can("round.editTimeline", { type: "round", id }) &&
+      editableFields(round.status, activeRole.role).length > 0 && (
+        <Button key="edit" onClick={() => showForm(round)}>
+          Sửa
         </Button>
-      ))}
+      ),
+    !publicView &&
+      can("round.manage", { type: "round", id }) &&
+      round.status === "draft" && (
+        <Button
+          key="release"
+          onClick={() =>
+            setConfirm({ name: "rounds.release", title: "Phát hành ĐXT?" })
+          }
+        >
+          Phát hành
+        </Button>
+      ),
+  ];
+  return (
+    <div className="space-y-6">
+      <Panel>
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+          <h2 className="text-title-2">{round.name}</h2>
+          <CodeTag>{round.code}</CodeTag>
+          <StatusBadge domain="round">{round.status}</StatusBadge>
+        </div>
+        <div className="mt-4">
+          <RoundTrack status={round.status} />
+        </div>
+        <div className="mt-5 border-t border-ink-200 pt-5">
+          <DescriptionList
+            layout="plain"
+            columns={3}
+            items={[
+              { label: "Lớp", value: round.class.code },
+              { label: "Phân loại", value: round.typeLabel },
+              {
+                label: "Năm học",
+                value: `${round.academicYear} · ${round.semester}`,
+              },
+              { label: "Sĩ số tối đa", value: round.quota },
+              {
+                label: "Chế độ",
+                value: round.isFirstRound
+                  ? "Xếp hạng chung"
+                  : RANKING_MODE[round.rankingMode],
+              },
+            ]}
+          />
+        </div>
+      </Panel>
+      <Panel>
+        <RoundMilestones round={round} now={db.clock.now} />
+      </Panel>
+      <p className="max-w-[68ch] text-body text-ink-700">{round.description}</p>
+      {(round.attachments ?? []).length > 0 && (
+        <div className="flex flex-col items-start gap-1">
+          {(round.attachments ?? []).map((f, i) => (
+            <Button key={i} variant="link" icon={FileText} onClick={() => setFile(f)}>
+              {f.name}
+            </Button>
+          ))}
+        </div>
+      )}
       {round.criteriaSnapshot && (
         <Callout>
           Snapshot bộ tiêu chí v{round.criteriaSnapshot.version} lúc{" "}
           {formatIct(round.openedAt)}
         </Callout>
       )}
-      <CriteriaTable
-        snapshot={
-          round.criteriaSnapshot ??
-          db.criteriaSets.find((s) => s.id === round.criteriaSetId)
-        }
-      />
-      <div className="flex flex-wrap gap-2">
-        {publicView && (
-          <>
-            <Button variant="secondary" onClick={() => navigate("/")}>
-              Về trang chủ
-            </Button>
-            {round.status === "open" && (
-              <Button
-                onClick={() =>
-                  navigate(
-                    me
-                      ? `/app/apply/${id}`
-                      : `/dang-nhap?returnTo=${encodeURIComponent(`/app/apply/${id}`)}`,
-                  )
-                }
-              >
-                Nộp hồ sơ
-              </Button>
-            )}
-            {round.status === "published" && (
-              <Button onClick={() => navigate(`/ket-qua/${id}`)}>
-                Xem kết quả
-              </Button>
-            )}
-          </>
-        )}
-        {!publicView &&
-          can("round.editTimeline", { type: "round", id }) &&
-          editableFields(round.status, activeRole.role).length > 0 && (
-            <Button onClick={() => showForm(round)}>Sửa</Button>
-          )}
-        {!publicView &&
+      <Panel padded={false} className="overflow-hidden">
+        <CriteriaTable
+          snapshot={
+            round.criteriaSnapshot ??
+            db.criteriaSets.find((s) => s.id === round.criteriaSetId)
+          }
+        />
+      </Panel>
+      <ActionBar
+        start={
+          !publicView &&
           can("round.manage", { type: "round", id }) &&
-          round.status === "draft" && (
+          ["draft", "upcoming"].includes(round.status) && (
             <Button
+              variant="dangerOutline"
               onClick={() =>
-                setConfirm({ name: "rounds.release", title: "Phát hành ĐXT?" })
+                setConfirm({ name: "rounds.delete", title: "Xóa ĐXT?" })
               }
             >
-              Phát hành
+              Xóa
             </Button>
-          )}
+          )
+        }
+      >
+        {publicView && (
+          <Button variant="secondary" onClick={() => navigate("/")}>
+            Về trang chủ
+          </Button>
+        )}
+        {!publicView && can("application.review", { type: "round", id }) && (
+          <Button
+            variant="secondary"
+            onClick={() => navigate(`/app/reviews?round=${id}`)}
+          >
+            Duyệt hồ sơ
+          </Button>
+        )}
+        {!publicView && (
+          <Button
+            variant="secondary"
+            onClick={() => navigate(`/app/approvals/${id}`)}
+          >
+            Danh sách phê duyệt
+          </Button>
+        )}
         {!publicView &&
           can("round.transitionManual", { type: "round", id }) &&
           ["upcoming", "open"].includes(round.status) && (
@@ -471,35 +535,8 @@ export function RoundsPage({ id, publicView = false }) {
                 : "Đóng tiếp nhận sớm"}
             </Button>
           )}
-        {!publicView &&
-          can("round.manage", { type: "round", id }) &&
-          ["draft", "upcoming"].includes(round.status) && (
-            <Button
-              variant="dangerOutline"
-              onClick={() =>
-                setConfirm({ name: "rounds.delete", title: "Xóa ĐXT?" })
-              }
-            >
-              Xóa
-            </Button>
-          )}
-        {!publicView && can("application.review", { type: "round", id }) && (
-          <Button
-            variant="secondary"
-            onClick={() => navigate(`/app/reviews?round=${id}`)}
-          >
-            Duyệt hồ sơ
-          </Button>
-        )}
-        {!publicView && (
-          <Button
-            variant="secondary"
-            onClick={() => navigate(`/app/approvals/${id}`)}
-          >
-            Danh sách phê duyệt
-          </Button>
-        )}
-      </div>
+        {actionsPrimary}
+      </ActionBar>
       {dialog}
     </div>
   );

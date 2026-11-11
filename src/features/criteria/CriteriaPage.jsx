@@ -17,6 +17,9 @@ import {
   Checkbox,
 } from "../../components/ui/Form.jsx";
 import { Callout } from "../../components/ui/Display.jsx";
+import { Panel } from "../../components/ui/Panel.jsx";
+import { StatePage } from "../../components/ui/StatePage.jsx";
+import { ActionBar } from "../../components/layout/ActionBar.jsx";
 import { StatusBadge } from "../../components/ui/StatusBadge.jsx";
 import { CriterionField } from "../../components/domain-ui/CriterionField.jsx";
 import { CriteriaTable } from "../../components/domain-ui/CriteriaTable.jsx";
@@ -65,20 +68,34 @@ export function CriteriaPage({ id }) {
   if (!id)
     return (
       <div className="space-y-4">
-        <div className="flex flex-wrap gap-2">
-          <Button variant="secondary" onClick={() => setMode("all")}>
-            Tất cả trong khoa
-          </Button>
-          <Button variant="secondary" onClick={() => setMode("own")}>
-            Do tôi tạo
-          </Button>
-          <Button variant="secondary" onClick={() => setMode("archive")}>
-            Lưu trữ
-          </Button>
+        <ActionBar
+          start={
+            <div
+              role="group"
+              className="inline-flex rounded-control bg-ink-100 p-0.5"
+            >
+              {[
+                ["all", "Tất cả trong khoa"],
+                ["own", "Do tôi tạo"],
+                ["archive", "Lưu trữ"],
+              ].map(([value, label]) => (
+                <button
+                  key={value}
+                  type="button"
+                  aria-pressed={mode === value}
+                  onClick={() => setMode(value)}
+                  className={`h-8 rounded-xs px-3 text-body-sm font-medium max-sm:h-10 ${mode === value ? "bg-white text-ink-900 shadow-raised" : "text-ink-600 hover:text-ink-900"}`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          }
+        >
           {can("criteria.create") && (
             <Button onClick={() => setCreate(true)}>Tạo bộ tiêu chí</Button>
           )}
-        </div>
+        </ActionBar>
         <DataList
           rows={sets.filter((s) =>
             mode === "own"
@@ -170,9 +187,9 @@ export function CriteriaPage({ id }) {
     );
   if (!set)
     return (
-      <Callout tone="danger">
+      <StatePage tone="danger">
         Không tìm thấy bộ tiêu chí hoặc không có quyền.
-      </Callout>
+      </StatePage>
     );
   const writable =
       set.status === "DRAFT" &&
@@ -189,101 +206,113 @@ export function CriteriaPage({ id }) {
     return r;
   };
   return (
-    <div className="space-y-5">
-      <h2 className="text-title-2">
-        {set.name} · v{set.version}
-      </h2>
-      <StatusBadge domain="criteriaSet">{set.status}</StatusBadge>
-      {db.rounds.some(
-        (r) => r.criteriaSetId === set.id && r.criteriaSnapshot,
-      ) && (
-        <Callout>
-          ĐXT đang chạy dùng bản snapshot; phiên bản mới không ảnh hưởng điểm
-          của ĐXT.
-        </Callout>
-      )}
-      {writable ? (
-        <>
-          <Field label="Tên bộ">
-            <Input
-              value={local.name}
-              onChange={(e) => setEditing({ ...local, name: e.target.value })}
-            />
-          </Field>
-          <Field label="Mô tả">
-            <Textarea
-              value={local.description}
-              onChange={(e) =>
-                setEditing({ ...local, description: e.target.value })
-              }
-            />
-          </Field>
-          <Button variant="secondary" onClick={addCriterion}>
-            Thêm tiêu chí
-          </Button>
-        </>
-      ) : null}
-      <CriteriaTable snapshot={local} />
-      {writable &&
-        local.criteria.map((c, i) => (
-          <div key={c.id} className="flex flex-wrap gap-2">
-            <span className="text-body">{c.name}</span>
-            <Button
-              size="sm"
-              variant="secondary"
-              onClick={() => setCriterion(structuredClone(c))}
-            >
-              Sửa
-            </Button>
-            <Button
-              size="sm"
-              variant="secondary"
-              disabled={i === 0}
-              onClick={() => {
-                const copy = [...local.criteria];
-                [copy[i - 1], copy[i]] = [copy[i], copy[i - 1]];
-                setEditing({
-                  ...local,
-                  criteria: copy.map((c, i) => ({ ...c, sortOrder: i + 1 })),
-                });
-              }}
-            >
-              Lên
-            </Button>
-            <Button
-              size="sm"
-              variant="secondary"
-              disabled={i === local.criteria.length - 1}
-              onClick={() => {
-                const copy = [...local.criteria];
-                [copy[i], copy[i + 1]] = [copy[i + 1], copy[i]];
-                setEditing({
-                  ...local,
-                  criteria: copy.map((c, i) => ({ ...c, sortOrder: i + 1 })),
-                });
-              }}
-            >
-              Xuống
-            </Button>
-            <Button
-              size="sm"
-              variant="dangerOutline"
-              onClick={() =>
-                setEditing({
-                  ...local,
-                  criteria: local.criteria.filter((x) => x.id !== c.id),
-                })
-              }
-            >
-              Xóa tiêu chí
+    <div className="space-y-6">
+      <Panel>
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+          <h2 className="text-title-2">
+            {set.name} · v{set.version}
+          </h2>
+          <StatusBadge domain="criteriaSet">{set.status}</StatusBadge>
+        </div>
+        {db.rounds.some(
+          (r) => r.criteriaSetId === set.id && r.criteriaSnapshot,
+        ) && (
+          <div className="mt-4">
+            <Callout>
+              ĐXT đang chạy dùng bản snapshot; phiên bản mới không ảnh hưởng
+              điểm của ĐXT.
+            </Callout>
+          </div>
+        )}
+        {writable ? (
+          <div className="mt-5 space-y-4 border-t border-ink-200 pt-5">
+            <Field label="Tên bộ">
+              <Input
+                value={local.name}
+                onChange={(e) => setEditing({ ...local, name: e.target.value })}
+              />
+            </Field>
+            <Field label="Mô tả">
+              <Textarea
+                value={local.description}
+                onChange={(e) =>
+                  setEditing({ ...local, description: e.target.value })
+                }
+              />
+            </Field>
+            <Button variant="secondary" onClick={addCriterion}>
+              Thêm tiêu chí
             </Button>
           </div>
-        ))}
-      <section className="rounded-card border border-ink-200 bg-white p-5">
+        ) : null}
+      </Panel>
+      <Panel padded={false} className="overflow-hidden">
+        <CriteriaTable snapshot={local} />
+      </Panel>
+      {writable && (
+        <Panel padded={false}>
+          <ul className="divide-y divide-ink-200">
+            {local.criteria.map((c, i) => (
+              <li key={c.id} className="flex flex-wrap items-center gap-2 px-5 py-3">
+                <span className="min-w-0 flex-1 text-body">{c.name}</span>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={() => setCriterion(structuredClone(c))}
+                >
+                  Sửa
+                </Button>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  disabled={i === 0}
+                  onClick={() => {
+                    const copy = [...local.criteria];
+                    [copy[i - 1], copy[i]] = [copy[i], copy[i - 1]];
+                    setEditing({
+                      ...local,
+                      criteria: copy.map((c, i) => ({ ...c, sortOrder: i + 1 })),
+                    });
+                  }}
+                >
+                  Lên
+                </Button>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  disabled={i === local.criteria.length - 1}
+                  onClick={() => {
+                    const copy = [...local.criteria];
+                    [copy[i], copy[i + 1]] = [copy[i + 1], copy[i]];
+                    setEditing({
+                      ...local,
+                      criteria: copy.map((c, i) => ({ ...c, sortOrder: i + 1 })),
+                    });
+                  }}
+                >
+                  Xuống
+                </Button>
+                <Button
+                  size="sm"
+                  variant="dangerOutline"
+                  onClick={() =>
+                    setEditing({
+                      ...local,
+                      criteria: local.criteria.filter((x) => x.id !== c.id),
+                    })
+                  }
+                >
+                  Xóa tiêu chí
+                </Button>
+              </li>
+            ))}
+          </ul>
+        </Panel>
+      )}
+      <section className="space-y-4">
         <h3 className="text-title-3">Xem trước điểm</h3>
         <Button
           variant="secondary"
-          className="my-3"
           onClick={() =>
             setItems(
               local.criteria.map((c) => ({
@@ -325,26 +354,27 @@ export function CriteriaPage({ id }) {
             }
           />
         ))}
-        <p aria-live="polite" className="mt-4 text-title-2">
-          {preview.total} điểm · {preview.eligible ? "Đạt BB" : "Chưa đạt BB"}
-        </p>
+        <Panel>
+          <p aria-live="polite" className="text-title-2">
+            {preview.total} điểm · {preview.eligible ? "Đạt BB" : "Chưa đạt BB"}
+          </p>
+        </Panel>
       </section>
-      <div className="flex flex-wrap gap-2">
-        {writable && (
-          <>
-            <Button loading={action.busy} onClick={save}>
-              Lưu nháp
-            </Button>
+      <ActionBar
+        sticky
+        className="sm:pr-52"
+        start={
+          can("criteria.update", { type: "criteriaSet", entity: set }) &&
+          set.status === "DRAFT" && (
             <Button
-              onClick={async () => {
-                if (editing && !(await save()).ok) return;
-                await action.run("criteria.publish", { id: set.id });
-              }}
+              variant="dangerOutline"
+              onClick={() => setOperation("delete")}
             >
-              Ban hành
+              Xóa bộ nháp
             </Button>
-          </>
-        )}
+          )
+        }
+      >
         {can("criteria.update", { type: "criteriaSet", entity: set }) && (
           <>
             <Button
@@ -364,17 +394,24 @@ export function CriteriaPage({ id }) {
             <Button variant="secondary" onClick={() => setOperation("archive")}>
               Lưu trữ
             </Button>
-            {set.status === "DRAFT" && (
-              <Button
-                variant="dangerOutline"
-                onClick={() => setOperation("delete")}
-              >
-                Xóa bộ nháp
-              </Button>
-            )}
           </>
         )}
-      </div>
+        {writable && (
+          <>
+            <Button loading={action.busy} onClick={save}>
+              Lưu nháp
+            </Button>
+            <Button
+              onClick={async () => {
+                if (editing && !(await save()).ok) return;
+                await action.run("criteria.publish", { id: set.id });
+              }}
+            >
+              Ban hành
+            </Button>
+          </>
+        )}
+      </ActionBar>
       <ConfirmDialog
         open={Boolean(operation)}
         title={
