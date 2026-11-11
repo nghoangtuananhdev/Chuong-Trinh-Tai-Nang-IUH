@@ -1,5 +1,8 @@
+import { FileText, Plus } from "lucide-react";
 import { Field, Input, Select } from "../ui/Form.jsx";
 import { Button } from "../ui/Button.jsx";
+import { Callout } from "../ui/Display.jsx";
+import { Panel } from "../ui/Panel.jsx";
 import { EvidenceUploader } from "./EvidenceUploader.jsx";
 import { OPERATOR } from "../../domain/constants.js";
 export function CriterionField({
@@ -12,24 +15,36 @@ export function CriterionField({
 }) {
   const change = (patch) => onChange({ ...item, criterionId: c.id, ...patch });
   return (
-    <section className="space-y-3 rounded-card border border-ink-200 bg-white p-4">
-      <h3 className="text-title-3">
-        {c.name}{" "}
-        <span className="text-body-sm text-ink-500">
-          {c.kind === "REQUIRED" ? "BB" : "UT"} · {c.unit}
-        </span>
-      </h3>
-      <p className="text-body-sm text-ink-700">
-        Mức điểm:{" "}
-        {c.levels
-          .map((l) =>
-            c.valueType === "ACCUMULATIVE_ENUM"
-              ? `${l.label}: ${l.points} điểm`
-              : `${OPERATOR[l.operator]} ${l.valueFrom}${l.operator === "BETWEEN" ? `–${l.valueTo}` : ""} → ${l.points} điểm`,
-          )
-          .join(" · ")}
-      </p>
-      <p className="text-body-sm text-ink-600">{c.evidenceGuide}</p>
+    <Panel
+      titleAs="h3"
+      title={
+        <>
+          {c.name}{" "}
+          <span
+            className={`rounded-full px-2 text-caption font-semibold ${c.kind === "REQUIRED" ? "bg-brand-50 text-brand-700" : "bg-ink-100 text-ink-700"}`}
+          >
+            {c.kind === "REQUIRED" ? "BB" : "UT"}
+          </span>{" "}
+          <span className="text-body-sm font-normal text-ink-600">
+            · {c.unit}
+          </span>
+        </>
+      }
+    >
+     <div className="space-y-3">
+      <div className="space-y-1 rounded-control bg-ink-25 px-3 py-2 text-body-sm text-ink-700">
+        <p>
+          Mức điểm:{" "}
+          {c.levels
+            .map((l) =>
+              c.valueType === "ACCUMULATIVE_ENUM"
+                ? `${l.label}: ${l.points} điểm`
+                : `${OPERATOR[l.operator]} ${l.valueFrom}${l.operator === "BETWEEN" ? `–${l.valueTo}` : ""} → ${l.points} điểm`,
+            )
+            .join(" · ")}
+        </p>
+        <p className="text-ink-600">{c.evidenceGuide}</p>
+      </div>
       {c.refCriterionId ? (
         <p className="text-body-sm">
           Dùng giá trị của tiêu chí được tham chiếu.
@@ -41,6 +56,7 @@ export function CriterionField({
               key={entry.id}
               className="space-y-3 rounded-control border border-ink-200 p-4"
             >
+              <div className="grid gap-3 sm:grid-cols-2">
               <Field label={`Tên thành tích ${i + 1}`}>
                 <Input
                   value={entry.title ?? ""}
@@ -74,17 +90,22 @@ export function CriterionField({
                   ))}
                 </Select>
               </Field>
-              {readOnly &&
-                (entry.evidence ?? []).map((file, i) => (
-                  <Button
-                    key={i}
-                    size="sm"
-                    variant="link"
-                    onClick={() => onView?.(file)}
-                  >
-                    {file.name}
-                  </Button>
-                ))}
+              </div>
+              {readOnly && (entry.evidence ?? []).length > 0 && (
+                <div className="flex flex-col items-start gap-1">
+                  {(entry.evidence ?? []).map((file, i) => (
+                    <Button
+                      key={i}
+                      size="sm"
+                      variant="link"
+                      icon={FileText}
+                      onClick={() => onView?.(file)}
+                    >
+                      {file.name}
+                    </Button>
+                  ))}
+                </div>
+              )}
               {withEvidence && !readOnly && (
                 <EvidenceUploader
                   files={entry.evidence}
@@ -98,25 +119,28 @@ export function CriterionField({
                   }
                 />
               )}
-              <Button
-                size="sm"
-                variant="dangerOutline"
-                disabled={readOnly}
-                onClick={() =>
-                  change({
-                    declaredEntries: item.declaredEntries.filter(
-                      (_, j) => i !== j,
-                    ),
-                  })
-                }
-              >
-                Xóa thành tích
-              </Button>
+              <div className="flex justify-end">
+                <Button
+                  size="sm"
+                  variant="dangerOutline"
+                  disabled={readOnly}
+                  onClick={() =>
+                    change({
+                      declaredEntries: item.declaredEntries.filter(
+                        (_, j) => i !== j,
+                      ),
+                    })
+                  }
+                >
+                  Xóa thành tích
+                </Button>
+              </div>
             </div>
           ))}
           {!readOnly && (
             <Button
               variant="secondary"
+              icon={Plus}
               onClick={() =>
                 change({
                   declaredEntries: [
@@ -160,24 +184,28 @@ export function CriterionField({
               }
             />
           </Field>
-          {readOnly &&
-            (item.evidence ?? []).map((file, i) => (
-              <Button
-                key={i}
-                size="sm"
-                variant="link"
-                onClick={() => onView?.(file)}
-              >
-                {file.name}
-              </Button>
-            ))}
+          {readOnly && (item.evidence ?? []).length > 0 && (
+            <div className="flex flex-col items-start gap-1">
+              {(item.evidence ?? []).map((file, i) => (
+                <Button
+                  key={i}
+                  size="sm"
+                  variant="link"
+                  icon={FileText}
+                  onClick={() => onView?.(file)}
+                >
+                  {file.name}
+                </Button>
+              ))}
+            </div>
+          )}
           {withEvidence &&
             c.valueType === "COUNT" &&
             Number(item.declaredCount) > (item.evidence?.length ?? 0) && (
-              <p className="text-body-sm text-warning-fg" role="status">
+              <Callout tone="warning" role="status">
                 Số tệp minh chứng đang ít hơn số thành tích khai báo. Nên có một
                 minh chứng cho mỗi thành tích.
-              </p>
+              </Callout>
             )}
           {withEvidence && !readOnly && (
             <EvidenceUploader
@@ -188,6 +216,7 @@ export function CriterionField({
           )}
         </>
       )}
-    </section>
+     </div>
+    </Panel>
   );
 }
