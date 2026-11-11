@@ -3,7 +3,7 @@
   --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", "Segoe UI Mono", Menlo, Consolas, monospace;
 
-  /* Brand — Navy IUH */
+  /* Brand — xanh logo IUH (600 = #153898, màu chính thức) — GIỮ NGUYÊN */
   --color-brand-25: #f7f9ff;
   --color-brand-50: #eef3ff;
   --color-brand-100: #dce6ff;
@@ -17,7 +17,7 @@
   --color-brand-900: #10285e;
   --color-brand-950: #0a1a40;
 
-  /* Ink — xám ánh lam */
+  /* Ink — xám ánh lam — GIỮ NGUYÊN */
   --color-ink-0: #ffffff;
   --color-ink-25: #fafbfd;
   --color-ink-50: #f4f6fa;
@@ -31,11 +31,14 @@
   --color-ink-800: #263043;
   --color-ink-900: #182235;
 
-  /* Accent — ánh đồng học thuật (cực tiết chế) */
-  --color-accent-50: #fbf6ea;
-  --color-accent-300: #e2c47e;
-  --color-accent-500: #b8892b;
-  --color-accent-700: #7e5c17;
+  /* Accent — ĐỔI: vàng logo IUH (500 = #F9B200). Chỉ dùng trên nền xanh. */
+  --color-accent-50: #fff8e1;
+  --color-accent-100: #ffedb3;   /* MỚI */
+  --color-accent-300: #fdcb54;
+  --color-accent-400: #fdb726;   /* MỚI — vàng của logo bản trắng */
+  --color-accent-500: #f9b200;
+  --color-accent-600: #d99a00;   /* MỚI — hover nút accent */
+  --color-accent-700: #8a6200;
 
   /* Semantic */
   --color-success-fg: #166534;
@@ -43,10 +46,11 @@
   --color-success-border: #bbf7d0;
   --color-success-solid: #16a34a;
 
-  --color-warning-fg: #854d0e;
-  --color-warning-bg: #fffbeb;
-  --color-warning-border: #fde68a;
-  --color-warning-solid: #d97706;
+  /* ĐỔI: cam, tách khỏi vàng thương hiệu */
+  --color-warning-fg: #9a3412;
+  --color-warning-bg: #fff7ed;
+  --color-warning-border: #fed7aa;
+  --color-warning-solid: #ea580c;
 
   --color-danger-fg: #b42318;
   --color-danger-bg: #fef3f2;
@@ -54,37 +58,43 @@
   --color-danger-solid: #dc2626;
   --color-danger-hover: #912018;
 
-  --color-info-fg: #1e40af;
-  --color-info-bg: #eff6ff;
-  --color-info-border: #bfdbfe;
-  --color-info-solid: #2563eb;
+  /* ĐỔI: gộp về tông brand */
+  --color-info-fg: #102c79;
+  --color-info-bg: #eef3ff;
+  --color-info-border: #baccf7;
+  --color-info-solid: #2f59c4;
 
-  --color-neutral-fg: #475569;
-  --color-neutral-bg: #f1f5f9;
-  --color-neutral-border: #e2e8f0;
-  --color-neutral-solid: #64748b;
+  /* ĐỔI: gộp về tông ink */
+  --color-neutral-fg: #3a4659;
+  --color-neutral-bg: #eceff5;
+  --color-neutral-border: #cbd3df;
+  --color-neutral-solid: #626f85;
 
-  --color-focus: #2563eb;
+  --color-focus: #2f59c4;        /* ĐỔI */
 
-  /* Thang chữ */
-  --text-display: 2.75rem;
-  --text-display--line-height: 3.25rem;
-  --text-display--letter-spacing: -0.022em;
+  /* Thang chữ — ĐỔI theo mục 3.3 */
+  --text-display: 2.5rem;
+  --text-display--line-height: 3rem;
+  --text-display--letter-spacing: -0.02em;
   --text-display--font-weight: 700;
-  --text-title-1: 1.75rem;
-  --text-title-1--line-height: 2.25rem;
-  --text-title-1--letter-spacing: -0.018em;
+  --text-title-1: 1.5rem;
+  --text-title-1--line-height: 2rem;
+  --text-title-1--letter-spacing: -0.015em;
   --text-title-1--font-weight: 700;
-  --text-title-2: 1.25rem;
-  --text-title-2--line-height: 1.75rem;
-  --text-title-2--letter-spacing: -0.012em;
+  --text-title-2: 1.125rem;
+  --text-title-2--line-height: 1.625rem;
+  --text-title-2--letter-spacing: -0.01em;
   --text-title-2--font-weight: 650;
-  --text-title-3: 1rem;
-  --text-title-3--line-height: 1.5rem;
-  --text-title-3--letter-spacing: -0.006em;
+  --text-title-3: 0.9375rem;
+  --text-title-3--line-height: 1.375rem;
+  --text-title-3--letter-spacing: -0.005em;
   --text-title-3--font-weight: 600;
+  --text-metric: 1.75rem;                    /* MỚI */
+  --text-metric--line-height: 2rem;
+  --text-metric--letter-spacing: -0.015em;
+  --text-metric--font-weight: 650;
   --text-body-lg: 1rem;
-  --text-body-lg--line-height: 1.625rem;
+  --text-body-lg--line-height: 1.5rem;
   --text-body: 0.875rem;
   --text-body--line-height: 1.375rem;
   --text-body-sm: 0.8125rem;
@@ -92,24 +102,25 @@
   --text-caption: 0.75rem;
   --text-caption--line-height: 1rem;
   --text-caption--letter-spacing: 0.01em;
-  --text-overline: 0.71875rem;
+  --text-overline: 0.75rem;                  /* ĐỔI: không còn cỡ lẻ 11.5px */
   --text-overline--line-height: 1rem;
-  --text-overline--letter-spacing: 0.08em;
+  --text-overline--letter-spacing: 0.04em;
   --text-overline--font-weight: 600;
 
-  /* Bo góc */
-  --radius-xs: 6px;
-  --radius-control: 10px;
-  --radius-card: 14px;
-  --radius-modal: 18px;
+  /* Bo góc — ĐỔI: gọn hơn */
+  --radius-xs: 4px;
+  --radius-control: 8px;
+  --radius-card: 12px;
+  --radius-modal: 16px;
 
-  /* Đổ bóng nhuộm navy */
+  /* Đổ bóng nhuộm xanh — chỉ cho lớp nổi (mục 3.4) */
   --shadow-hairline: 0 0 0 1px rgb(16 40 94 / 0.06);
-  --shadow-raised: 0 1px 2px rgb(16 40 94 / 0.06), 0 1px 1px rgb(16 40 94 / 0.04);
+  --shadow-raised: 0 1px 2px rgb(16 40 94 / 0.06);
   --shadow-card: 0 1px 2px rgb(16 40 94 / 0.05), 0 4px 12px -4px rgb(16 40 94 / 0.08);
   --shadow-overlay: 0 8px 24px -6px rgb(16 40 94 / 0.16), 0 2px 6px -2px rgb(16 40 94 / 0.08);
   --shadow-modal: 0 24px 48px -12px rgb(10 26 64 / 0.28), 0 8px 16px -8px rgb(10 26 64 / 0.12);
-  --shadow-focus: 0 0 0 4px rgb(37 99 235 / 0.16);
+  --shadow-focus: 0 0 0 4px rgb(47 89 196 / 0.2);
+  --shadow-bar: 0 -1px 0 rgb(16 40 94 / 0.08), 0 -8px 24px -12px rgb(16 40 94 / 0.16);   /* MỚI: thanh hành động dính đáy */
 
   /* Chuyển động */
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);

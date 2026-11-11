@@ -34,6 +34,13 @@
     overflow-x: hidden;
   }
 
+  ::selection { background-color: var(--color-brand-100); color: var(--color-brand-900); }
+  html { caret-color: var(--color-brand-600); accent-color: var(--color-brand-600); scrollbar-color: var(--color-ink-300) transparent; }
+  h1, h2, h3 { text-wrap: balance; }
+  p, li, dd { text-wrap: pretty; }
+  .text-link { color: var(--color-brand-600); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+  .text-link:hover { color: var(--color-brand-700); text-decoration-thickness: 2px; }
+
   .num, td.num, .tabular {
     font-variant-numeric: tabular-nums;
   }

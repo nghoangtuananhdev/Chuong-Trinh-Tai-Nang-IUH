@@ -6,7 +6,21 @@
     background-color: var(--color-ink-0);
     border: 1px solid var(--color-ink-200);
     border-radius: var(--radius-card);
-    box-shadow: var(--shadow-card);
+  }
+
+  .surface {
+    background: var(--color-ink-0);
+    border: 1px solid var(--color-ink-200);
+    border-radius: var(--radius-card);
+  }
+
+  .action-bar-sticky {
+    position: sticky;
+    bottom: 0;
+    z-index: var(--z-sticky);
+    background: var(--color-ink-0);
+    border-top: 1px solid var(--color-ink-200);
+    box-shadow: var(--shadow-bar);
   }
 
   /* Form controls */
@@ -91,14 +105,12 @@
     top: 0;
     z-index: 1;
     background-color: var(--color-ink-25);
-    color: var(--color-ink-500);
-    font-size: 0.75rem;
-    line-height: 1rem;
+    color: var(--color-ink-600);
+    font-size: 0.8125rem;
+    line-height: 1.25rem;
     font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
     text-align: left;
-    height: 44px;
+    height: 40px;
     padding: 0 16px;
     border-bottom: 1px solid var(--color-ink-200);
     white-space: nowrap;
@@ -115,7 +127,7 @@
   }
 
   .ui-table td {
-    height: 56px;
+    height: 52px;
     padding: 10px 16px;
     color: var(--color-ink-900);
     border-bottom: 1px solid var(--color-ink-200);
@@ -131,16 +143,12 @@
     border-bottom: none;
   }
 
-  .ui-table tbody tr[data-attention="true"] td:first-child {
-    box-shadow: inset 2px 0 0 var(--color-warning-solid);
+  .ui-table tbody tr[data-attention="true"] td {
+    background-color: var(--color-warning-bg);
   }
 
   .ui-table tbody tr[data-selected="true"] td {
     background-color: var(--color-brand-50);
-  }
-
-  .ui-table tbody tr[data-selected="true"] td:first-child {
-    box-shadow: inset 2px 0 0 var(--color-brand-600);
   }
 
   /* Chữ ký thị giác */
@@ -178,8 +186,7 @@
 
   /* Overlay */
   .overlay-backdrop {
-    background-color: rgb(10 26 64 / 0.48);
-    backdrop-filter: blur(3px);
+    background-color: rgb(10 26 64 / 0.5);
     animation: fadeIn var(--duration-base) var(--ease-standard);
   }
 

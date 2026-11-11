@@ -79,7 +79,7 @@ export function ResponsiveTable({
             <li
               key={rowKey(row)}
               onClick={activate(row)}
-              className={`px-4 py-4 data-[attention=true]:shadow-[inset_3px_0_0_var(--color-warning-solid)] ${onRowClick ? "cursor-pointer active:bg-brand-25" : ""}`}
+              className={`px-4 py-4 data-[attention=true]:bg-warning-bg ${onRowClick ? "cursor-pointer active:bg-brand-25" : ""}`}
               {...(getRowProps ? getRowProps(row) : {})}
             >
               {mobileCard(row)}
