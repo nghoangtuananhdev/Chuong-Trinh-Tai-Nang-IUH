@@ -14,6 +14,7 @@ export function FileDropzone({
   disabled = false,
   children,
   buttonLabel = "Chọn tệp PDF",
+  lead = "Kéo thả tệp vào đây hoặc",
   className = ""
 }) {
   const inputRef = useRef(null);
@@ -38,7 +39,7 @@ export function FileDropzone({
         setDragging(false);
         if (!disabled) handleFiles(e.dataTransfer.files);
       }}
-      className={`flex ${compact ? "flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center" : "flex-col items-center gap-2 px-4 py-6 text-center"} rounded-card border-[1.5px] border-dashed transition-colors duration-120 ${
+      className={`flex ${compact ? "flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center" : "flex-col items-center gap-2 px-4 py-6 text-center"} rounded-card border border-dashed transition-colors duration-120 ${
         dragging ? "border-brand-600 bg-brand-25" : "border-ink-300 bg-ink-25"
       } ${className}`}
     >
@@ -60,7 +61,7 @@ export function FileDropzone({
       <div className="flex min-w-0 flex-1 items-center gap-3">
         <UploadCloud size={compact ? 20 : 24} aria-hidden="true" className="shrink-0 text-brand-600" />
         <p className="min-w-0 text-body-sm text-ink-600">
-          <span className="block">Kéo thả tệp vào đây hoặc</span>
+          {lead != null && <span className="block">{lead}</span>}
           {children}
         </p>
       </div>
@@ -94,7 +95,7 @@ export function FileItem({
 }) {
   return (
     <div className={`flex items-center gap-3 rounded-control border border-ink-200 bg-white p-3 shadow-raised ${className}`}>
-      <span className="flex size-10 shrink-0 items-center justify-center rounded-control bg-danger-bg text-danger-fg">
+      <span className="flex size-10 shrink-0 items-center justify-center rounded-control bg-brand-50 text-brand-700">
         <FileText size={18} aria-hidden="true" />
       </span>
       <div className="min-w-0 flex-1">
@@ -102,7 +103,7 @@ export function FileItem({
         <p className="truncate text-body font-semibold text-ink-900" title={name}>
           {middleEllipsis(name)}
         </p>
-        <p className="flex items-center gap-1.5 text-body-sm text-ink-500">
+        <p className="flex items-center gap-1.5 text-body-sm text-ink-600">
           {size && <span className="tabular-nums">{size}</span>}
           {status === "ok" ? (
             <CheckCircle2 size={14} aria-hidden="true" className="text-success-solid" />

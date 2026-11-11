@@ -151,39 +151,6 @@
     background-color: var(--color-brand-50);
   }
 
-  /* Chữ ký thị giác */
-  .honor-rule {
-    display: block;
-    width: 32px;
-    height: 2px;
-    background-color: var(--color-accent-500);
-  }
-  .honor-rule.on-dark {
-    background-color: var(--color-accent-300);
-  }
-
-  .academic-grid {
-    position: relative;
-  }
-  .academic-grid::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background-image: radial-gradient(circle at 1px 1px, rgb(255 255 255 / 0.9) 1px, transparent 1.4px);
-    background-size: 22px 22px;
-    opacity: 0.06;
-    mask-image: linear-gradient(to bottom, #000 40%, transparent);
-    -webkit-mask-image: linear-gradient(to bottom, #000 40%, transparent);
-  }
-  .academic-grid.on-light::before {
-    background-image: radial-gradient(circle at 1px 1px, var(--color-brand-900) 1px, transparent 1.4px);
-    opacity: 0.08;
-  }
-  .academic-grid > * {
-    position: relative;
-  }
-
   /* Overlay */
   .overlay-backdrop {
     background-color: rgb(10 26 64 / 0.5);

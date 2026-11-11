@@ -51,7 +51,7 @@ export function FilterTabs({ options, value, onChange, label, appearance = "segm
                   ? `relative inline-flex h-11 items-center gap-2 px-3 text-body font-medium transition-colors duration-120 after:absolute after:inset-x-3 after:bottom-0 after:h-0.5 after:rounded-full after:transition-colors ${
                       active ? "text-brand-700 after:bg-brand-600" : "text-ink-600 after:bg-transparent hover:text-ink-900"
                     }`
-                  : `inline-flex h-8 items-center gap-2 rounded-[8px] px-3 text-body-sm font-medium transition-[background-color,box-shadow,color] duration-180 ${
+                  : `inline-flex h-8 max-sm:h-10 items-center gap-2 rounded-xs px-3 text-body-sm font-medium transition-[background-color,box-shadow,color] duration-180 ${
                       active ? "bg-white text-ink-900 shadow-raised" : "text-ink-600 hover:text-ink-900"
                     }`
               }
@@ -60,7 +60,7 @@ export function FilterTabs({ options, value, onChange, label, appearance = "segm
               {opt.count != null && (
                 <span
                   className={`min-w-5 rounded-full px-1.5 text-center text-caption font-semibold tabular-nums ${
-                    active ? "bg-brand-50 text-brand-700" : "bg-white/70 text-ink-500"
+                    active ? "bg-brand-50 text-brand-700" : "bg-white/70 text-ink-600"
                   }`}
                 >
                   {opt.count}

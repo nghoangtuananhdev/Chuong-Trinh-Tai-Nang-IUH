@@ -2,8 +2,8 @@ import { forwardRef } from "react";
 import { Tooltip } from "./Tooltip.jsx";
 
 const sizeClasses = {
-  sm: "size-7 rounded-xs",
-  md: "size-[34px] rounded-control",
+  sm: "size-8 max-sm:size-10 rounded-xs",
+  md: "size-9 max-sm:size-10 rounded-control",
   lg: "size-10 rounded-control"
 };
 

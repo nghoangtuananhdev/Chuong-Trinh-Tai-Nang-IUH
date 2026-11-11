@@ -26,7 +26,7 @@ export function Pagination({ page, totalPages, onChange, total, pageSize = 10 })
   const endIdx = Math.min(page * pageSize, total);
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 border-t border-ink-200 bg-ink-25 px-5 py-3 text-body-sm text-ink-600">
+    <div className="flex flex-wrap items-center justify-between gap-3 border-t border-ink-200 bg-white px-5 py-3 text-body-sm text-ink-600">
       <p role="status">
         Hiển thị <span className="font-semibold tabular-nums text-ink-900">{single ? `1–${total}` : `${startIdx}–${endIdx}`}</span> trong{" "}
         <span className="font-semibold tabular-nums text-ink-900">{total}</span> bản ghi{" "}
@@ -41,7 +41,7 @@ export function Pagination({ page, totalPages, onChange, total, pageSize = 10 })
             disabled={page === 1}
             onClick={() => onChange(page - 1)}
             aria-label="Trang trước"
-            className="inline-flex h-8 items-center gap-1 rounded-control px-2.5 text-body-sm font-medium text-ink-700 transition-colors hover:bg-ink-100 disabled:cursor-not-allowed disabled:text-ink-400 disabled:hover:bg-transparent"
+            className="inline-flex h-8 items-center gap-1 max-sm:h-10 rounded-control px-2.5 text-body-sm font-medium text-ink-700 transition-colors hover:bg-ink-100 disabled:cursor-not-allowed disabled:text-ink-400 disabled:hover:bg-transparent"
           >
             <ChevronLeft size={14} aria-hidden="true" />
             <span>Trước</span>
@@ -74,7 +74,7 @@ export function Pagination({ page, totalPages, onChange, total, pageSize = 10 })
             disabled={page === totalPages}
             onClick={() => onChange(page + 1)}
             aria-label="Trang sau"
-            className="inline-flex h-8 items-center gap-1 rounded-control px-2.5 text-body-sm font-medium text-ink-700 transition-colors hover:bg-ink-100 disabled:cursor-not-allowed disabled:text-ink-400 disabled:hover:bg-transparent"
+            className="inline-flex h-8 items-center gap-1 max-sm:h-10 rounded-control px-2.5 text-body-sm font-medium text-ink-700 transition-colors hover:bg-ink-100 disabled:cursor-not-allowed disabled:text-ink-400 disabled:hover:bg-transparent"
           >
             <span>Sau</span>
             <ChevronRight size={14} aria-hidden="true" />

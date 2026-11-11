@@ -31,7 +31,7 @@ export function StatusBadge({ children, domain = "general", size = "md", appeara
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border font-semibold text-caption ${size === "sm" ? "h-5 px-2" : "h-6 px-2.5"} ${palette[tone]} ${className}`}
+      className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border font-medium text-caption ${size === "sm" ? "h-5 px-2" : "h-6 px-2.5"} ${palette[tone]} ${className}`}
     >
       <span className={`size-1.5 shrink-0 rounded-full ${dot[tone]}`} aria-hidden="true" />
       <span>{meta.label || children}</span>

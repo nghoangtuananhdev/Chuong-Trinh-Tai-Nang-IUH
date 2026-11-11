@@ -99,7 +99,7 @@ export function Checkbox({ checked, onChange, children, className = "", id: idPr
       <input id={id} type="checkbox" checked={checked} onChange={onChange} className="peer sr-only" {...props} />
       <span
         aria-hidden="true"
-        className="mt-0.5 flex size-[18px] shrink-0 items-center justify-center rounded-[5px] border border-ink-300 bg-white text-transparent shadow-raised transition-colors duration-120 peer-checked:border-brand-600 peer-checked:bg-brand-600 peer-checked:text-white peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-focus"
+        className="mt-0.5 flex size-[18px] shrink-0 items-center justify-center rounded-xs border border-ink-300 bg-white text-transparent shadow-raised transition-colors duration-120 peer-checked:border-brand-600 peer-checked:bg-brand-600 peer-checked:text-white peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-focus"
       >
         <Check size={13} strokeWidth={3} />
       </span>

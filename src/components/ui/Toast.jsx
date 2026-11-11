@@ -2,11 +2,11 @@ import { useEffect, useRef, useState } from "react";
 import { CheckCircle2, AlertTriangle, AlertCircle, Info, X } from "lucide-react";
 
 const config = {
-  success: { icon: CheckCircle2, bar: "bg-success-solid", ic: "text-success-solid", ttl: 4000 },
-  info: { icon: Info, bar: "bg-info-solid", ic: "text-info-solid", ttl: 4000 },
-  warning: { icon: AlertTriangle, bar: "bg-warning-solid", ic: "text-warning-solid", ttl: 6000 },
+  success: { icon: CheckCircle2, ic: "text-success-solid", ttl: 4000 },
+  info: { icon: Info, ic: "text-info-solid", ttl: 4000 },
+  warning: { icon: AlertTriangle, ic: "text-warning-solid", ttl: 6000 },
   // Lỗi tự ẩn sau 8 giây (rê chuột để giữ lại) để không che nút thao tác của hộp thoại.
-  error: { icon: AlertCircle, bar: "bg-danger-solid", ic: "text-danger-solid", ttl: 8000 }
+  error: { icon: AlertCircle, ic: "text-danger-solid", ttl: 8000 }
 };
 
 function ToastItem({ toast, onClose }) {
@@ -36,9 +36,8 @@ function ToastItem({ toast, onClose }) {
       onMouseLeave={() => setPaused(false)}
       onFocus={() => setPaused(true)}
       onBlur={() => setPaused(false)}
-      className="toast-in pointer-events-auto relative flex w-full items-start gap-3 overflow-hidden rounded-control border border-ink-200 bg-white py-3 pl-5 pr-3 text-ink-900 shadow-overlay"
+      className="toast-in pointer-events-auto relative flex w-full items-start gap-3 overflow-hidden rounded-control border border-ink-200 bg-white py-3 pl-4 pr-3 text-ink-900 shadow-overlay"
     >
-      <span aria-hidden="true" className={`absolute inset-y-0 left-0 w-[3px] ${current.bar}`} />
       <Icon size={18} className={`mt-0.5 shrink-0 ${current.ic}`} aria-hidden="true" />
       <span className="flex-1 text-body font-medium text-ink-900">{toast.message}</span>
       <button

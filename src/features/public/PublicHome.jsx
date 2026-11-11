@@ -52,9 +52,8 @@ export function PublicHome({
         Đến danh sách đợt xét tuyển
       </a>
       <PublicHeader onOpenLogin={onLogin} />
-      <section className="academic-grid on-dark bg-brand-900 px-4 py-12 text-white sm:px-6 lg:px-8">
+      <section className="bg-brand-900 px-4 py-12 text-white sm:px-6 lg:px-8">
         <div className="mx-auto max-w-6xl">
-          <span className="honor-rule on-dark mb-4" aria-hidden="true" />
           <p className="text-overline text-accent-300">
             CHƯƠNG TRÌNH CỬ NHÂN &amp; KỸ SƯ TÀI NĂNG
           </p>

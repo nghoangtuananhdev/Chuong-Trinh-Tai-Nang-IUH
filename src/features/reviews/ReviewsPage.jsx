@@ -314,7 +314,7 @@ export function ReviewsPage({ id, roundId, readOnly = false }) {
                 {(item.declaredEntries ?? []).map((e) => (
                   <div
                     key={e.id}
-                    className="space-y-2 border-l-2 border-brand-200 pl-3"
+                    className="space-y-2 rounded-control border border-ink-200 p-3"
                   >
                     <p className="text-body-sm">
                       {e.title} ·{" "}

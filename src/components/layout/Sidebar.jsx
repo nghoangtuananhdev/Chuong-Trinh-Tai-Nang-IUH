@@ -43,7 +43,7 @@ export const SIDEBAR_COLLAPSED = 72;
 /** Logo plate + vai trò + phạm vi — dùng chung cho sidebar desktop và drawer mobile. */
 export function SidebarBrand({ role, collapsed = false }) {
   return (
-    <div className="academic-grid shrink-0">
+    <div className="shrink-0">
       <div className={`px-3 pt-4 ${collapsed ? "px-2" : ""}`}>
         <a
           href="#/"
@@ -59,7 +59,6 @@ export function SidebarBrand({ role, collapsed = false }) {
       </div>
       {!collapsed && (
         <div className="px-5 pb-3 pt-4">
-          <span className="honor-rule on-dark mb-3" aria-hidden="true" />
           <p className="text-overline uppercase text-brand-300">{role.label}</p>
           <p className="mt-0.5 break-words text-body-sm text-white/70">
             {role.scope}

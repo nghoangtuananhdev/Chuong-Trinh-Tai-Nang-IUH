@@ -1,18 +1,15 @@
-import { Check } from "lucide-react";
-
 /**
- * Stepper ngang. steps: [{ title, description }].
+ * Stepper ngang theo ngữ pháp ProcessTrack. steps: [{ title, description }].
  * canGoTo(index) quyết định bước nào bấm được.
  */
 export function Stepper({ steps, current, onStep, canGoTo = () => true }) {
   const total = steps.length;
-  const progress = total > 1 ? (current / (total - 1)) * 100 : 0;
 
   return (
     <nav aria-label="Các bước nộp hồ sơ">
       {/* Mobile: thanh tiến độ mảnh */}
       <div className="md:hidden">
-        <p className="text-caption font-semibold uppercase tracking-wider text-ink-500">
+        <p className="text-caption font-semibold text-ink-600">
           Bước {current + 1}/{total}
         </p>
         <p className="mt-0.5 text-title-3 text-ink-900">{steps[current].title}</p>
@@ -25,41 +22,28 @@ export function Stepper({ steps, current, onStep, canGoTo = () => true }) {
       </div>
 
       {/* Desktop */}
-      <ol className="relative hidden md:flex">
-        <span aria-hidden="true" className="absolute left-0 right-0 top-[19px] mx-[calc(100%/6)] h-0.5 bg-ink-200">
-          <span
-            className="block h-full bg-brand-600 transition-[width] ease-out"
-            style={{ width: `${progress}%`, transitionDuration: "260ms" }}
-          />
-        </span>
+      <ol className="hidden gap-1.5 md:grid" style={{ gridTemplateColumns: `repeat(${total}, minmax(0, 1fr))` }}>
         {steps.map((step, idx) => {
           const done = idx < current;
           const active = idx === current;
           const allowed = canGoTo(idx);
           return (
-            <li key={step.title} className="relative flex-1">
+            <li key={step.title} className="min-w-0">
               <button
                 type="button"
                 onClick={() => allowed && onStep(idx)}
                 aria-disabled={!allowed}
                 aria-current={active ? "step" : undefined}
-                className={`group flex w-full flex-col items-center px-3 text-center ${allowed ? "cursor-pointer" : "cursor-not-allowed"}`}
+                className={`group block w-full rounded-xs text-left ${allowed ? "cursor-pointer" : "cursor-not-allowed"}`}
               >
-                <span
-                  className={`relative z-10 flex size-10 items-center justify-center rounded-full border-2 text-body font-bold tabular-nums transition-colors duration-180 ${
-                    done
-                      ? "border-success-solid bg-success-solid text-white"
-                      : active
-                      ? "border-brand-600 bg-brand-600 text-white ring-4 ring-brand-100"
-                      : "border-ink-300 bg-white text-ink-500"
-                  }`}
-                >
-                  {done ? <Check size={18} strokeWidth={3} aria-hidden="true" /> : idx + 1}
+                <span aria-hidden="true" className={`relative block h-1.5 rounded-full transition-colors duration-180 ${done || active ? "bg-brand-600" : "bg-ink-200"}`}>
+                  {active && <span className="absolute right-0 top-1/2 size-2 -translate-y-1/2 rounded-full bg-brand-600 ring-2 ring-white" />}
                 </span>
-                <span className={`mt-2 text-body font-semibold ${active ? "text-ink-900" : done ? "text-ink-800" : "text-ink-500"}`}>
-                  {step.title}
+                <span className="mt-2 flex items-baseline gap-2">
+                  <span className={`text-caption tabular-nums ${active ? "font-semibold text-brand-700" : "text-ink-600"}`}>{idx + 1}</span>
+                  <span className={`text-body-sm ${active ? "font-semibold text-ink-900" : done ? "text-ink-700" : "text-ink-600"}`}>{step.title}</span>
                 </span>
-                {step.description && <span className="mt-0.5 max-w-[26ch] text-body-sm text-ink-500">{step.description}</span>}
+                {step.description && <span className="mt-0.5 block max-w-[34ch] text-body-sm text-ink-600">{step.description}</span>}
               </button>
             </li>
           );

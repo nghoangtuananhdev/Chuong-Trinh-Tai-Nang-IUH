@@ -39,7 +39,7 @@ export function CriterionField({
           {(item.declaredEntries ?? []).map((entry, i) => (
             <div
               key={entry.id}
-              className="space-y-2 border-l-2 border-brand-200 pl-3"
+              className="space-y-3 rounded-control border border-ink-200 p-4"
             >
               <Field label={`Tên thành tích ${i + 1}`}>
                 <Input

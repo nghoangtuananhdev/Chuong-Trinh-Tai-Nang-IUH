@@ -30,7 +30,6 @@ export function ResultPages({ roundId }) {
       <a href={buildHref("/")} className="text-brand-600">
         Về trang chủ
       </a>
-      <span className="honor-rule block" />
       <h1 data-page-heading tabIndex={-1} className="text-title-1">
         {roundId ? "Kết quả công khai" : "Tra cứu kết quả cá nhân"}
       </h1>

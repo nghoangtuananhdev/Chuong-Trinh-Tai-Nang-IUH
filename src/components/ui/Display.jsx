@@ -3,12 +3,12 @@ import { AlertTriangle, CheckCircle2, Info, XCircle } from "lucide-react";
 /** Mã định danh dạng “tem” — chữ ký thị giác #2. */
 export function CodeTag({ children, tone = "stamp", className = "" }) {
   const tones = {
-    stamp: "rounded-xs border border-brand-100 bg-brand-50 px-2 py-0.5 text-brand-700",
+    stamp: "rounded-xs border border-brand-100 bg-brand-50 px-1.5 py-0.5 text-brand-700",
     plain: "text-brand-700",
     neutral: "rounded-xs border border-ink-200 bg-ink-100 px-2 py-0.5 text-ink-700"
   };
   return (
-    <span className={`inline-block whitespace-nowrap font-mono text-[0.78rem] font-semibold tabular-nums ${tones[tone] || tones.stamp} ${className}`}>
+    <span className={`inline-block whitespace-nowrap font-mono text-caption font-semibold tabular-nums ${tones[tone] || tones.stamp} ${className}`}>
       {children}
     </span>
   );
@@ -27,7 +27,7 @@ export function getInitials(name = "") {
 }
 
 const avatarSizes = {
-  24: "size-6 text-[0.65rem]",
+  24: "size-6 text-caption",
   28: "size-7 text-caption",
   32: "size-8 text-caption",
   40: "size-10 text-body font-semibold",
@@ -39,7 +39,7 @@ export function Avatar({ initials, name, size = 32, round = false, className = "
   return (
     <span
       aria-hidden="true"
-      className={`inline-flex shrink-0 items-center justify-center bg-brand-900 font-bold uppercase tracking-wide text-white shadow-[inset_0_0_0_1px_rgb(255_255_255/0.12)] ${round || size === 80 ? "rounded-full" : "rounded-control"} ${avatarSizes[size] || avatarSizes[32]} ${className}`}
+      className={`inline-flex shrink-0 items-center justify-center bg-brand-600 font-bold uppercase tracking-wide text-white ${round || size === 80 ? "rounded-full" : "rounded-control"} ${avatarSizes[size] || avatarSizes[32]} ${className}`}
     >
       {text}
     </span>
@@ -47,19 +47,19 @@ export function Avatar({ initials, name, size = 32, round = false, className = "
 }
 
 const calloutTones = {
-  info: { icon: Info, box: "border-info-border bg-info-bg", bar: "border-l-info-solid", ic: "text-info-solid", text: "text-info-fg" },
-  success: { icon: CheckCircle2, box: "border-success-border bg-success-bg", bar: "border-l-success-solid", ic: "text-success-solid", text: "text-success-fg" },
-  warning: { icon: AlertTriangle, box: "border-warning-border bg-warning-bg", bar: "border-l-warning-solid", ic: "text-warning-solid", text: "text-warning-fg" },
-  danger: { icon: XCircle, box: "border-danger-border bg-danger-bg", bar: "border-l-danger-solid", ic: "text-danger-solid", text: "text-danger-fg" },
-  neutral: { icon: Info, box: "border-ink-200 bg-ink-25", bar: "border-l-ink-400", ic: "text-ink-500", text: "text-ink-700" },
-  brand: { icon: Info, box: "border-brand-100 bg-brand-25", bar: "border-l-brand-600", ic: "text-brand-600", text: "text-brand-900" }
+  info: { icon: Info, box: "border-info-border bg-info-bg", ic: "text-info-solid", text: "text-info-fg" },
+  success: { icon: CheckCircle2, box: "border-success-border bg-success-bg", ic: "text-success-solid", text: "text-success-fg" },
+  warning: { icon: AlertTriangle, box: "border-warning-border bg-warning-bg", ic: "text-warning-solid", text: "text-warning-fg" },
+  danger: { icon: XCircle, box: "border-danger-border bg-danger-bg", ic: "text-danger-solid", text: "text-danger-fg" },
+  neutral: { icon: Info, box: "border-ink-200 bg-ink-25", ic: "text-ink-500", text: "text-ink-700" },
+  brand: { icon: Info, box: "border-brand-100 bg-brand-25", ic: "text-brand-600", text: "text-brand-900" }
 };
 
 export function Callout({ tone = "info", icon, title, children, action, className = "", role }) {
   const t = calloutTones[tone] || calloutTones.info;
   const Icon = icon || t.icon;
   return (
-    <div role={role} className={`flex items-start gap-3 rounded-control border border-l-[3px] px-4 py-3 ${t.box} ${t.bar} ${className}`}>
+    <div role={role} className={`flex items-start gap-3 rounded-control border px-4 py-3 ${t.box} ${className}`}>
       <Icon size={18} aria-hidden="true" className={`mt-0.5 shrink-0 ${t.ic}`} />
       <div className={`min-w-0 flex-1 text-body ${t.text}`}>
         {title && <p className="font-semibold">{title}</p>}
@@ -93,7 +93,7 @@ const gridCols = {
   4: "grid-cols-2 lg:grid-cols-4"
 };
 
-/** Nhãn UPPERCASE nhỏ + giá trị. layout: grid | inline | plain */
+/** Nhãn nhỏ + giá trị. layout: grid | inline | plain */
 export function DescriptionList({ items, columns = 2, layout = "grid", className = "" }) {
   const visible = items.filter(Boolean);
 
@@ -102,7 +102,7 @@ export function DescriptionList({ items, columns = 2, layout = "grid", className
       <dl className={`divide-y divide-ink-200 ${className}`}>
         {visible.map((item) => (
           <div key={item.label} className="flex items-start justify-between gap-4 py-2.5 first:pt-0 last:pb-0">
-            <dt className="shrink-0 text-body-sm text-ink-500">{item.label}</dt>
+            <dt className="shrink-0 text-body-sm text-ink-600">{item.label}</dt>
             <dd className="min-w-0 text-right text-body font-medium text-ink-900 break-words">{item.value}</dd>
           </div>
         ))}
@@ -115,7 +115,7 @@ export function DescriptionList({ items, columns = 2, layout = "grid", className
       <dl className={`grid gap-x-6 gap-y-4 ${gridCols[columns] || gridCols[2]} ${className}`}>
         {visible.map((item) => (
           <div key={item.label} className="min-w-0">
-            <dt className="text-overline uppercase text-ink-500">{item.label}</dt>
+            <dt className="text-body-sm text-ink-600">{item.label}</dt>
             <dd className="mt-1 text-body font-medium text-ink-900 break-words">{item.value}</dd>
           </div>
         ))}
@@ -124,11 +124,11 @@ export function DescriptionList({ items, columns = 2, layout = "grid", className
   }
 
   return (
-    <div className={`overflow-hidden rounded-card border border-ink-200 bg-ink-25 ${className}`}>
-      <dl className={`-ml-px -mt-px grid ${gridCols[columns] || gridCols[2]}`}>
+    <div className={`surface p-5 ${className}`}>
+      <dl className={`grid gap-x-8 gap-y-4 ${gridCols[columns] || gridCols[2]}`}>
         {visible.map((item) => (
-          <div key={item.label} className="min-w-0 border-l border-t border-ink-200 px-4 py-3">
-            <dt className="text-overline uppercase text-ink-500">{item.label}</dt>
+          <div key={item.label} className="min-w-0">
+            <dt className="text-body-sm text-ink-600">{item.label}</dt>
             <dd className="mt-1 text-body font-medium text-ink-900 break-words">{item.value}</dd>
           </div>
         ))}
@@ -172,9 +172,9 @@ export function Timeline({ items, className = "" }) {
                   <span className="rounded-full bg-ink-100 px-2 py-0.5 text-caption font-medium text-ink-600">{item.role}</span>
                 )}
               </p>
-              <p className="mt-0.5 text-body-sm tabular-nums text-ink-500">{item.date}</p>
+              <p className="mt-0.5 text-body-sm tabular-nums text-ink-600">{item.date}</p>
               {item.note && (
-                <blockquote className="mt-2 border-l-2 border-ink-300 bg-ink-25 px-3 py-2 text-body text-ink-700">
+                <blockquote className="mt-2 rounded-control bg-ink-50 px-3 py-2 text-body text-ink-700">
                   “{item.note}”
                 </blockquote>
               )}

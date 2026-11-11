@@ -25,6 +25,12 @@ import { FilterTabs } from "../components/ui/FilterTabs.jsx";
 import { Stepper } from "../components/ui/Stepper.jsx";
 import { FileDropzone, FileItem } from "../components/ui/FileDropzone.jsx";
 import { EmptyState } from "../components/ui/EmptyState.jsx";
+import { Panel } from "../components/ui/Panel.jsx";
+import { ProcessTrack } from "../components/ui/ProcessTrack.jsx";
+import { MetricTile } from "../components/ui/MetricTile.jsx";
+import { IdentityHeader } from "../components/ui/IdentityHeader.jsx";
+import { StatePage } from "../components/ui/StatePage.jsx";
+import { RoundTrack } from "../components/domain-ui/RoundTrack.jsx";
 import { Pagination } from "../components/ui/Pagination.jsx";
 import { Modal } from "../components/ui/Modal.jsx";
 import { Drawer } from "../components/ui/Drawer.jsx";
@@ -225,6 +231,31 @@ function GalleryContent() {
           ]}
         />
         <EmptyState compact />
+      </Section>
+
+      <Section title="Panel, ProcessTrack, MetricTile, IdentityHeader, StatePage">
+        <Panel title="Panel có tiêu đề" titleAs="h3" description="Mô tả ngắn" actions={<Button size="sm" variant="secondary">Hành động</Button>}>
+          <IdentityHeader name="Nguyễn Văn An" meta="21094501 · DHKTPM17A" />
+        </Panel>
+        <div className="grid gap-4 sm:grid-cols-3">
+          <MetricTile value={6} label="hồ sơ chờ duyệt" action={<Button variant="link" size="sm">Đi tới</Button>} />
+          <MetricTile value={2} label="danh sách chờ bạn" />
+          <MetricTile value={0} label="email lỗi" />
+        </div>
+        <ProcessTrack
+          label="Ba cấp"
+          steps={[
+            { key: "a", label: "Chủ nhiệm ngành", meta: "Đã duyệt", state: "done" },
+            { key: "b", label: "Ban lãnh đạo khoa", meta: "Đang chờ", state: "current" },
+            { key: "c", label: "Phòng Đào tạo", meta: "Chưa tới", state: "todo" },
+          ]}
+        />
+        <RoundTrack status="review" />
+        <RoundTrack status="open" size="sm" showLabels={false} decorative />
+        <div className="rounded-card bg-brand-600 p-4">
+          <Button variant="accent">Nút accent trên nền xanh</Button>
+        </div>
+        <StatePage tone="danger" title="Trạng thái toàn trang">Mô tả</StatePage>
       </Section>
 
       <Section title="Tệp">

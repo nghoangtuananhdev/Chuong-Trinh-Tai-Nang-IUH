@@ -115,8 +115,7 @@ export function WorkspaceLayout({ route, children }) {
           className="mx-auto max-w-screen-2xl space-y-6 px-4 pb-24 pt-6 sm:px-6 lg:px-8"
         >
           <div>
-            <span className="honor-rule mb-3 block" aria-hidden="true" />
-            <h1 data-page-heading tabIndex={-1} className="text-title-1">
+            <h1 data-page-heading tabIndex={-1} className="text-title-1 text-ink-900 outline-none">
               {label}
             </h1>
           </div>

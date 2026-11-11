@@ -142,7 +142,6 @@ export function AuthPage({ route, forced = false }) {
       <a href={buildHref("/")} className="text-brand-600">
         Về trang chủ
       </a>
-      <span className="honor-rule block" aria-hidden="true" />
       <h1 data-page-heading tabIndex={-1} className="text-title-1">
         {title}
       </h1>
