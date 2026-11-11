@@ -23,7 +23,6 @@ export function WorkspaceHeader({
   onOpenPassword,
   onToggleMobileNav,
   mobileNavOpen,
-  scrolled = false,
 }) {
   const { call } = useBackend();
   const { showToast } = useToast();
@@ -78,15 +77,11 @@ export function WorkspaceHeader({
   };
 
   const itemCls =
-    "flex w-full items-center gap-2.5 px-4 py-2 text-left text-body text-ink-900 outline-none transition-colors hover:bg-ink-50 focus-visible:bg-ink-50";
+    "flex min-h-10 w-full items-center gap-2.5 px-4 py-2 text-left text-body text-ink-900 outline-none transition-colors hover:bg-ink-50 focus-visible:bg-ink-50";
 
   return (
     <header
-      className={`sticky top-0 z-20 flex min-h-16 flex-wrap shrink-0 items-center justify-between gap-4 border-b px-4 py-3 transition-[background-color,box-shadow,border-color] duration-180 sm:px-6 ${
-        scrolled
-          ? "border-ink-200 bg-white/85 shadow-raised backdrop-blur-md"
-          : "border-ink-200/60 bg-white"
-      }`}
+      className="sticky top-0 z-20 flex h-14 shrink-0 flex-nowrap items-center justify-between gap-4 border-b border-ink-200 bg-white px-4 sm:px-6"
     >
       <div className="flex min-w-0 items-center gap-3">
         <IconButton
@@ -100,15 +95,15 @@ export function WorkspaceHeader({
 
         <nav
           aria-label="Đường dẫn điều hướng"
-          className="hidden min-w-0 items-center gap-1.5 text-body-sm text-ink-600 sm:flex"
+          className="hidden min-w-0 flex-nowrap items-center gap-1.5 overflow-hidden whitespace-nowrap text-body-sm text-ink-600 sm:flex"
         >
-          <span className="text-ink-500">Cổng xét tuyển</span>
+          <span className="truncate text-ink-600">Cổng xét tuyển</span>
           <ChevronRight
             size={14}
             className="shrink-0 text-ink-300"
             aria-hidden="true"
           />
-          <span className="font-medium text-ink-700">{role.label}</span>
+          <span className="truncate font-medium text-ink-700">{role.label}</span>
           <ChevronRight
             size={14}
             className="shrink-0 text-ink-300"
@@ -116,7 +111,7 @@ export function WorkspaceHeader({
           />
           <span
             aria-current="page"
-            className="truncate font-semibold text-ink-900"
+            className="truncate font-medium text-ink-900"
           >
             {activeLabel}
           </span>
@@ -127,7 +122,7 @@ export function WorkspaceHeader({
         </span>
       </div>
 
-      <div className="flex min-w-0 max-w-full flex-wrap items-center gap-3">
+      <div className="flex shrink-0 flex-nowrap items-center gap-3">
         <RoleSwitcher />
         <NotificationBell />
 
@@ -142,15 +137,15 @@ export function WorkspaceHeader({
             className="flex items-center gap-2 rounded-control border border-transparent p-1.5 transition-colors hover:border-ink-200 hover:bg-ink-25"
           >
             <Avatar initials={role.initials} name={role.name} size={32} />
-            <div className="hidden text-left leading-tight sm:block">
-              <strong className="block text-body-sm font-semibold text-ink-900">
+            <div className="hidden max-w-40 text-left leading-tight lg:block">
+              <strong className="block truncate text-body-sm font-semibold text-ink-900">
                 {role.name}
               </strong>
               <span className="text-caption text-ink-600">{role.label}</span>
             </div>
             <ChevronDown
               size={14}
-              className={`hidden shrink-0 text-ink-400 transition-transform duration-180 sm:block ${accountOpen ? "rotate-180" : ""}`}
+              className={`hidden shrink-0 text-ink-500 transition-transform duration-180 sm:block ${accountOpen ? "rotate-180" : ""}`}
               aria-hidden="true"
             />
           </button>

@@ -1,16 +1,18 @@
 import { scopeLabel } from "../../domain/selectors.js";
 import { useBackend } from "../../mock/backend.jsx";
 import { ROLE_LABEL } from "../../domain/constants.js";
-import { Select, Field } from "../ui/Form.jsx";
+import { Select } from "../ui/Form.jsx";
 import { useToast } from "../ui/ToastProvider.jsx";
 import { navigate } from "../../app/router.js";
 export function RoleSwitcher() {
   const { roles, activeRole, call, db } = useBackend(),
     { showToast } = useToast();
   return roles.length > 1 ? (
-    <Field label="Vai trò đang làm việc" className="min-w-0 max-w-full">
+    <label className="flex min-w-0 items-center gap-2">
+      <span className="hidden text-body-sm text-ink-600 xl:inline">Vai trò đang làm việc</span>
       <Select
-        className="max-w-72"
+        aria-label="Vai trò đang làm việc"
+        className="h-9 min-h-9 max-w-64 py-1"
         value={activeRole.id}
         onChange={async (e) => {
           try {
@@ -28,8 +30,8 @@ export function RoleSwitcher() {
           </option>
         ))}
       </Select>
-    </Field>
+    </label>
   ) : (
-    <span className="text-body-sm">{ROLE_LABEL[activeRole.role]}</span>
+    <span className="hidden text-body-sm md:inline">{ROLE_LABEL[activeRole.role]}</span>
   );
 }

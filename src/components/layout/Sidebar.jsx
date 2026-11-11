@@ -7,19 +7,28 @@ import {
   ShieldCheck,
   CalendarCheck,
   ClipboardList,
-  FolderOpen,
   ClipboardCheck,
-  Award,
   KeyRound,
   FileText,
-  CheckCircle2,
+  LayoutDashboard,
+  Network,
+  Stamp,
+  ChartColumn,
+  ScrollText,
+  Mail,
+  Settings,
+  Bell,
+  UserRound,
   PanelLeftClose,
   PanelLeftOpen
 } from "lucide-react";
-import logo from "../../../assets/img/logo-iuh-khoa-cntt.svg";
+import logoWhite from "../../../assets/img/brand/iuh-logo-white.svg";
+import faviconMark from "../../../assets/img/brand/favicon-32x32.png";
 import { Tooltip } from "../ui/Tooltip.jsx";
 
 const menuIcons = {
+  dashboard: LayoutDashboard,
+  catalog: Network,
   book: BookOpen,
   class: GraduationCap,
   teacher: UserCog,
@@ -27,12 +36,16 @@ const menuIcons = {
   permission: ShieldCheck,
   calendar: CalendarCheck,
   criteria: ClipboardList,
-  folder: FolderOpen,
   approve: ClipboardCheck,
-  award: Award,
+  stamp: Stamp,
+  report: ChartColumn,
+  audit: ScrollText,
+  mail: Mail,
+  settings: Settings,
+  bell: Bell,
   key: KeyRound,
   file: FileText,
-  check: CheckCircle2
+  profile: UserRound
 };
 
 export const SIDEBAR_MIN = 200;
@@ -40,27 +53,23 @@ export const SIDEBAR_MAX = 360;
 export const SIDEBAR_DEFAULT = 248;
 export const SIDEBAR_COLLAPSED = 72;
 
-/** Logo plate + vai trò + phạm vi — dùng chung cho sidebar desktop và drawer mobile. */
+/** Logo + vai trò + phạm vi — dùng chung cho sidebar desktop và drawer mobile. */
 export function SidebarBrand({ role, collapsed = false }) {
   return (
     <div className="shrink-0">
-      <div className={`px-3 pt-4 ${collapsed ? "px-2" : ""}`}>
-        <a
-          href="#/"
-          aria-label="Về trang chủ"
-          className={`flex items-center justify-center rounded-card bg-white shadow-raised ${collapsed ? "h-11 p-1.5" : "p-2.5"}`}
-        >
+      <div className={collapsed ? "flex justify-center px-2 pt-5 pb-4" : "px-5 pt-5 pb-4"}>
+        <a href="#/" aria-label="Về trang chủ" className="on-dark inline-flex items-center rounded-xs">
           <img
-            src={logo}
+            src={collapsed ? faviconMark : logoWhite}
             alt="IUH"
-            className={collapsed ? "size-8 object-contain object-left" : "h-9 w-auto max-w-full object-contain"}
+            className={collapsed ? "size-8 rounded-xs" : "h-10 w-auto"}
           />
         </a>
       </div>
       {!collapsed && (
-        <div className="px-5 pb-3 pt-4">
-          <p className="text-overline uppercase text-brand-300">{role.label}</p>
-          <p className="mt-0.5 break-words text-body-sm text-white/70">
+        <div className="border-b border-white/10 px-5 pb-4">
+          <p className="text-body-sm font-semibold text-white">{role.label}</p>
+          <p className="mt-0.5 break-words text-body-sm text-brand-200">
             {role.scope}
           </p>
         </div>
@@ -85,11 +94,11 @@ export function SidebarNav({ role, activePage, onNavigate, collapsed = false }) 
               collapsed ? "justify-center px-0" : "px-3"
             } ${
               isActive
-                ? "bg-white/10 font-semibold text-white before:absolute before:inset-y-2 before:left-0 before:w-[3px] before:rounded-full before:bg-brand-300"
-                : "font-medium text-white/70 hover:bg-white/5 hover:text-white"
+                ? "bg-white font-semibold text-brand-700"
+                : "font-medium text-brand-100 hover:bg-white/10 hover:text-white"
             }`}
           >
-            <Icon size={18} aria-hidden="true" className={`shrink-0 ${isActive ? "text-white" : "text-white/60"}`} />
+            <Icon size={18} aria-hidden="true" className={`shrink-0 ${isActive ? "text-brand-600" : "text-brand-200"}`} />
             {!collapsed && <span className="min-w-0 break-words">{label}</span>}
           </button>
         );
@@ -142,7 +151,7 @@ export function Sidebar({ role, activePage, onNavigate, collapsed, onToggleColla
 
   return (
     <aside
-      className="relative z-30 hidden shrink-0 select-none flex-col border-r border-brand-950 bg-brand-900 text-white transition-[width] duration-180 lg:flex"
+      className="relative z-30 hidden shrink-0 select-none flex-col border-r border-brand-700 bg-brand-600 text-white transition-[width] duration-180 lg:flex"
       style={{ width: collapsed ? SIDEBAR_COLLAPSED : width }}
     >
       <SidebarBrand role={role} collapsed={collapsed} />
@@ -156,7 +165,7 @@ export function Sidebar({ role, activePage, onNavigate, collapsed, onToggleColla
               type="button"
               onClick={onToggleCollapse}
               aria-label={label}
-              className={`on-dark flex h-10 w-full items-center gap-2.5 rounded-control text-body-sm font-medium text-white/70 transition-colors hover:bg-white/5 hover:text-white ${
+              className={`on-dark flex h-10 w-full items-center gap-2.5 rounded-control text-body-sm font-medium text-brand-100 transition-colors hover:bg-white/10 hover:text-white ${
                 collapsed ? "justify-center" : "px-3"
               }`}
             >
@@ -198,7 +207,7 @@ export function Sidebar({ role, activePage, onNavigate, collapsed, onToggleColla
           }}
           className="on-dark group absolute inset-y-0 -right-[3px] z-10 w-1.5 cursor-col-resize"
         >
-          <span className="absolute inset-y-0 left-[2px] w-0.5 bg-transparent transition-colors group-hover:bg-white/30 group-focus-visible:bg-brand-300 group-data-[dragging=true]:bg-brand-300" />
+          <span className="absolute inset-y-0 left-[2px] w-0.5 bg-transparent transition-colors group-hover:bg-white/40 group-focus-visible:bg-accent-400 group-data-[dragging=true]:bg-accent-400" />
         </div>
       )}
     </aside>

@@ -95,7 +95,7 @@ export function WorkspaceLayout({ route, children }) {
         size="nav"
         sheetOnMobile={false}
       >
-        <div className="bg-brand-900 text-white">
+        <div className="bg-brand-600 text-white">
           <SidebarBrand role={role} />
           <SidebarNav role={role} activePage={page} onNavigate={go} />
         </div>
