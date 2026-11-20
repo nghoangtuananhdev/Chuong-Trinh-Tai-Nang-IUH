@@ -10,8 +10,8 @@ const OperationsPage = lazy(() =>
   })),
 );
 import { RecordsPage } from "./features/operations/RecordsPage.jsx";
-import { ResultPages } from "./features/public/ResultPages.jsx";
 import { isKnownRoute } from "./app/routes.jsx";
+import { StudentImportPage } from "./features/students/StudentImportPage.jsx";
 import { ReviewsPage } from "./features/reviews/ReviewsPage.jsx";
 import { ApprovalsPage } from "./features/approvals/ApprovalsPage.jsx";
 import { StudentPortal } from "./features/student-portal/StudentPortal.jsx";
@@ -25,6 +25,8 @@ import { AuthGate } from "./app/AuthGate.jsx";
 import { WorkspaceLayout } from "./app/WorkspaceLayout.jsx";
 import { useHashRoute, navigate } from "./app/router.js";
 import { StatePage } from "./components/ui/StatePage.jsx";
+import { NotFound } from "./features/public/NotFound.jsx";
+import { MotionConfig } from "motion/react";
 function WorkspacePage({ route }) {
   const { activeRole } = useBackend();
   const page = route.segments[1];
@@ -46,6 +48,7 @@ function WorkspacePage({ route }) {
         roundId={route.query.round}
       />
     );
+  if (page === "student-import") return <StudentImportPage />;
   if (page === "approvals") return <ApprovalsPage id={route.segments[2]} />;
   if (page === "records" && route.segments[2] === "application")
     return <ReviewsPage key={route.segments[3]} id={route.segments[3]} readOnly />;
@@ -111,24 +114,7 @@ function Prototype({ roleKey, initialHash }) {
   let content;
   if (!isKnownRoute(route))
     content = (
-      <StatePage tone="danger" title="Không tìm thấy trang">
-        Vui lòng kiểm tra đường dẫn.
-      </StatePage>
-    );
-  else if (route.segments[0] === "dot")
-    content = (
-      <div className="mx-auto max-w-6xl p-5">
-        <RoundsPage id={route.segments[1]} publicView />
-      </div>
-    );
-  else if (route.segments[0] === "ket-qua" || route.segments[0] === "tra-cuu")
-    content = (
-      <ResultPages
-        key={route.path}
-        roundId={
-          route.segments[0] === "ket-qua" ? route.segments[1] : undefined
-        }
-      />
+      <NotFound onLogin={() => navigate("/dang-nhap")} onHome={() => navigate("/")} />
     );
   else if (route.segments[0] === "app")
     content = (
@@ -150,16 +136,8 @@ function Prototype({ roleKey, initialHash }) {
     content = (
       <PublicHome
         onLogin={() => navigate("/dang-nhap")}
-        onApply={(id) =>
-          navigate(
-            me
-              ? `/app/apply/${id}`
-              : `/dang-nhap?returnTo=${encodeURIComponent("/app/apply/" + id)}`,
-          )
-        }
-        onLookup={() => navigate("/tra-cuu")}
-        onDetail={(id) => navigate(`/dot/${id}`)}
-        onResults={(id) => navigate(`/ket-qua/${id}`)}
+        onRegister={() => navigate("/dang-ky")}
+        onWorkspace={() => navigate("/app/dashboard")}
       />
     );
   return (
@@ -175,10 +153,12 @@ function Prototype({ roleKey, initialHash }) {
 }
 export default function App({ roleKey = "public", initialState, initialHash }) {
   return (
-    <ToastProvider>
-      <MockBackendProvider initialState={initialState}>
-        <Prototype roleKey={roleKey} initialHash={initialHash} />
-      </MockBackendProvider>
-    </ToastProvider>
+    <MotionConfig reducedMotion="user">
+      <ToastProvider>
+        <MockBackendProvider initialState={initialState}>
+          <Prototype roleKey={roleKey} initialHash={initialHash} />
+        </MockBackendProvider>
+      </ToastProvider>
+    </MotionConfig>
   );
 }

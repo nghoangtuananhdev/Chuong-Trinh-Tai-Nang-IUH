@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { WorkspaceHeader } from "../components/layout/WorkspaceHeader.jsx";
 import {
   Sidebar,
@@ -18,6 +18,7 @@ import {
   scopeLabel,
 } from "../domain/selectors.js";
 import { MENUS } from "./menus.js";
+import { ChevronMark } from "../components/ui/ChevronField.jsx";
 import { navigate, buildHref } from "./router.js";
 export function WorkspaceLayout({ route, children }) {
   const { db, me, activeRole, call } = useBackend(),
@@ -65,11 +66,21 @@ export function WorkspaceLayout({ route, children }) {
         notifications: "Thông báo",
       }[page] ??
       "Chi tiết";
+  const mainRef = useRef(null);
   useEffect(() => {
     document
       .querySelector("[data-page-heading]")
       ?.focus({ preventScroll: true });
     window.scrollTo(0, 0);
+    // Chuyển trang: nổi nhẹ lên, không remount trang (giữ state bộ lọc).
+    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches)
+      mainRef.current?.animate?.(
+        [
+          { opacity: 0, transform: "translateY(10px)" },
+          { opacity: 1, transform: "none" },
+        ],
+        { duration: 380, easing: "cubic-bezier(0.16, 1, 0.3, 1)" },
+      );
   }, [route.path]);
   return (
     <div className="flex min-h-screen bg-ink-50">
@@ -95,7 +106,7 @@ export function WorkspaceLayout({ route, children }) {
         size="nav"
         sheetOnMobile={false}
       >
-        <div className="bg-brand-600 text-white">
+        <div className="min-h-full bg-brand-600 text-white">
           <SidebarBrand role={role} />
           <SidebarNav role={role} activePage={page} onNavigate={go} />
         </div>
@@ -110,12 +121,14 @@ export function WorkspaceLayout({ route, children }) {
           mobileNavOpen={mobile}
         />
         <main
+          ref={mainRef}
           id="workspace-main"
           tabIndex={-1}
-          className="mx-auto max-w-screen-2xl space-y-6 px-4 pb-24 pt-6 sm:px-6 lg:px-8"
+          className="mx-auto max-w-screen-2xl space-y-6 px-4 pb-24 pt-7 sm:px-6 lg:px-10 lg:pt-9"
         >
-          <div>
-            <h1 data-page-heading tabIndex={-1} className="text-title-1 text-ink-900 outline-none">
+          <div className="flex items-center gap-3">
+            <ChevronMark className="text-body-lg text-brand-600" />
+            <h1 data-page-heading tabIndex={-1} className="text-title-1 text-brand-950 outline-none">
               {label}
             </h1>
           </div>

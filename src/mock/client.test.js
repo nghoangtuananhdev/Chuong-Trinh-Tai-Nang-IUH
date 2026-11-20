@@ -101,9 +101,11 @@ test("Reset thay db, hủy session và xóa file; tick clock thực sự mở R6
 });
 test("Service chỉ đọc không ghi storage, trạng thái ngoài tab được dùng ở call sau", async () => {
   const m = make();
-  const result = await m.client.call("public.listRounds");
-  assert.ok(result.length);
-  assert.equal(m.saved, 0);
+  await m.client.call("system.demoLogin", { userId: "usr_gv001" });
+  const saved = m.saved;
+  const result = await m.client.call("me.get");
+  assert.equal(result.username, "GV001");
+  assert.equal(m.saved, saved);
   const next = structuredClone(m.client.getState());
   next.db.clock.now = "2026-11-15T00:00:00+07:00";
   m.client.replaceState(next);

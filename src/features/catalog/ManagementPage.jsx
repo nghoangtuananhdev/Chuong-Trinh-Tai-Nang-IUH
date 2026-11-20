@@ -560,7 +560,6 @@ export function ManagementPage({ page, id }) {
         <ConfirmDialog
           open={Boolean(confirmation)}
           title={confirmation?.title}
-          description="Thao tác được kiểm tra quyền và ghi nhật ký."
           confirmLabel="Xác nhận"
           onCancel={() => setConfirmation(null)}
           loading={action.busy}

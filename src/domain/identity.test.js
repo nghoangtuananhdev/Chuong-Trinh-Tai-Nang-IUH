@@ -2,8 +2,6 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
   isIuhStudentEmail,
-  maskName,
-  maskStudentCode,
   checkPasswordPolicy,
 } from "./identity.js";
 for (const [code, email, expected] of [
@@ -18,12 +16,6 @@ for (const [code, email, expected] of [
   test(`Đối chiếu email ${email}`, () =>
     assert.equal(isIuhStudentEmail(code, email), expected));
 }
-test("Che tên và MSSV theo D-23", () => {
-  assert.equal(maskStudentCode("21094501"), "21****01");
-  assert.equal(maskStudentCode("12"), "****");
-  assert.equal(maskName("Nguyễn Hoàng Nam"), "N. H. Nam");
-  assert.equal(maskName("Nam"), "Nam");
-});
 test("Mật khẩu tối thiểu 8 ký tự, chữ và số", () => {
   assert.deepEqual(checkPasswordPolicy("demo1234"), []);
   for (const p of ["demo", "abcdefgh", "00000000", "", null])

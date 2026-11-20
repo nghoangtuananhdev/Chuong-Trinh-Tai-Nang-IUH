@@ -1,6 +1,7 @@
 import { timestamp, addHours, addDays, ictDate } from "./time.js";
 import { studyYear, isFirstRound, latestList } from "./selectors.js";
 import { assignmentChain, roleCovers } from "./scope.js";
+import { canReviewApplications } from "./round-machine.js";
 import { audit, notify, queueEmail, applicationHistory } from "./events.js";
 
 // Domain-only recipients helper, also used by mock services.
@@ -87,6 +88,12 @@ export function tick(source, now, config = source.config) {
         after: round,
       });
       events.push({ type: "ROUND_OPENED", roundId: round.id });
+      notify(db, ctx, roleRecipients(db, ["LECTURER", "HEAD"], chain, now), {
+        type: "ROUND_OPENED_REVIEWERS",
+        title: "ĐXT đã mở tiếp nhận",
+        body: "ĐXT đã mở tiếp nhận — có thể xét duyệt hồ sơ ngay khi sinh viên nộp",
+        link: `/app/reviews?round=${round.id}`,
+      });
       if (!isFirstRound(db, round))
         send(
           members(),
@@ -187,7 +194,7 @@ export function tick(source, now, config = source.config) {
         }
         notify(db, ctx, roleRecipients(db, ["LECTURER", "HEAD"], chain, now), {
           type: "REVIEW_STARTED",
-          title: "ĐXT đã chuyển sang xét duyệt",
+          title: "ĐXT đã đóng tiếp nhận hồ sơ",
           body: `Có ${db.applications.filter((a) => a.roundId === round.id && a.status === "pending").length} hồ sơ cần duyệt`,
           link: `/app/rounds/${round.id}`,
         });
@@ -250,7 +257,7 @@ export function tick(source, now, config = source.config) {
       .filter((r) => r.applicationId === app.id && !r.resolvedAt)
       .at(-1);
     if (
-      round?.status !== "review" ||
+      !canReviewApplications(round) ||
       !request ||
       timestamp(now) <= timestamp(request.dueAt)
     )

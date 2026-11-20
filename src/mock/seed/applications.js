@@ -186,7 +186,7 @@ export function seedApplications(db) {
   add("DXT-2025-01", "26900011", "rejected");
   add("DXT-2026-01", "26010011", "draft");
   add("DXT-2026-01", "26010022", "pending");
-  for (const code of ["26900004", "26900005", "26900006"])
+  for (const code of ["26900013", "26900014", "26900015"])
     add("DXT-2026-01", code, "pending");
   // Two retained students, then two new applicants tied for one remaining seat.
   add("DXT-2026-03", "26900001", "approved", { flow: "C", gpa: 3.6 });
@@ -200,7 +200,7 @@ export function seedApplications(db) {
   add("DXT-2026-05", "26900007", "approved", { flow: "C" });
   add("DXT-2026-05", "26900008", "approved", { gpa: 3.6 });
   add("DXT-2026-05", "26900009", "approved", { gpa: 3.4 });
-  add("DXT-2026-01", "26900012", "withdrawn");
+  add("DXT-2026-01", "26900016", "withdrawn");
   for (const profile of db.studentProfiles)
     profile.isKSTN = latestMemberships(db, profile.userId).some(
       (m) => m.status === "ACTIVE",

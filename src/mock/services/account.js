@@ -33,7 +33,7 @@ export const registerStudent = defineService("account.registerStudent", {
     requireValue(
       entry,
       "OTP_INVALID",
-      "Thông tin xác thực không khớp danh bạ IUH.",
+      "Thông tin xác thực không khớp danh sách sinh viên đã được nhập.",
     );
     assertPassword(db, password);
     const id = nextId(db, "usr");
@@ -58,6 +58,7 @@ export const registerStudent = defineService("account.registerStudent", {
       dob: entry.dob,
       homeClass: entry.homeClass,
       majorId: entry.majorId,
+      cohort: entry.cohort ?? null,
       isKSTN: false,
     });
     const role = {

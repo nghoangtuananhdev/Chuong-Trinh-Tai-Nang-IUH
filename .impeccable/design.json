@@ -1,0 +1,180 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-20T00:00:00Z",
+  "title": "Design System: IUH Talent Admissions",
+  "extensions": {
+    "colorMeta": {
+      "brand-600": { "role": "primary", "displayName": "Xanh IUH", "canonical": "#153898", "tonalRamp": ["#0a1a40", "#0c2058", "#0e266b", "#112f82", "#153898", "#2f59c4", "#8aa6ee", "#edf2ff"] },
+      "brand-950": { "role": "primary", "displayName": "Mực xanh thẫm", "canonical": "#0a1a40", "tonalRamp": ["#0a1a40", "#0c2058", "#0e266b", "#112f82", "#153898", "#2f59c4", "#8aa6ee", "#edf2ff"] },
+      "brand-100": { "role": "primary", "displayName": "Xanh nhạt trên nền xanh", "canonical": "#dbe5ff", "tonalRamp": ["#0a1a40", "#0c2058", "#0e266b", "#112f82", "#153898", "#2f59c4", "#8aa6ee", "#edf2ff"] },
+      "brand-25": { "role": "primary", "displayName": "Xanh sương", "canonical": "#f6f8ff", "tonalRamp": ["#0a1a40", "#0c2058", "#0e266b", "#112f82", "#153898", "#2f59c4", "#8aa6ee", "#f6f8ff"] },
+      "accent-500": { "role": "secondary", "displayName": "Vàng ngọn lửa", "canonical": "#f9b200", "tonalRamp": ["#8a6200", "#d99a00", "#f9b200", "#fdb726", "#fdcb54", "#ffe08a", "#ffedb3", "#fff8e1"] },
+      "ink-50": { "role": "neutral", "displayName": "Nền sáng ánh lam", "canonical": "#f3f6fc", "tonalRamp": ["#141e33", "#243046", "#38445a", "#4f5d75", "#95a1b6", "#c8d1e0", "#eaeef7", "#f3f6fc"] },
+      "ink-200": { "role": "neutral", "displayName": "Viền", "canonical": "#dfe5f0", "tonalRamp": ["#141e33", "#243046", "#38445a", "#4f5d75", "#95a1b6", "#c8d1e0", "#dfe5f0", "#fafbfe"] },
+      "ink-900": { "role": "neutral", "displayName": "Chữ chính", "canonical": "#141e33", "tonalRamp": ["#141e33", "#243046", "#38445a", "#4f5d75", "#5f6c84", "#95a1b6", "#c8d1e0", "#f3f6fc"] },
+      "danger-fg": { "role": "neutral", "displayName": "Đỏ lỗi", "canonical": "#b42318", "tonalRamp": ["#5c120c", "#912018", "#b42318", "#dc2626", "#f87171", "#fecdd3", "#fee2e2", "#fef3f2"] },
+      "warning-fg": { "role": "neutral", "displayName": "Cam cảnh báo", "canonical": "#9a3412", "tonalRamp": ["#4a1a09", "#7c2d12", "#9a3412", "#ea580c", "#fb923c", "#fdd5a8", "#ffedd5", "#fff6ec"] },
+      "success-fg": { "role": "neutral", "displayName": "Xanh lá hợp lệ", "canonical": "#166534", "tonalRamp": ["#0a3019", "#14532d", "#166534", "#16a34a", "#4ade80", "#bbf0cd", "#dcfce7", "#effcf3"] }
+    },
+    "typographyMeta": {
+      "hero": { "displayName": "Hero", "purpose": "Chỉ H1 trang chủ công khai, trên khối xanh." },
+      "display": { "displayName": "Display", "purpose": "H1 trang xác thực và khẩu hiệu cột xanh." },
+      "title-1": { "displayName": "Title 1", "purpose": "Tiêu đề trang và tấm chồng; số trong pipeline dashboard." },
+      "title-2": { "displayName": "Title 2", "purpose": "Tiêu đề khối." },
+      "title-3": { "displayName": "Title 3", "purpose": "Tiêu đề nhóm; chữ nút lg." },
+      "metric": { "displayName": "Metric", "purpose": "Số liệu tổng hợp đếm lên trong MetricTile." },
+      "body-lg": { "displayName": "Body lg", "purpose": "Câu dẫn hero, ô tìm kiếm hero." },
+      "body": { "displayName": "Body", "purpose": "Chữ mặc định 14px." },
+      "body-sm": { "displayName": "Body sm", "purpose": "Meta, nhãn thanh tiến trình, sidebar." },
+      "caption": { "displayName": "Caption", "purpose": "Nhãn phụ, đếm trên tab; cỡ nhỏ nhất cho phép." },
+      "code": { "displayName": "Code", "purpose": "CodeTag dạng tem cho mã đợt, mã hồ sơ." }
+    },
+    "shadows": [
+      { "name": "raised", "value": "0 1px 2px rgb(12 32 88 / 0.06)", "purpose": "Nút và input ở trạng thái nghỉ." },
+      { "name": "card", "value": "0 1px 2px rgb(12 32 88 / 0.04), 0 10px 28px -14px rgb(21 56 152 / 0.18)", "purpose": "Bề mặt tĩnh, viên chọn trượt, nút chính khi hover." },
+      { "name": "lift", "value": "0 2px 4px rgb(12 32 88 / 0.05), 0 22px 44px -18px rgb(21 56 152 / 0.3)", "purpose": "Phần tử nổi lên khi nhấn mạnh." },
+      { "name": "sheet", "value": "0 -2px 6px rgb(10 26 64 / 0.04), 0 30px 60px -24px rgb(10 26 64 / 0.35)", "purpose": "Tấm trắng chồng lên dải xanh ở trang công khai." },
+      { "name": "overlay", "value": "0 10px 28px -8px rgb(12 32 88 / 0.2), 0 2px 6px -2px rgb(12 32 88 / 0.08)", "purpose": "Popover, ô tìm kiếm hero, nút vàng khi hover." },
+      { "name": "modal", "value": "0 28px 56px -14px rgb(10 26 64 / 0.34), 0 8px 16px -8px rgb(10 26 64 / 0.12)", "purpose": "Modal, drawer." },
+      { "name": "bar", "value": "0 -1px 0 rgb(12 32 88 / 0.08), 0 -10px 28px -14px rgb(12 32 88 / 0.2)", "purpose": "Thanh hành động dính đáy." },
+      { "name": "focus", "value": "0 0 0 4px rgb(47 89 196 / 0.2)", "purpose": "Vòng focus của input." }
+    ],
+    "motion": [
+      { "name": "ease-out-expo", "value": "cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "Nổi lên vào trang, lấp đầy chevron, đếm lên, chuyển trang workspace." },
+      { "name": "ease-standard", "value": "cubic-bezier(0.2, 0, 0, 1)", "purpose": "Chuyển trạng thái, overlay, popover." },
+      { "name": "ease-emphasized", "value": "cubic-bezier(0.22, 1, 0.36, 1)", "purpose": "Chuyển động nhấn mạnh." },
+      { "name": "duration-fast", "value": "120ms", "purpose": "Hover, màu." },
+      { "name": "duration-base", "value": "180ms", "purpose": "Mặc định cho trạng thái." },
+      { "name": "duration-slow", "value": "260ms", "purpose": "Overlay, drawer vào." },
+      { "name": "chev-fill", "value": "640ms ease-out-expo, stagger 70ms", "purpose": "Đoạn chevron lấp đầy lần lượt." },
+      { "name": "page-rise", "value": "360–380ms ease-out-expo, translateY 10px", "purpose": "Vào trang / chuyển trang workspace (WAAPI, không remount)." },
+      { "name": "slide-indicator", "value": "spring stiffness 480–520, damping 38–40", "purpose": "Viên chọn trượt của sidebar và FilterTabs (motion layoutId)." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Nút chính xanh, pill; mặc định trên nền sáng.",
+      "html": "<button class=\"ds-btn-primary\">Nộp hồ sơ</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; height: 40px; padding: 0 20px; border-radius: 9999px; border: 1px solid var(--color-brand-600, #153898); background: var(--color-brand-600, #153898); color: #fff; font: 600 0.875rem/1.375rem 'Be Vietnam Pro', sans-serif; box-shadow: 0 1px 2px rgb(12 32 88 / 0.06); cursor: pointer; transition: background-color 180ms, transform 180ms, box-shadow 180ms; } .ds-btn-primary:hover { background: #112f82; border-color: #112f82; transform: translateY(-1px); box-shadow: 0 1px 2px rgb(12 32 88 / 0.04), 0 10px 28px -14px rgb(21 56 152 / 0.18); } .ds-btn-primary:active { background: #0e266b; transform: none; } .ds-btn-primary:focus-visible { outline: 2px solid #2f59c4; outline-offset: 2px; }"
+    },
+    {
+      "name": "Accent Button (on blue)",
+      "kind": "button",
+      "refersTo": "button-accent",
+      "description": "CTA vàng duy nhất của một vùng xanh.",
+      "html": "<div class=\"ds-blue\"><button class=\"ds-btn-accent\">Đăng ký tài khoản sinh viên →</button></div>",
+      "css": ".ds-blue { background: #153898; padding: 24px; } .ds-btn-accent { display: inline-flex; align-items: center; height: 48px; padding: 0 28px; border-radius: 9999px; border: 1px solid #f9b200; background: #f9b200; color: #0a1a40; font: 600 1rem/1.5rem 'Be Vietnam Pro', sans-serif; cursor: pointer; transition: background-color 180ms, transform 180ms, box-shadow 180ms; } .ds-btn-accent:hover { background: #fdb726; border-color: #fdb726; transform: translateY(-1px); box-shadow: 0 10px 28px -8px rgb(12 32 88 / 0.2); } .ds-btn-accent:active { background: #d99a00; } .ds-btn-accent:focus-visible { outline: 2px solid #fdb726; outline-offset: 2px; }"
+    },
+    {
+      "name": "On-dark Button",
+      "kind": "button",
+      "refersTo": "button-on-dark",
+      "description": "Nút phụ trên nền xanh.",
+      "html": "<div class=\"ds-blue\"><button class=\"ds-btn-ondark\">Xem tiêu chí</button></div>",
+      "css": ".ds-blue { background: #153898; padding: 24px; } .ds-btn-ondark { height: 40px; padding: 0 20px; border-radius: 9999px; border: 1px solid rgb(255 255 255 / 0.3); background: rgb(255 255 255 / 0.1); color: #fff; font: 600 0.875rem/1.375rem 'Be Vietnam Pro', sans-serif; cursor: pointer; transition: background-color 180ms, border-color 180ms; } .ds-btn-ondark:hover { background: rgb(255 255 255 / 0.18); border-color: rgb(255 255 255 / 0.6); } .ds-btn-ondark:focus-visible { outline: 2px solid #fdb726; outline-offset: 2px; }"
+    },
+    {
+      "name": "Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Ô nhập 42px, bo 12px, vòng focus xanh.",
+      "html": "<input class=\"ds-input\" placeholder=\"Ví dụ: KTPM, K22…\" />",
+      "css": ".ds-input { width: 280px; min-height: 42px; padding: 9px 14px; border: 1px solid #c8d1e0; border-radius: 12px; background: #fff; color: #141e33; font: 400 0.875rem/1.375rem 'Be Vietnam Pro', sans-serif; box-shadow: 0 1px 2px rgb(12 32 88 / 0.06); transition: border-color 120ms, box-shadow 120ms; } .ds-input::placeholder { color: #95a1b6; } .ds-input:hover { border-color: #8aa6ee; } .ds-input:focus { outline: none; border-color: #153898; box-shadow: 0 0 0 4px rgb(47 89 196 / 0.2); }"
+    },
+    {
+      "name": "Filter Tabs",
+      "kind": "chip",
+      "refersTo": "filter-pill-active",
+      "description": "Rãnh pill với viên trắng trượt theo lựa chọn và đếm số.",
+      "html": "<div class=\"ds-tabs\"><button class=\"ds-tab is-active\">Tất cả <span class=\"ds-count\">8</span></button><button class=\"ds-tab\">Đang tiếp nhận <span class=\"ds-count\">2</span></button></div>",
+      "css": ".ds-tabs { display: inline-flex; gap: 2px; padding: 4px; border-radius: 9999px; background: #eaeef7; } .ds-tab { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 14px; border: 0; border-radius: 9999px; background: transparent; color: #4f5d75; font: 500 0.8125rem/1.25rem 'Be Vietnam Pro', sans-serif; cursor: pointer; transition: color 180ms; } .ds-tab:hover { color: #141e33; } .ds-tab.is-active { background: #fff; color: #0e266b; box-shadow: 0 1px 2px rgb(12 32 88 / 0.04), 0 10px 28px -14px rgb(21 56 152 / 0.18); } .ds-tab:focus-visible { outline: 2px solid #2f59c4; outline-offset: 2px; } .ds-count { min-width: 20px; padding: 0 6px; border-radius: 9999px; background: rgb(255 255 255 / 0.8); font-size: 0.75rem; font-weight: 600; text-align: center; font-variant-numeric: tabular-nums; } .is-active .ds-count { background: #153898; color: #fff; }"
+    },
+    {
+      "name": "Process Track",
+      "kind": "custom",
+      "refersTo": "process-track",
+      "description": "Chữ ký: chuỗi chevron nối nhau — đã qua xanh, hiện tại vàng, chưa tới xám.",
+      "html": "<ol class=\"ds-track\"><li><span class=\"ds-seg ds-first ds-done\"></span><span class=\"ds-lbl\">Nháp</span></li><li><span class=\"ds-seg ds-done\"></span><span class=\"ds-lbl\">Phát hành</span></li><li><span class=\"ds-seg ds-cur\"></span><span class=\"ds-lbl ds-lbl-cur\">Tiếp nhận</span></li><li><span class=\"ds-seg\"></span><span class=\"ds-lbl\">Xét duyệt</span></li><li><span class=\"ds-seg\"></span><span class=\"ds-lbl\">Công bố</span></li></ol>",
+      "css": ".ds-track { --k: 9px; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); list-style: none; margin: 0; padding: 0; width: 520px; font-family: 'Be Vietnam Pro', sans-serif; } .ds-seg { display: block; height: 14px; background: #dfe5f0; clip-path: polygon(0 0, calc(100% - var(--k)) 0, 100% 50%, calc(100% - var(--k)) 100%, 0 100%, var(--k) 50%); } .ds-track li + li .ds-seg { margin-left: calc(3px - var(--k)); } .ds-first { clip-path: polygon(0 0, calc(100% - var(--k)) 0, 100% 50%, calc(100% - var(--k)) 100%, 0 100%); } .ds-done { background: #153898; } .ds-cur { background: #f9b200; } .ds-lbl { display: block; margin-top: 8px; font-size: 0.8125rem; color: #4f5d75; } .ds-lbl-cur { font-weight: 600; color: #141e33; }"
+    },
+    {
+      "name": "Metric Tile",
+      "kind": "card",
+      "refersTo": "metric-tile",
+      "description": "Số liệu + nhãn trên một dòng đọc; bằng 0 thì thẻ lùi xuống.",
+      "html": "<div class=\"ds-metric\"><span class=\"ds-num\">12</span><span class=\"ds-mlbl\">hồ sơ chờ duyệt</span></div>",
+      "css": ".ds-metric { display: flex; align-items: baseline; gap: 10px; padding: 20px; border: 1px solid #dfe5f0; border-radius: 18px; background: #fff; box-shadow: 0 1px 2px rgb(12 32 88 / 0.04), 0 10px 28px -14px rgb(21 56 152 / 0.18); font-family: 'Be Vietnam Pro', sans-serif; } .ds-num { font-size: 2.25rem; line-height: 2.5rem; font-weight: 700; letter-spacing: -0.03em; color: #0a1a40; font-variant-numeric: tabular-nums; } .ds-mlbl { font-size: 0.875rem; font-weight: 500; color: #243046; }"
+    },
+    {
+      "name": "Sidebar Nav",
+      "kind": "nav",
+      "refersTo": "sidebar-item-active",
+      "description": "Sidebar xanh; mục chọn là viên trắng trượt kèm chevron vàng.",
+      "html": "<nav class=\"ds-side\"><a class=\"ds-item is-active\">Duyệt hồ sơ <span class=\"ds-chev\"><i></i><i></i></span></a><a class=\"ds-item\">Đợt xét tuyển</a></nav>",
+      "css": ".ds-side { width: 248px; padding: 12px; background: #153898; font-family: 'Be Vietnam Pro', sans-serif; } .ds-item { display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 8px 12px; border-radius: 12px; color: #dbe5ff; font-size: 0.8125rem; font-weight: 500; cursor: pointer; transition: background-color 150ms, color 150ms; } .ds-item:hover { background: rgb(255 255 255 / 0.08); color: #fff; } .ds-item.is-active { background: #fff; color: #0e266b; font-weight: 600; box-shadow: 0 1px 2px rgb(12 32 88 / 0.04), 0 10px 28px -14px rgb(21 56 152 / 0.18); } .ds-item:focus-visible { outline: 2px solid #fdb726; outline-offset: 2px; } .ds-chev { margin-left: auto; display: inline-flex; flex-direction: column; width: 0.6rem; color: #f9b200; } .ds-chev i { display: block; height: 0.68rem; background: currentColor; clip-path: polygon(0 19.75%, 50% 0, 100% 19.75%, 100% 100%, 50% 80.25%, 0 100%); } .ds-chev i + i { margin-top: -0.05rem; }"
+    },
+    {
+      "name": "U-corner Band + Sheet",
+      "kind": "custom",
+      "refersTo": "signature-band",
+      "description": "Khối xanh một góc chữ U, tấm trắng chồng lên mép dưới.",
+      "html": "<div class=\"ds-wrap\"><section class=\"ds-band\"><h1>Xét tuyển Cử nhân &amp; Kỹ sư tài năng</h1></section><div class=\"ds-sheet\">Các đợt xét tuyển</div></div>",
+      "css": ".ds-wrap { background: #f3f6fc; padding-bottom: 24px; font-family: 'Be Vietnam Pro', sans-serif; } .ds-band { background: #153898; color: #fff; border-bottom-left-radius: 112px; padding: 48px 40px 120px; } .ds-band h1 { margin: 0; font-size: 2.5rem; line-height: 1.04; font-weight: 800; letter-spacing: -0.035em; } .ds-sheet { position: relative; margin: -96px 24px 0; padding: 32px; border-radius: 24px; background: #fff; color: #0a1a40; font-size: 1.625rem; font-weight: 700; box-shadow: 0 -2px 6px rgb(10 26 64 / 0.04), 0 30px 60px -24px rgb(10 26 64 / 0.35); }"
+    },
+    {
+      "name": "Code Tag",
+      "kind": "chip",
+      "refersTo": "code-tag",
+      "description": "Mã định danh dạng tem, không ngắt dòng.",
+      "html": "<span class=\"ds-code\">KSTN-KTPM-K22</span>",
+      "css": ".ds-code { display: inline-block; white-space: nowrap; padding: 2px 6px; border: 1px solid #dbe5ff; border-radius: 6px; background: #edf2ff; color: #112f82; font: 600 0.75rem/1rem ui-monospace, Menlo, Consolas, monospace; font-variant-numeric: tabular-nums; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Chevron vươn lên",
+    "overview": "Bộ nhận diện IUH 2025 được chơi thẳng và trọn vẹn: module chevron dải đứng của logo (đỉnh nhọn trên, khấc dưới) và góc bo lớn một phía như nét chữ U là ngữ pháp của cả hệ. Mọi chuỗi có thứ tự (5 giai đoạn ĐXT, 3 cấp phê duyệt, wizard nộp hồ sơ, đăng ký 3 bước) là các chevron nối nhau; giai đoạn hiện tại luôn là chevron vàng. Hệ từ chối kiểu banner xanh phẳng + lưới thẻ bằng nhau của mọi cổng tuyển sinh.\n\nCó hai cường độ. Trang công khai và xác thực là Persuade: trường xanh IUH phủ cả khối, trường chevron 3D (three.js) nổi lên theo con trỏ, tiêu đề Be Vietnam Pro 800 cỡ lớn, tấm trắng bo tròn chồng lên mép dưới khối xanh. Workspace là Operate: nền sáng ánh lam, sidebar xanh, hiệu ứng tiết chế (chỉ báo trượt theo lựa chọn, số đếm lên, trang nổi nhẹ khi chuyển, pipeline chevron); không có WebGL.\n\nKhông dark mode. Không ảnh khuôn viên hay ảnh stock: thương hiệu do hệ chevron gánh.",
+    "keyCharacteristics": [
+      "Trường xanh `brand-600` phủ trọn khối chủ đạo; mực xanh thẫm `brand-950` cho tiêu đề trên nền sáng và chân trang.",
+      "Vàng ngọn lửa `accent-500` chỉ một điểm nhấn mỗi vùng: CTA trên nền xanh và chevron (giai đoạn hiện tại, dấu chevron).",
+      "Một góc chữ U lớn trên mỗi khối xanh chữ ký; nút và bộ lọc bo tròn hẳn (pill).",
+      "Tấm trắng bo `modal` có bóng `sheet` chồng lên mép dưới dải xanh ở trang công khai.",
+      "Chuyển động một lần, nổi lên từ dưới với ease-out mũ; tắt hoàn toàn khi `prefers-reduced-motion`."
+    ],
+    "rules": [
+      { "name": "The Gold Only On Blue Rule", "body": "Vàng `accent-*` chỉ xuất hiện trên nền xanh (nút, chữ hover, dấu chevron) hoặc dưới dạng chevron hiện tại. Không bao giờ là chữ hay viền trên nền trắng, không bao giờ là màu trạng thái. Trên nền sáng, nút chính là xanh (`PublicHeader` tự đổi Đăng nhập từ `accent` sang `primary` khi cuộn).", "section": "colors" },
+      { "name": "The One Flame Rule", "body": "Mỗi vùng chỉ một điểm vàng chủ đạo: một CTA vàng trên hero, một chevron hiện tại trên mỗi thanh tiến trình.", "section": "colors" },
+      { "name": "The Light Ground Rule", "body": "Nền trang luôn sáng (`ink-50`); khối xanh là vùng có chủ đích, không phải chế độ tối. Không dark mode, `color-scheme: light`.", "section": "colors" },
+      { "name": "The Unbroken Code Rule", "body": "Mã và khoảng (KSTN-KTPM-K22, 2026–2027, DXT-2026…) không bao giờ bị ngắt dòng giữa chừng: bọc bằng `whitespace-nowrap`.", "section": "typography" },
+      { "name": "The Tabular Numbers Rule", "body": "Mọi con số so sánh được (số liệu, đếm, ngày giờ, mã) dùng `tabular-nums`; tiêu đề cột và nhãn mô tả không in hoa.", "section": "typography" },
+      { "name": "The Frosted Layer Rule", "body": "Blur chỉ cho lớp nằm trên nội dung: header khi cuộn và header workspace (`bg-white/80–85` + blur), backdrop overlay (`brand-950/42` + blur 6px), thanh hành động dính, chip hạn chót trên hero. Không blur trang trí trên bề mặt tĩnh.", "section": "elevation" },
+      { "name": "The Scrim Not Gradient Rule", "body": "Chuyển sắc chỉ xuất hiện như lớp phủ xanh-trên-xanh (`brand-800` → trong suốt) giúp chữ đọc được trên trường chevron; không gradient trang trí, không gradient nhiều màu.", "section": "elevation" },
+      { "name": "The One U Corner Rule", "body": "Một khối, một góc chữ U. Không bo đều bốn góc cho khối xanh, không dùng `u`/`hero` trên thẻ thường.", "section": "shapes" }
+    ],
+    "dos": [
+      "**Do** đặt vàng `accent-500` chỉ trên nền xanh hoặc làm chevron hiện tại; trên nền trắng dùng nút `primary` xanh.",
+      "**Do** cho mỗi khối xanh chữ ký đúng một góc chữ U (`u` 64px / `hero` 112px từ `lg`).",
+      "**Do** chồng tấm trắng bo `modal` có bóng `sheet` lên mép dưới dải xanh ở trang công khai.",
+      "**Do** biểu diễn mọi chuỗi có thứ tự bằng `ProcessTrack` / `chev-track`, không bằng chấm, số tròn hay progress ring.",
+      "**Do** giữ WebGL cho trang công khai và xác thực; workspace chỉ dùng chỉ báo trượt, đếm lên, trang nổi nhẹ và pipeline chevron.",
+      "**Do** dùng semantic token trong JSX; mã và khoảng bọc `whitespace-nowrap`."
+    ],
+    "donts": [
+      "**Don't** dùng vàng làm chữ, viền hay màu trạng thái trên nền trắng.",
+      "**Don't** dùng gradient trang trí, glow/pulse, hay blur trên bề mặt tĩnh; chuyển sắc chỉ là lớp phủ xanh-trên-xanh cho chữ đọc được.",
+      "**Don't** làm dark mode.",
+      "**Don't** dùng emoji, ảnh stock hay ảnh khuôn viên, số liệu bịa, marketing copy.",
+      "**Don't** đặt bóng chồng bóng: bề mặt lồng trong bề mặt khác chỉ giữ viền.",
+      "**Don't** thêm eyebrow/kicker in hoa, `border-left`/`border-right` màu > 1px, sparkline hay progress ring trang trí.",
+      "**Don't** dùng màu Tailwind mặc định, mã hex hay `text-[..px]` trong JSX; chữ không nhỏ hơn 12px.",
+      "**Don't** đưa ChevronField (WebGL) vào workspace."
+    ]
+  }
+}

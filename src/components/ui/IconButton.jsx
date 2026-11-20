@@ -2,16 +2,16 @@ import { forwardRef } from "react";
 import { Tooltip } from "./Tooltip.jsx";
 
 const sizeClasses = {
-  sm: "size-8 max-sm:size-10 rounded-xs",
-  md: "size-9 max-sm:size-10 rounded-control",
-  lg: "size-10 rounded-control"
+  sm: "size-8 max-sm:size-10 rounded-full",
+  md: "size-9 max-sm:size-10 rounded-full",
+  lg: "size-10 rounded-full"
 };
 
 const iconSizes = { sm: 14, md: 16, lg: 18 };
 
 const variantClasses = {
   secondary:
-    "bg-white text-ink-600 border border-ink-200 shadow-raised hover:border-ink-400 hover:text-ink-900 hover:bg-ink-25",
+    "bg-white text-ink-600 border border-ink-200 shadow-raised hover:border-brand-300 hover:text-brand-700 hover:bg-brand-25",
   tertiary:
     "bg-transparent text-ink-500 border border-transparent hover:bg-ink-100 hover:text-ink-900",
   danger:

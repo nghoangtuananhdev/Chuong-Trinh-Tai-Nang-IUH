@@ -43,7 +43,7 @@ export function NotificationBell() {
         aria-label={`Thông báo (${unread})`}
         aria-expanded={open}
         onClick={() => setOpen(!open)}
-        className="relative inline-flex size-9 shrink-0 items-center justify-center rounded-control border border-ink-200 bg-white text-ink-600 shadow-raised transition-colors hover:border-ink-400 hover:bg-ink-25 hover:text-ink-900 max-sm:size-10"
+        className="relative inline-flex size-9 shrink-0 items-center justify-center rounded-full border border-ink-200 bg-white text-ink-600 shadow-raised transition-colors hover:border-brand-300 hover:bg-brand-25 hover:text-brand-700 max-sm:size-10"
       >
         <Bell size={16} aria-hidden="true" />
         {unread > 0 && (

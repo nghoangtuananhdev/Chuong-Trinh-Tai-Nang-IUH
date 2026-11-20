@@ -3,10 +3,6 @@ export const templates = {
     subject: "[IUH CN/KSTN] Mã xác thực đăng ký tài khoản",
     body: "Mã OTP của bạn là {{code}}, hiệu lực {{ttl}} phút. Không chia sẻ mã này.",
   },
-  OTP_LOOKUP: {
-    subject: "[IUH CN/KSTN] Mã tra cứu kết quả",
-    body: "Mã OTP tra cứu: {{code}} ({{ttl}} phút).",
-  },
   OTP_CHANGE_EMAIL: {
     subject: "[IUH CN/KSTN] Xác nhận email mới",
     body: "Mã xác nhận: {{code}}.",

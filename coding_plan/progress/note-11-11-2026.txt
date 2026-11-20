@@ -1,1 +1,7 @@
-nói 
+Note: 
+- Đăng ký trước tài khoản và hệ thống sẽ xác định các lớp phù hợp. (Buộc phải đăng ký tài khoản trước) 
+- Import danh sách của sinh viên các khóa vô trước rồi đăng ký sau. 
+- Không thể liên kết được với dữ liệu gốc của trường (Phải được import sẵn chỉ từ các chủ nhiệm ngành)
+- Nộp hồ sơ rồi thì chỉ thông báo đã nộp thành công
+- Cho duyệt bất kể thgian
+- Customize các giai đoạn

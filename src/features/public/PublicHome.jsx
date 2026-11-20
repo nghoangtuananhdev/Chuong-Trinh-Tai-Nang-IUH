@@ -1,318 +1,167 @@
-import { useState } from "react";
-import { CalendarClock, Search, SearchX, Users } from "lucide-react";
+import { motion } from "motion/react";
+import { ArrowRight, LogIn } from "lucide-react";
 import { useBackend } from "../../mock/backend.jsx";
 import { PublicHeader } from "../../components/layout/PublicHeader.jsx";
+import { PublicFooter } from "../../components/layout/PublicFooter.jsx";
 import { Button } from "../../components/ui/Button.jsx";
-import { Field, Input, Select } from "../../components/ui/Form.jsx";
-import { FilterTabs } from "../../components/ui/FilterTabs.jsx";
-import { StatusBadge } from "../../components/ui/StatusBadge.jsx";
-import { CodeTag, DescriptionList } from "../../components/ui/Display.jsx";
-import { Modal } from "../../components/ui/Modal.jsx";
-import { Pagination } from "../../components/ui/Pagination.jsx";
-import { Panel } from "../../components/ui/Panel.jsx";
-import { EmptyState } from "../../components/ui/EmptyState.jsx";
-import { RoundTrack } from "../../components/domain-ui/RoundTrack.jsx";
-import { CriteriaTable } from "../../components/domain-ui/CriteriaTable.jsx";
-import { usePagedFilter } from "../../hooks/usePagedFilter.js";
-import { ROUND_STATUSES } from "../../domain/constants.js";
-import { classifyFlow } from "../../domain/flows.js";
-import { studentProfile } from "../../domain/selectors.js";
-import { roundView } from "../../domain/selectors.js";
-import { formatIct } from "../../domain/time.js";
-export function PublicHome({
-  onLogin,
-  onApply,
-  onLookup,
-  onDetail,
-  onResults,
-}) {
+import { ChevronField, ChevronMark } from "../../components/ui/ChevronField.jsx";
+
+const rise = {
+  hidden: { opacity: 0, y: 18 },
+  show: (i = 0) => ({ opacity: 1, y: 0, transition: { duration: 0.7, delay: 0.08 * i, ease: [0.16, 1, 0.3, 1] } }),
+};
+
+/**
+ * Trang chủ công khai. Đợt xét tuyển và kết quả KHÔNG hiển thị công khai:
+ * sinh viên phải đăng ký tài khoản, hệ thống mới hiện đợt theo ngành và khóa.
+ */
+export function PublicHome({ onLogin, onRegister, onWorkspace }) {
   const { db, me } = useBackend();
-  const allowed = (r) =>
-    !me || (me.kind === "STUDENT" && classifyFlow(db, me.id, r).allowed);
-  const maintaining = me && studentProfile(db, me.id)?.isKSTN;
-  const [academicYear, setAcademicYear] = useState(""),
-    [semester, setSemester] = useState(""),
-    [faculty, setFaculty] = useState(""),
-    [detail, setDetail] = useState(null);
-  const rounds = db.rounds
-    .filter((r) => r.status !== "draft")
-    .map((r) => roundView(db, r));
-  const list = usePagedFilter(rounds, {
-    match: (r, q, status) =>
-      (!status || r.status === status) &&
-      (!academicYear || r.academicYear === academicYear) &&
-      (!semester || r.semester === semester) &&
-      (!faculty || r.faculty?.id === faculty) &&
-      `${r.code} ${r.name} ${r.faculty?.name} ${r.major?.name}`
-        .toLowerCase()
-        .includes(q),
-  });
-  const selected = rounds.find((r) => r.id === detail);
-  const openDetail = (r) => (onDetail ? onDetail(r.id) : setDetail(r.id));
+  const steps = [
+    {
+      actor: "Chủ nhiệm ngành",
+      title: "Nhập danh sách sinh viên",
+      text: "Theo từng khóa, trước khi mở đăng ký.",
+    },
+    {
+      actor: "Sinh viên",
+      title: "Đăng ký tài khoản",
+      text: "Bằng email @student.iuh.edu.vn và mã OTP; ngành, khóa lấy từ danh sách.",
+    },
+    {
+      actor: "Hệ thống",
+      title: "Hiện đợt phù hợp",
+      text: "Chỉ đợt của lớp CN/KSTN cùng ngành, cùng khóa.",
+    },
+    {
+      actor: "Sinh viên",
+      title: "Nộp hồ sơ",
+      text: `Khai tiêu chí, tải minh chứng PDF/JPG/PNG tối đa ${db.config.files.maxMb} MB/tệp.`,
+    },
+    {
+      actor: "Giảng viên phụ trách",
+      short: "GV phụ trách",
+      title: "Xét duyệt",
+      text: "Kiểm tiêu chí và minh chứng, có thể yêu cầu bổ sung kèm hạn.",
+    },
+    {
+      actor: "Ba cấp phê duyệt",
+      short: "CNN · BLĐ · PĐT",
+      title: "Phê duyệt và công bố",
+      text: "Chủ nhiệm ngành → Ban lãnh đạo khoa → Phòng Đào tạo. Kết quả gửi về tài khoản và email.",
+    },
+  ];
+  // Bước kế tiếp của người đang xem: khách → đăng ký; sinh viên → nộp hồ sơ.
+  const next = !me ? 1 : me.kind === "STUDENT" ? 3 : -1;
+
   return (
-    <div className="min-h-screen bg-ink-50 pb-20">
-      <a className="skip-link" href="#dot-xet-tuyen">
-        Đến danh sách đợt xét tuyển
+    <div className="min-h-screen bg-ink-50">
+      <a className="skip-link" href="#quy-trinh">
+        Đến quy trình xét tuyển
       </a>
       <PublicHeader onOpenLogin={onLogin} />
-      <section className="bg-brand-600 text-white">
-        <div className="mx-auto max-w-6xl px-4 pb-20 pt-10 sm:px-6 lg:px-8">
-          <p className="text-body-sm font-semibold text-accent-400">
-            CHƯƠNG TRÌNH CỬ NHÂN &amp; KỸ SƯ TÀI NĂNG
-          </p>
-          <h1
+
+      <section className="on-dark relative isolate -mt-20 overflow-hidden rounded-bl-u bg-brand-600 pt-20 text-white lg:rounded-bl-hero">
+        <div aria-hidden="true" className="chev-pattern absolute inset-0 -z-20" />
+        <ChevronField className="-z-10" />
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 -z-10 bg-linear-to-r from-brand-800/95 via-brand-700/70 to-brand-700/0 max-lg:via-brand-800/75 max-lg:to-brand-800/45"
+        />
+        <div className="mx-auto max-w-7xl px-4 pb-36 pt-12 sm:px-6 lg:px-10 lg:pb-44 lg:pt-24">
+          <motion.h1
             data-page-heading
             tabIndex={-1}
-            className="mt-2 text-title-1 sm:text-display"
+            initial="hidden"
+            animate="show"
+            variants={rise}
+            className="max-w-5xl text-hero outline-none"
           >
-            Các đợt xét tuyển
-          </h1>
-          <p className="mt-3 max-w-2xl text-body-lg text-brand-100">
-            Tìm đợt xét tuyển phù hợp, xem điều kiện tham gia và theo dõi kết
-            quả hồ sơ của bạn.
-          </p>
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-end">
-            <Field
-              label="Tìm theo tên đợt, mã đợt hoặc chuyên ngành"
-              labelClassName="!text-white"
-              className="sm:max-w-xl sm:flex-1"
-            >
-              <Input
-                type="search"
-                leadingIcon={Search}
-                className="h-11"
-                value={list.query}
-                onChange={(e) => list.setQuery(e.target.value)}
-                placeholder="Nhập từ khóa tìm kiếm…"
-              />
-            </Field>
-            <Button
-              variant="accent"
-              size="md"
-              className="h-11"
-              onClick={onLookup ?? onLogin}
-            >
-              Tra cứu kết quả
-            </Button>
-          </div>
+            Xét tuyển <span className="whitespace-nowrap">Cử nhân tài năng</span>
+            <br className="max-lg:hidden" /> <span className="whitespace-nowrap">&amp; Kỹ sư tài năng</span>
+          </motion.h1>
+          <motion.p initial="hidden" animate="show" custom={1} variants={rise} className="mt-5 max-w-xl text-body-lg text-brand-100">
+            Đăng ký bằng email sinh viên IUH để xem các đợt dành cho ngành và khóa của bạn.
+          </motion.p>
+          <motion.div initial="hidden" animate="show" custom={2} variants={rise} className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
+            {me ? (
+              <Button variant="accent" size="lg" iconRight={ArrowRight} onClick={onWorkspace}>
+                Vào trang của bạn
+              </Button>
+            ) : (
+              <>
+                <Button variant="accent" size="lg" iconRight={ArrowRight} onClick={onRegister}>
+                  Đăng ký tài khoản sinh viên
+                </Button>
+                <Button variant="onDark" size="lg" icon={LogIn} onClick={onLogin}>
+                  Đã có tài khoản? Đăng nhập
+                </Button>
+              </>
+            )}
+          </motion.div>
+          {!me && (
+            <motion.p initial="hidden" animate="show" custom={3} variants={rise} className="mt-6 max-w-xl text-body-sm text-brand-100">
+              Chỉ sinh viên có tên trong danh sách do Chủ nhiệm ngành nhập mới đăng ký được.
+            </motion.p>
+          )}
         </div>
       </section>
-      <main
-        id="dot-xet-tuyen"
-        className="mx-auto max-w-6xl space-y-6 px-4 pb-6 sm:px-6 lg:px-8"
-      >
-        <Panel className="relative -mt-12">
-        <FilterTabs
-          label="Trạng thái ĐXT"
-          options={[
-            { value: "", label: "Tất cả", count: rounds.length },
-            ...Object.entries(ROUND_STATUSES)
-              .filter(([s]) => s !== "draft")
-              .map(([value, meta]) => ({
-                value,
-                label: meta.label,
-                count: rounds.filter((r) => r.status === value).length,
-              })),
-          ]}
-          value={list.filter}
-          onChange={list.setFilter}
-        />
-        <div className="mt-4 grid gap-4 border-t border-ink-200 pt-4 sm:grid-cols-3">
-          <Field label="Năm học">
-            <Select
-              value={academicYear}
-              onChange={(e) => {
-                setAcademicYear(e.target.value);
-                list.setPage(1);
-              }}
-            >
-              <option value="">Tất cả năm học</option>
-              {[...new Set(rounds.map((r) => r.academicYear))]
-                .sort()
-                .reverse()
-                .map((y) => (
-                  <option key={y}>{y}</option>
-                ))}
-            </Select>
-          </Field>
-          <Field label="Học kỳ">
-            <Select
-              value={semester}
-              onChange={(e) => {
-                setSemester(e.target.value);
-                list.setPage(1);
-              }}
-            >
-              <option value="">Tất cả học kỳ</option>
-              {[...new Set(rounds.map((r) => r.semester))].map((s) => (
-                <option key={s}>{s}</option>
-              ))}
-            </Select>
-          </Field>
-          <Field label="Khoa">
-            <Select
-              value={faculty}
-              onChange={(e) => {
-                setFaculty(e.target.value);
-                list.setPage(1);
-              }}
-            >
-              <option value="">Tất cả khoa</option>
-              {db.faculties.map((f) => (
-                <option key={f.id} value={f.id}>
-                  {f.name}
-                </option>
-              ))}
-            </Select>
-          </Field>
-        </div>
-        </Panel>
-        <p className="text-body-sm text-ink-600" role="status">
-          {list.total} đợt xét tuyển phù hợp
-        </p>
-        <div className="surface overflow-hidden">
-          {list.total > 0 && (
-            <ul className="divide-y divide-ink-200">
-              {list.rows.map((r) => (
-                <li key={r.id}>
-                  <article className="grid min-w-0 gap-4 p-5 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)_auto] lg:items-center">
-                    <div className="min-w-0">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <CodeTag>{r.code}</CodeTag>
-                        <StatusBadge domain="round">{r.status}</StatusBadge>
-                      </div>
-                      <h2 className="mt-2 text-title-2">{r.name}</h2>
-                      <p className="mt-1 text-body-sm font-medium text-brand-700">
-                        {r.typeLabel}
-                      </p>
-                      <p className="mt-1 text-body-sm text-ink-600">
-                        {r.class.code} · {r.program?.name} · {r.faculty?.name}
-                      </p>
-                      <p className="mt-1 text-body-sm text-ink-600">
-                        Năm học {r.academicYear} · {r.semester}
-                      </p>
-                    </div>
-                    <div className="min-w-0 space-y-2">
-                      <RoundTrack
-                        status={r.status}
-                        size="sm"
-                        showLabels={false}
-                        decorative
-                      />
-                      <p className="flex items-start gap-2 text-body-sm tabular-nums">
-                        <CalendarClock
-                          size={16}
-                          aria-hidden="true"
-                          className="mt-0.5 shrink-0 text-ink-500"
-                        />
-                        <span>
-                          Tiếp nhận: {formatIct(r.intakeStart)} –{" "}
-                          {formatIct(r.intakeEnd)}
-                        </span>
-                      </p>
-                      <p className="flex items-center gap-2 text-body-sm tabular-nums">
-                        <Users
-                          size={16}
-                          aria-hidden="true"
-                          className="shrink-0 text-ink-500"
-                        />
-                        Sĩ số tối đa: {r.quota}
-                      </p>
-                    </div>
-                    <div className="flex flex-wrap items-center gap-2 lg:justify-end">
-                      <Button variant="secondary" onClick={() => openDetail(r)}>
-                        Xem chi tiết
-                      </Button>
-                      {r.status === "open" &&
-                        !allowed(r) &&
-                        me?.kind === "STUDENT" && (
-                          <p className="text-body-sm text-ink-600">
-                            Bạn đang học lớp CN/KSTN khác.
-                          </p>
-                        )}
-                      {r.status === "open" && allowed(r) && (
-                        <Button
-                          onClick={() => (onApply ? onApply(r.id) : onLogin?.())}
-                        >
-                          {maintaining ? "Cập nhật hồ sơ tích lũy" : "Nộp hồ sơ"}
-                        </Button>
-                      )}
-                      {r.status === "published" && onResults && (
-                        <Button onClick={() => onResults(r.id)}>Xem kết quả</Button>
-                      )}
-                    </div>
-                  </article>
-                </li>
-              ))}
-            </ul>
-          )}
-          {!list.total && (
-            <EmptyState
-              icon={SearchX}
-              title="Không có ĐXT phù hợp. Vui lòng đổi bộ lọc."
-              description={null}
-            />
-          )}
-          <Pagination {...list} onChange={list.setPage} />
-        </div>
-      </main>
-      <footer className="mx-auto mt-10 max-w-6xl px-4 sm:px-6 lg:px-8">
-        <p className="border-t border-ink-200 py-6 text-body-sm text-ink-600">
-          Đại học Công nghiệp TP. Hồ Chí Minh · Bản prototype – dữ liệu minh họa
-        </p>
-      </footer>
-      <Modal
-        open={Boolean(selected)}
-        onClose={() => setDetail(null)}
-        title={selected?.name}
-        size="xl"
-      >
-        {selected && (
-          <div className="space-y-5">
-            <DescriptionList
-              items={[
-                {
-                  label: "Lớp",
-                  value: <CodeTag>{selected.class.code}</CodeTag>,
-                },
-                {
-                  label: "Năm học / Học kỳ",
-                  value: `${selected.academicYear} · ${selected.semester}`,
-                },
-                {
-                  label: "Tiếp nhận",
-                  value: `${formatIct(selected.intakeStart)} – ${formatIct(selected.intakeEnd)}`,
-                },
-                {
-                  label: "Xét duyệt",
-                  value: `${formatIct(selected.reviewStart)} – ${formatIct(selected.reviewEnd)}`,
-                },
-                { label: "Sĩ số tối đa", value: selected.quota },
-                {
-                  label: "Bộ tiêu chí",
-                  value: (
-                    selected.criteriaSnapshot ??
-                    db.criteriaSets.find((c) => c.id === selected.criteriaSetId)
-                  )?.name,
-                },
-              ]}
-            />
-            <RoundTrack status={selected.status} />
-            <p className="text-body">{selected.description}</p>
-            <div className="surface overflow-hidden">
-              <CriteriaTable
-                snapshot={
-                  selected.criteriaSnapshot ??
-                  db.criteriaSets.find((c) => c.id === selected.criteriaSetId)
-                }
-              />
-            </div>
-            <p className="text-body-sm text-ink-600">
-              Minh chứng PDF/JPG/PNG, tối đa {db.config.files.maxMb} MB/tệp.
-            </p>
+
+      <main id="quy-trinh" className="relative mx-auto -mt-24 max-w-7xl scroll-mt-24 px-4 sm:px-6 lg:-mt-28 lg:px-10">
+        <motion.section
+          initial={{ y: 40 }}
+          animate={{ y: 0 }}
+          transition={{ duration: 0.8, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
+          aria-labelledby="quy-trinh-title"
+          className="overflow-hidden rounded-modal bg-white shadow-sheet ring-1 ring-ink-200/70"
+        >
+          <div className="px-5 pb-2 pt-7 sm:px-8 sm:pt-9">
+            <h2 id="quy-trinh-title" className="text-title-1 text-brand-950">
+              Quy trình xét tuyển
+            </h2>
           </div>
-        )}
-      </Modal>
+          <ol className="chev-track grid gap-y-6 px-5 pb-8 pt-6 sm:px-8 lg:grid-cols-6 lg:gap-y-0" style={{ "--k": "14px" }}>
+            {steps.map((s, i) => {
+              const mine = i === next;
+              return (
+                <li key={s.title} className="page-in min-w-0" style={{ animationDelay: `${340 + i * 70}ms` }}>
+                  <span aria-hidden="true" title={s.actor} className={`chev-seg h-14 max-lg:hidden ${mine ? "bg-accent-500" : "bg-brand-600"}`}>
+                    <span className={`flex h-full items-center gap-2 pl-7 pr-5 text-body-sm font-semibold ${mine ? "text-brand-950" : "text-white"}`}>
+                      <span className="text-title-2 tabular-nums">{i + 1}</span>
+                      <span className="truncate">{s.short ?? s.actor}</span>
+                    </span>
+                  </span>
+                  <div className="flex gap-4 lg:block lg:pr-5 lg:pt-4">
+                    <span
+                      aria-hidden="true"
+                      className={`chev-up flex h-11 w-9 shrink-0 items-center justify-center pt-1 text-body font-bold tabular-nums lg:hidden ${
+                        mine ? "bg-accent-500 text-brand-950" : "bg-brand-600 text-white"
+                      }`}
+                    >
+                      {i + 1}
+                    </span>
+                    <div className="min-w-0">
+                      <h3 className="text-title-3 text-pretty text-brand-950">{s.title}</h3>
+                      <p className="mt-1 text-body-sm text-ink-600">
+                        <span className="font-semibold text-brand-600 lg:sr-only">{s.actor} · </span>
+                        {s.text}
+                      </p>
+                      {mine && (
+                        <p className="mt-2 inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-brand-50 py-1 pl-2 pr-2.5 text-caption font-semibold text-brand-700">
+                          <ChevronMark className="text-caption text-accent-500" />
+                          Bước tiếp theo
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </li>
+              );
+            })}
+          </ol>
+        </motion.section>
+      </main>
+
+      <PublicFooter />
     </div>
   );
 }

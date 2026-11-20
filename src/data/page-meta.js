@@ -6,6 +6,7 @@ export const pageMeta = {
   classesView: { title: "Thông tin lớp toàn trường", desc: "Tra cứu danh sách lớp và sinh viên hệ Cử nhân / Kỹ sư tài năng toàn trường." },
   teachers: { title: "Tài khoản giảng viên", desc: "Hồ sơ công tác, phân nhiệm vai trò và trạng thái tài khoản giảng viên." },
   students: { title: "Tài khoản sinh viên CN/KSTN", desc: "Quản lý danh sách tài khoản sinh viên thuộc các lớp CN/KSTN." },
+  studentImport: { title: "Danh sách sinh viên", desc: "Chủ nhiệm ngành nhập danh sách sinh viên theo khóa; chỉ sinh viên trong danh sách mới đăng ký được tài khoản." },
   permissions: { title: "Phân quyền giảng viên", desc: "Phân nhiệm quyền hạn và phạm vi tác nghiệp trong quy trình xét duyệt." },
   rounds: { title: "Đợt xét tuyển", desc: "Quản lý thời hạn nhận hồ sơ, đối tượng áp dụng và trạng thái các đợt tuyển sinh." },
   roundsView: { title: "Tra cứu đợt xét tuyển", desc: "Xem thông tin kế hoạch và tiến độ các đợt xét tuyển chương trình tài năng." },

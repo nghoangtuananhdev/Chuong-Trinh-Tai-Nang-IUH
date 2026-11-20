@@ -35,7 +35,7 @@ export function Dashboard() {
         label: {
           intakeStart: "Mở tiếp nhận",
           intakeEnd: "Đóng tiếp nhận",
-          reviewEnd: "Hết hạn xét duyệt",
+          reviewEnd: "Kết thúc xét duyệt dự kiến",
           approvalDue: "Hạn phê duyệt",
         }[k],
         at: r[k],
@@ -91,26 +91,33 @@ export function Dashboard() {
           />
         )}
       </div>
-      <Panel>
-        <div className="grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-3 xl:grid-cols-6">
-          {Object.entries(ROUND_STATUSES).map(([status, m]) => {
-            const n = rounds.filter((r) => r.status === status).length;
-            return (
-              <div key={status} className="min-w-0">
-                <span
-                  aria-hidden="true"
-                  className={`block h-1.5 rounded-full ${n > 0 ? "bg-brand-600" : "bg-ink-200"}`}
-                />
-                <p className="mt-2 text-body-sm text-ink-600">{m.label}</p>
-                <p className="text-title-2 tabular-nums text-ink-900">
-                  {n} <span className="text-body-sm font-normal text-ink-600">ĐXT</span>
-                </p>
-              </div>
-            );
-          })}
+      <h2 className="pt-2 text-title-3">Đợt xét tuyển theo giai đoạn</h2>
+      <Panel padded={false}>
+        <div className="mask-x scrollbar-thin overflow-x-auto p-5">
+          <ol
+            className="chev-track grid min-w-[54rem]"
+            style={{ gridTemplateColumns: `repeat(${Object.keys(ROUND_STATUSES).length}, minmax(0, 1fr))`, "--k": "16px" }}
+          >
+            {Object.entries(ROUND_STATUSES).map(([status, m], i) => {
+              const n = rounds.filter((r) => r.status === status).length;
+              return (
+                <li key={status} className="min-w-0">
+                  <span
+                    className={`chev-seg page-in h-24 ${n > 0 ? "bg-brand-600" : "bg-ink-100"}`}
+                    style={{ animationDelay: `${i * 70}ms` }}
+                  >
+                    <span className="flex h-full flex-col justify-center pl-8 pr-6">
+                      <span className={`text-title-1 tabular-nums ${n > 0 ? "text-white" : "text-ink-500"}`}>{n}</span>
+                      <span className={`line-clamp-2 text-body-sm leading-tight ${n > 0 ? "text-brand-100" : "text-ink-600"}`}>{m.label}</span>
+                    </span>
+                  </span>
+                </li>
+              );
+            })}
+          </ol>
         </div>
       </Panel>
-      <h2 className="mt-8 text-title-3">Mốc sắp tới trong 7 ngày</h2>
+      <h2 className="pt-2 text-title-3">Mốc sắp tới trong 7 ngày</h2>
       <DataList
         rows={upcoming}
         columns={[

@@ -147,8 +147,7 @@ export function ApprovalsPage({ id }) {
       ))}
       {tie && myTurn && activeRole.role === "HEAD" && (
         <Callout tone="warning">
-          Chọn đúng số hồ sơ đồng hạng để lấp số suất còn lại. Service sẽ kiểm
-          tra trước khi xác nhận.
+          Chọn đúng số hồ sơ đồng hạng để lấp số suất còn lại.
         </Callout>
       )}
       <AdmissionListTable

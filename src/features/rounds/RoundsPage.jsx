@@ -37,8 +37,8 @@ import {
 } from "../../domain/constants.js";
 import { FilterTabs } from "../../components/ui/FilterTabs.jsx";
 import { navigate } from "../../app/router.js";
-export function RoundsPage({ id, publicView = false }) {
-  const { db, can, activeRole, me } = useBackend(),
+export function RoundsPage({ id }) {
+  const { db, can, activeRole } = useBackend(),
     action = useAction();
   const [view, setView] = useState("rounds"),
     [file, setFile] = useState(null),
@@ -50,11 +50,7 @@ export function RoundsPage({ id, publicView = false }) {
     [year, setYear] = useState(""),
     [semester, setSemester] = useState("");
   const rows = db.rounds
-    .filter((r) =>
-      publicView
-        ? r.status !== "draft"
-        : can("round.view", { type: "round", entity: r }),
-    )
+    .filter((r) => can("round.view", { type: "round", entity: r }))
     .map((r) => roundView(db, r));
   const round = rows.find((r) => r.id === id);
   const dates = [
@@ -150,6 +146,12 @@ export function RoundsPage({ id, publicView = false }) {
       }[key],
       type: "datetime-local",
       required: key !== "approvalDue",
+      hint:
+        key === "reviewStart" || key === "reviewEnd"
+          ? "Được chồng lên thời gian tiếp nhận. Chỉ là khung dự kiến, không chặn việc duyệt."
+          : key === "intakeEnd" && round?.status === "review"
+            ? "Đặt ngày sau thời điểm hiện tại để mở lại tiếp nhận."
+            : undefined,
     })),
     { key: "description", label: "Mô tả tuyển sinh", type: "textarea" },
   ];
@@ -238,7 +240,6 @@ export function RoundsPage({ id, publicView = false }) {
       <ConfirmDialog
         open={Boolean(confirm)}
         title={confirm?.title}
-        description="Thao tác sẽ được ghi nhật ký."
         confirmLabel="Xác nhận"
         loading={action.busy}
         onCancel={() => setConfirm(null)}
@@ -349,6 +350,13 @@ export function RoundsPage({ id, publicView = false }) {
               cell: (r) =>
                 `${r.intakeStart ? formatIct(r.intakeStart) : "Chưa đặt"} – ${r.intakeEnd ? formatIct(r.intakeEnd) : "Chưa đặt"}`,
             },
+            {
+              key: "review",
+              header: "Xét duyệt",
+              hideBelow: "lg",
+              cell: (r) =>
+                `${r.reviewStart ? formatIct(r.reviewStart) : "Chưa đặt"} – ${r.reviewEnd ? formatIct(r.reviewEnd) : "Chưa đặt"}`,
+            },
             { key: "quota", header: "Chỉ tiêu", cell: (r) => r.quota },
             {
               key: "status",
@@ -376,33 +384,12 @@ export function RoundsPage({ id, publicView = false }) {
       </StatePage>
     );
   const actionsPrimary = [
-    publicView && round.status === "open" && (
-      <Button
-        key="apply"
-        onClick={() =>
-          navigate(
-            me
-              ? `/app/apply/${id}`
-              : `/dang-nhap?returnTo=${encodeURIComponent(`/app/apply/${id}`)}`,
-          )
-        }
-      >
-        Nộp hồ sơ
-      </Button>
-    ),
-    publicView && round.status === "published" && (
-      <Button key="results" onClick={() => navigate(`/ket-qua/${id}`)}>
-        Xem kết quả
-      </Button>
-    ),
-    !publicView &&
-      can("round.editTimeline", { type: "round", id }) &&
+    can("round.editTimeline", { type: "round", id }) &&
       editableFields(round.status, activeRole.role).length > 0 && (
         <Button key="edit" onClick={() => showForm(round)}>
           Sửa
         </Button>
       ),
-    !publicView &&
       can("round.manage", { type: "round", id }) &&
       round.status === "draft" && (
         <Button
@@ -415,7 +402,7 @@ export function RoundsPage({ id, publicView = false }) {
         </Button>
       ),
   ];
-  return (
+  const body = (
     <div className="space-y-6">
       <Panel>
         <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
@@ -477,7 +464,6 @@ export function RoundsPage({ id, publicView = false }) {
       </Panel>
       <ActionBar
         start={
-          !publicView &&
           can("round.manage", { type: "round", id }) &&
           ["draft", "upcoming"].includes(round.status) && (
             <Button
@@ -491,12 +477,7 @@ export function RoundsPage({ id, publicView = false }) {
           )
         }
       >
-        {publicView && (
-          <Button variant="secondary" onClick={() => navigate("/")}>
-            Về trang chủ
-          </Button>
-        )}
-        {!publicView && can("application.review", { type: "round", id }) && (
+        {can("application.review", { type: "round", id }) && (
           <Button
             variant="secondary"
             onClick={() => navigate(`/app/reviews?round=${id}`)}
@@ -504,16 +485,13 @@ export function RoundsPage({ id, publicView = false }) {
             Duyệt hồ sơ
           </Button>
         )}
-        {!publicView && (
-          <Button
-            variant="secondary"
-            onClick={() => navigate(`/app/approvals/${id}`)}
-          >
-            Danh sách phê duyệt
-          </Button>
-        )}
-        {!publicView &&
-          can("round.transitionManual", { type: "round", id }) &&
+        <Button
+          variant="secondary"
+          onClick={() => navigate(`/app/approvals/${id}`)}
+        >
+          Danh sách phê duyệt
+        </Button>
+        {can("round.transitionManual", { type: "round", id }) &&
           ["upcoming", "open"].includes(round.status) && (
             <Button
               variant="secondary"
@@ -540,4 +518,5 @@ export function RoundsPage({ id, publicView = false }) {
       {dialog}
     </div>
   );
+  return body;
 }

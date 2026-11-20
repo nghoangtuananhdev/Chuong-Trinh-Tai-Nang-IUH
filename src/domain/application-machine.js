@@ -1,5 +1,6 @@
 import { requireValue, IMMUTABLE_MESSAGE } from "./errors.js";
 import { timestamp } from "./time.js";
+import { canReviewApplications } from "./round-machine.js";
 export const APP_TRANSITIONS = Object.freeze({
   draft: ["draft", "pending", "cancelled"],
   pending: ["pending", "withdrawn", "needs_update", "approved", "rejected"],
@@ -33,7 +34,7 @@ export function assertTransition(
       (from === "draft" && to === "cancelled" && round.status === "review") ||
         (from === "needs_update" &&
           to === "rejected" &&
-          round.status === "review" &&
+          canReviewApplications(round) &&
           timestamp(now) > timestamp(dueAt)) ||
         (from === "approved" &&
           ["confirmed", "not_admitted"].includes(to) &&
@@ -46,7 +47,7 @@ export function assertTransition(
   if (actor === "STUDENT") {
     if (from === "needs_update" && to === "pending") {
       requireValue(
-        round.status === "review" && timestamp(now) <= timestamp(dueAt),
+        canReviewApplications(round) && timestamp(now) <= timestamp(dueAt),
         "INVALID_STATE",
         "Hồ sơ đã quá hạn bổ sung hoặc không trong giai đoạn xét duyệt.",
       );
@@ -64,12 +65,13 @@ export function assertTransition(
   }
   requireValue(
     ["LECTURER", "HEAD"].includes(actor) &&
-      round.status === "review" &&
+      canReviewApplications(round) &&
       ((from === "pending" &&
         ["approved", "rejected", "needs_update"].includes(to)) ||
+        (from === "needs_update" && to === "pending") ||
         (["approved", "rejected"].includes(from) && to === "pending")),
     "INVALID_STATE",
-    "Chỉ GVPT hoặc CNN được xét duyệt hồ sơ trong giai đoạn xét duyệt.",
+    "Chỉ GVPT hoặc CNN được xét duyệt hồ sơ khi ĐXT đang tiếp nhận hoặc đang xét duyệt.",
   );
   if (to !== "approved")
     requireValue(
@@ -77,12 +79,15 @@ export function assertTransition(
       "VALIDATION",
       "Vui lòng ghi rõ lý do hoặc nội dung yêu cầu.",
     );
-  if (to === "needs_update")
+  if (to === "needs_update") {
+    requireValue(dueAt, "VALIDATION", "Vui lòng chọn hạn bổ sung.", {
+      field: "dueAt",
+    });
     requireValue(
-      timestamp(now) < timestamp(dueAt) &&
-        timestamp(dueAt) <= timestamp(round.reviewEnd),
+      timestamp(now) < timestamp(dueAt),
       "VALIDATION",
-      "Hạn bổ sung phải sau hiện tại và không vượt quá ngày kết thúc xét duyệt.",
+      "Hạn bổ sung phải sau thời điểm hiện tại.",
       { field: "dueAt" },
     );
+  }
 }

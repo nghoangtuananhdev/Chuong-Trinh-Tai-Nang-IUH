@@ -22,6 +22,7 @@ export const PERMISSION_MATRIX = {
   "lecturer.resetPassword": { ADMIN: "*", TRAINING: "*", DEAN: "*", HEAD: "*" },
   "role.assign": { ADMIN: "*", TRAINING: "*", DEAN: "*", HEAD: "*" }, // + canAssignRole (BR-14)
   "student.manage": { ADMIN: "*" }, // khóa/mở khóa
+  "student.import": { HEAD: "*" }, // CNN nhập danh sách sinh viên theo khóa (A-22)
   "student.view": {
     ADMIN: "*",
     TRAINING: "*",

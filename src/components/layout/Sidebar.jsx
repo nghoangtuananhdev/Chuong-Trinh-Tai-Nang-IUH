@@ -1,4 +1,5 @@
-import { useRef, useCallback } from "react";
+import { useRef, useCallback, useId } from "react";
+import { motion } from "motion/react";
 import {
   BookOpen,
   GraduationCap,
@@ -25,6 +26,7 @@ import {
 import logoWhite from "../../../assets/img/brand/iuh-logo-white.svg";
 import faviconMark from "../../../assets/img/brand/favicon-32x32.png";
 import { Tooltip } from "../ui/Tooltip.jsx";
+import { ChevronMark } from "../ui/ChevronField.jsx";
 
 const menuIcons = {
   dashboard: LayoutDashboard,
@@ -57,7 +59,7 @@ export const SIDEBAR_COLLAPSED = 72;
 export function SidebarBrand({ role, collapsed = false }) {
   return (
     <div className="shrink-0">
-      <div className={collapsed ? "flex justify-center px-2 pt-5 pb-4" : "px-5 pt-5 pb-4"}>
+      <div className={collapsed ? "flex justify-center px-2 pb-4 pt-5" : "px-5 pb-4 pt-6"}>
         <a href="#/" aria-label="Về trang chủ" className="on-dark inline-flex items-center rounded-xs">
           <img
             src={collapsed ? faviconMark : logoWhite}
@@ -67,11 +69,12 @@ export function SidebarBrand({ role, collapsed = false }) {
         </a>
       </div>
       {!collapsed && (
-        <div className="border-b border-white/10 px-5 pb-4">
-          <p className="text-body-sm font-semibold text-white">{role.label}</p>
-          <p className="mt-0.5 break-words text-body-sm text-brand-200">
-            {role.scope}
+        <div className="mx-3 mb-3 rounded-control bg-white/8 px-3.5 py-3 ring-1 ring-inset ring-white/10">
+          <p className="flex items-center gap-2 text-body-sm font-semibold text-white">
+            <ChevronMark className="text-body-sm text-accent-500" />
+            {role.label}
           </p>
+          <p className="mt-1 break-words text-caption text-brand-100">{role.scope}</p>
         </div>
       )}
     </div>
@@ -79,6 +82,7 @@ export function SidebarBrand({ role, collapsed = false }) {
 }
 
 export function SidebarNav({ role, activePage, onNavigate, collapsed = false }) {
+  const indicatorId = useId();
   return (
     <nav aria-label="Chức năng không gian làm việc" className={`scrollbar-thin flex-1 space-y-0.5 overflow-y-auto py-2 ${collapsed ? "px-2" : "px-3"}`}>
       {role.menus.map(([id, label, iconKey]) => {
@@ -90,16 +94,21 @@ export function SidebarNav({ role, activePage, onNavigate, collapsed = false }) 
             aria-current={isActive ? "page" : undefined}
             aria-label={collapsed ? label : undefined}
             onClick={() => onNavigate(id)}
-            className={`on-dark relative flex min-h-10 w-full items-center gap-3 rounded-control py-2 text-left text-body-sm transition-colors duration-120 ${
+            className={`on-dark group relative flex min-h-10 w-full items-center gap-3 rounded-control py-2 text-left text-body-sm transition-colors duration-150 ${
               collapsed ? "justify-center px-0" : "px-3"
-            } ${
-              isActive
-                ? "bg-white font-semibold text-brand-700"
-                : "font-medium text-brand-100 hover:bg-white/10 hover:text-white"
-            }`}
+            } ${isActive ? "font-semibold text-brand-800" : "font-medium text-brand-100 hover:bg-white/8 hover:text-white"}`}
           >
-            <Icon size={18} aria-hidden="true" className={`shrink-0 ${isActive ? "text-brand-600" : "text-brand-200"}`} />
-            {!collapsed && <span className="min-w-0 break-words">{label}</span>}
+            {isActive && (
+              <motion.span
+                layoutId={indicatorId}
+                aria-hidden="true"
+                className="absolute inset-0 rounded-control bg-white shadow-card"
+                transition={{ type: "spring", stiffness: 480, damping: 38 }}
+              />
+            )}
+            <Icon size={18} aria-hidden="true" className={`relative shrink-0 ${isActive ? "text-brand-600" : "text-brand-200 group-hover:text-white"}`} />
+            {!collapsed && <span className="relative min-w-0 flex-1 break-words">{label}</span>}
+            {isActive && !collapsed && <ChevronMark className="relative text-caption text-accent-500" />}
           </button>
         );
         return collapsed ? (
@@ -151,13 +160,14 @@ export function Sidebar({ role, activePage, onNavigate, collapsed, onToggleColla
 
   return (
     <aside
-      className="relative z-30 hidden shrink-0 select-none flex-col border-r border-brand-700 bg-brand-600 text-white transition-[width] duration-180 lg:flex"
+      className="relative isolate z-30 hidden shrink-0 select-none flex-col bg-brand-600 text-white transition-[width] duration-180 lg:flex"
       style={{ width: collapsed ? SIDEBAR_COLLAPSED : width }}
     >
+      <div aria-hidden="true" className="chev-pattern pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-72 opacity-80 mask-t-from-10%" />
       <SidebarBrand role={role} collapsed={collapsed} />
       <SidebarNav role={role} activePage={activePage} onNavigate={onNavigate} collapsed={collapsed} />
 
-      <div className="w-full shrink-0 border-t border-white/10 p-3">
+      <div className="w-full shrink-0 border-t border-white/10 bg-brand-700/40 p-3 backdrop-blur-sm">
         {(() => {
           const label = collapsed ? "Mở rộng thanh điều hướng" : "Thu gọn thanh điều hướng";
           const btn = (
@@ -165,7 +175,7 @@ export function Sidebar({ role, activePage, onNavigate, collapsed, onToggleColla
               type="button"
               onClick={onToggleCollapse}
               aria-label={label}
-              className={`on-dark flex h-10 w-full items-center gap-2.5 rounded-control text-body-sm font-medium text-brand-100 transition-colors hover:bg-white/10 hover:text-white ${
+              className={`on-dark flex h-10 w-full items-center gap-2.5 rounded-control text-body-sm font-medium text-brand-100 transition-colors hover:bg-white/8 hover:text-white ${
                 collapsed ? "justify-center" : "px-3"
               }`}
             >

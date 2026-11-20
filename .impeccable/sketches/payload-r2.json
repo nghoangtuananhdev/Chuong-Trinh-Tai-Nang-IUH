@@ -1,0 +1,60 @@
+{
+  "title": "Bộ hướng an toàn — cổng xét tuyển CN/KSTN IUH",
+  "question": "Bạn đã quay hai lần. Đây là phía quen thuộc: ba hướng gần thương hiệu IUH nhất và phương án chuẩn. Nếu vẫn chưa ưng, hãy ghi vào ô định hướng điều còn thiếu (ví dụ: ‘giống website IUH hơn’, ‘nhiều 3D hơn’, ‘trang nghiêm hơn’).",
+  "options": [
+    {
+      "id": "grounded-chevron",
+      "kind": "grounded",
+      "label": "Hệ nhận diện IUH 2025: chevron vươn lên",
+      "lineage": "Bộ nhận diện mới của IUH (20/11/2025): chữ U bo góc, hai chevron vươn lên, ngọn lửa vàng",
+      "thesis": "Chơi thẳng ngôn ngữ logo mới: chevron vươn lên thành hệ đồ họa, mọi tiến trình là các chevron xếp tầng.",
+      "palette": ["#153898", "#0A1A40", "#F9B200", "#FFFFFF", "#EEF3FF"],
+      "materials": ["trường xanh IUH phủ lớn", "trường chevron 3D nổi khối theo chuột (three.js)", "góc bo theo chữ U", "ánh vàng ngọn lửa"],
+      "viewport": "Khối xanh IUH phủ nửa trên, nền là trường chevron 3D xếp tầng như logo, nổi lên khi rê chuột; tiêu đề lớn, ô tìm đợt và Tra cứu kết quả đặt trên trường đó; mép dưới khối xanh bo góc chữ U ôm danh sách đợt; thanh tiến trình mỗi đợt làm bằng chevron.",
+      "risk": "Quen thuộc nhất: là hệ nhận diện chơi thẳng; thiếu cam kết sẽ thành banner xanh bình thường.",
+      "html": ".impeccable/sketches/r2-chevron.html",
+      "comp": ".impeccable/mocks/decision/r2-chevron.webp"
+    },
+    {
+      "id": "grounded-lacquer",
+      "kind": "grounded",
+      "label": "Sơn mài xanh dát vàng",
+      "lineage": "Tranh sơn mài Việt Nam: nhiều lớp sơn, mài, dát vàng lá, khảm vỏ trứng",
+      "thesis": "Hồ sơ tài năng như tranh sơn mài: qua từng lớp duyệt, mài kỹ mới sáng lên.",
+      "palette": ["#06102E", "#153898", "#C9A227", "#F9B200", "#F4F6FA"],
+      "materials": ["mặt sơn mài xanh thẫm bóng, ánh sáng lướt theo chuột (WebGL)", "vàng lá dát cho tiêu đề", "khảm vỏ trứng rạn cho đợt đang mở"],
+      "viewport": "Mặt sơn mài xanh thẫm phủ khung, vệt sáng lướt qua theo chuột; tiêu đề dát vàng lá cỡ lớn; ô tìm và Tra cứu khảm trên mặt sơn; đợt đang tiếp nhận là một ô khảm vỏ trứng sáng có nút Nộp hồ sơ.",
+      "risk": "Dễ trượt thành ‘nền tối + vàng sang chảnh’; vàng lá chỉ dành cho tiêu đề và trạng thái công bố.",
+      "html": ".impeccable/sketches/r2-lacquer.html",
+      "comp": ".impeccable/mocks/decision/r2-lacquer.webp"
+    },
+    {
+      "id": "grounded-drawing",
+      "kind": "grounded",
+      "label": "Bản vẽ kỹ thuật khổ A1",
+      "lineage": "Di sản trường Công nghiệp: bản vẽ kỹ thuật có khung tên, đường ghi kích thước",
+      "thesis": "Trang chủ là một bản vẽ kỹ thuật: khung tên ghi thông tin đợt, đường kích thước đo các mốc thời gian.",
+      "palette": ["#F5F8FF", "#153898", "#0A1A40", "#F9B200"],
+      "materials": ["giấy can lưới mờ", "nét vẽ kỹ thuật xanh", "khung tên góc phải", "đường kích thước có mũi tên"],
+      "viewport": "Toàn khung là tờ bản vẽ có khung viền; tiêu đề lớn đặt như tên bản vẽ; khung tên góc phải dưới chứa đợt đang tiếp nhận và nút Nộp hồ sơ; đường kích thước ngang đo khoảng tiếp nhận → xét duyệt; ô tìm kiếm nằm trong ô Ghi chú.",
+      "risk": "Lối ‘blueprint’ hay gặp ở trang công nghệ; nét quá mảnh khó đọc trên máy chiếu hội đồng.",
+      "html": ".impeccable/sketches/r2-drawing.html",
+      "comp": ".impeccable/mocks/decision/r2-drawing.webp"
+    }
+  ],
+  "reroll": { "registers": ["safer", "bolder"] },
+  "buildPath": { "value": "code" },
+  "canon": true,
+  "canonCard": {
+    "kind": "canon",
+    "label": "Chuẩn cổng tuyển sinh, làm ngang tầm Bách khoa ĐHQG-HCM, UEH, NUS Admissions",
+    "thesis": "Những gì các cổng tuyển sinh tốt nhất đều làm, đặt ở tầm hoàn thiện của ba trang đó.",
+    "palette": ["#FFFFFF", "#153898", "#F9B200", "#F4F6FA"],
+    "materials": ["ảnh khuôn viên IUH thật", "lưới thẻ sạch", "chuyển động nhẹ"],
+    "viewport": "Banner xanh có ảnh khuôn viên, ô tìm kiếm, lưới thẻ đợt xét tuyển bên dưới.",
+    "risk": "Lẫn với mọi cổng tuyển sinh khác.",
+    "html": ".impeccable/sketches/r2-canon.html",
+    "comp": ".impeccable/mocks/decision/r2-canon.webp"
+  },
+  "steer": true
+}

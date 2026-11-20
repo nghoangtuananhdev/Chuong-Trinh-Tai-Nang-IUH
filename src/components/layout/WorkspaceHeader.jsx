@@ -81,7 +81,7 @@ export function WorkspaceHeader({
 
   return (
     <header
-      className="sticky top-0 z-20 flex h-14 shrink-0 flex-nowrap items-center justify-between gap-4 border-b border-ink-200 bg-white px-4 sm:px-6"
+      className="sticky top-0 z-20 flex h-16 shrink-0 flex-nowrap items-center justify-between gap-4 border-b border-ink-200/70 bg-white/80 px-4 backdrop-blur-xl backdrop-saturate-150 sm:px-6 lg:px-10"
     >
       <div className="flex min-w-0 items-center gap-3">
         <IconButton
@@ -134,7 +134,7 @@ export function WorkspaceHeader({
             aria-haspopup="menu"
             aria-label="Tùy chọn tài khoản"
             onClick={() => setAccountOpen((v) => !v)}
-            className="flex items-center gap-2 rounded-control border border-transparent p-1.5 transition-colors hover:border-ink-200 hover:bg-ink-25"
+            className="flex items-center gap-2 rounded-full border border-transparent p-1 pr-2 transition-colors hover:border-ink-200 hover:bg-white"
           >
             <Avatar initials={role.initials} name={role.name} size={32} />
             <div className="hidden max-w-40 text-left leading-tight lg:block">

@@ -6,7 +6,7 @@ import { useBackend } from "../../mock/backend.jsx";
 import { DataList, useAction } from "../shared/FeatureKit.jsx";
 import { Button } from "../../components/ui/Button.jsx";
 import { Field, Input, Checkbox } from "../../components/ui/Form.jsx";
-import { CircleAlert, CircleCheck } from "lucide-react";
+import { CircleAlert, CircleCheck, CheckCircle2 } from "lucide-react";
 import {
   Callout,
   CodeTag,
@@ -16,6 +16,7 @@ import {
 import { Panel } from "../../components/ui/Panel.jsx";
 import { IdentityHeader } from "../../components/ui/IdentityHeader.jsx";
 import { StatePage } from "../../components/ui/StatePage.jsx";
+import { EmptyState } from "../../components/ui/EmptyState.jsx";
 import { ActionBar } from "../../components/layout/ActionBar.jsx";
 import { StatusBadge } from "../../components/ui/StatusBadge.jsx";
 import { Stepper } from "../../components/ui/Stepper.jsx";
@@ -24,11 +25,13 @@ import { ConfirmDialog } from "../../components/ui/ConfirmDialog.jsx";
 import { CriterionField } from "../../components/domain-ui/CriterionField.jsx";
 import { EvidenceViewer } from "../../components/domain-ui/EvidenceViewer.jsx";
 import { classifyFlow } from "../../domain/flows.js";
+import { canReviewApplications } from "../../domain/round-machine.js";
 import { scoreApplication } from "../../domain/scoring.js";
 import {
   maintenanceRounds,
   studentProfile,
   latestMemberships,
+  eligibleClasses,
 } from "../../domain/selectors.js";
 import { formatIct } from "../../domain/time.js";
 import { FLOW_LABEL } from "../../domain/constants.js";
@@ -44,7 +47,9 @@ export function ApplicationForm({ roundId, applicationId }) {
         (a) =>
           a.roundId === roundId &&
           a.studentUserId === me.id &&
-          ["draft", "pending", "needs_update", "approved"].includes(a.status),
+          ["draft", "pending", "needs_update", "approved", "rejected"].includes(
+            a.status,
+          ),
       );
   const round = db.rounds.find((r) => r.id === (roundId ?? existing?.roundId));
   const [data, setData] = useState(() =>
@@ -54,7 +59,12 @@ export function ApplicationForm({ roundId, applicationId }) {
     [step, setStep] = useState(existing?.status === "needs_update" ? 1 : 0),
     [file, setFile] = useState(null),
     [confirm, setConfirm] = useState(null),
-    [saved, setSaved] = useState("");
+    [saved, setSaved] = useState(""),
+    [done, setDone] = useState(null);
+  const doneRef = useRef(null);
+  useEffect(() => {
+    if (done) doneRef.current?.focus();
+  }, [done]);
   const started = useRef(false),
     revision = useRef(0);
   const allowExit = useRef(false);
@@ -125,7 +135,17 @@ export function ApplicationForm({ roundId, applicationId }) {
     return <StatePage tone="danger">Không tìm thấy đợt xét tuyển.</StatePage>;
   if (!data)
     return (
-      <StatePage>{action.error?.message ?? "Đang tạo hồ sơ nháp…"}</StatePage>
+      <StatePage
+        action={
+          action.error && (
+            <Button onClick={() => navigate("/app/dashboard")}>
+              Về tổng quan
+            </Button>
+          )
+        }
+      >
+        {action.error?.message ?? "Đang tạo hồ sơ nháp…"}
+      </StatePage>
     );
   const persisted = db.applications.find((a) => a.id === data.id) ?? data;
   const request = db.reviewRequests
@@ -134,7 +154,7 @@ export function ApplicationForm({ roundId, applicationId }) {
   const editable =
     (round.status === "open" &&
       ["draft", "pending"].includes(persisted.status)) ||
-    (round.status === "review" && persisted.status === "needs_update");
+    (canReviewApplications(round) && persisted.status === "needs_update");
   const score = scoreApplication(round.criteriaSnapshot, data.items);
   const saveAction = async () => {
     const r = await action.run(
@@ -154,6 +174,158 @@ export function ApplicationForm({ roundId, applicationId }) {
       setSaved("Đã lưu");
     }
   };
+  const history = (
+    <Panel title="Lịch sử xử lý">
+      <Timeline
+        items={(persisted.history ?? []).map((h) => ({
+          date: formatIct(h.at),
+          actor: h.actorName,
+          role: h.actorRoleLabel,
+          action: h.action,
+          note: h.note,
+        }))}
+      />
+    </Panel>
+  );
+  if (done)
+    return (
+      <div className="mx-auto max-w-xl">
+        <Panel>
+          <div className="flex flex-col items-center py-6 text-center">
+            <span className="mb-4 flex size-12 items-center justify-center rounded-full bg-success-bg text-success-fg">
+              <CheckCircle2 size={24} aria-hidden="true" />
+            </span>
+            <h2
+              ref={doneRef}
+              tabIndex={-1}
+              className="text-title-2 text-ink-900 outline-none"
+            >
+              {done === "resubmit"
+                ? "Đã gửi bổ sung thành công"
+                : "Nộp hồ sơ thành công"}
+            </h2>
+            <dl className="mt-4 space-y-1 text-body text-ink-700">
+              <div>
+                Mã hồ sơ: <CodeTag>{persisted.code}</CodeTag>
+              </div>
+              <div>Đợt xét tuyển: {round.name}</div>
+              <div>
+                Thời điểm nộp:{" "}
+                {formatIct(
+                  done === "resubmit"
+                    ? (persisted.lastEditedAt ?? db.clock.now)
+                    : (persisted.submittedAt ?? db.clock.now),
+                )}
+              </div>
+            </dl>
+            <p className="mt-4 text-body text-ink-600">
+              Kết quả xét duyệt sẽ được gửi qua email và mục Thông báo.
+            </p>
+            <div className="mt-6 flex flex-wrap justify-center gap-3">
+              <Button
+                onClick={() => {
+                  setDone(null);
+                  navigate(`/app/my-applications/${data.id}`);
+                }}
+              >
+                Xem hồ sơ đã nộp
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={() => navigate("/app/dashboard")}
+              >
+                Về tổng quan
+              </Button>
+            </div>
+          </div>
+        </Panel>
+      </div>
+    );
+  if (!editable && persisted.status !== "draft")
+    return (
+      <div className="space-y-6">
+        <Panel>
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div className="min-w-0">
+              <h2 className="text-title-2">{round.name}</h2>
+              <p className="mt-1 text-body-sm text-ink-600">
+                {FLOW_LABEL[data.flow]} · Mã hồ sơ{" "}
+                <CodeTag>{persisted.code}</CodeTag>
+                {persisted.submittedAt
+                  ? ` · Nộp lúc ${formatIct(persisted.submittedAt)}`
+                  : ""}
+              </p>
+            </div>
+            <StatusBadge domain="application">{persisted.status}</StatusBadge>
+          </div>
+          {round.status === "published" && (
+            <p className="mt-4 flex items-baseline gap-2 border-t border-ink-200 pt-4">
+              <span className="text-body text-ink-700">Điểm chính thức:</span>
+              <span className="text-metric tabular-nums text-ink-900">
+                {persisted.officialScore ?? "Chưa có"}
+              </span>
+            </p>
+          )}
+          {persisted.decisionNote && (
+            <p className="mt-2 text-body-sm text-ink-600">
+              {persisted.decisionNote}
+            </p>
+          )}
+        </Panel>
+        <Panel title="Thông tin cá nhân">
+          <DescriptionList
+            layout="plain"
+            columns={3}
+            items={[
+              { label: "Họ tên", value: data.applicantName },
+              {
+                label: "MSSV",
+                value: <CodeTag>{data.studentCode}</CodeTag>,
+              },
+              { label: "Ngày sinh", value: data.dob },
+              { label: "Email IUH", value: data.email },
+              { label: "Ngành", value: data.majorName },
+              { label: "Số điện thoại", value: data.phone || "—" },
+              { label: "Lớp sinh hoạt", value: data.homeClass || "—" },
+            ]}
+          />
+        </Panel>
+        {round.criteriaSnapshot.criteria.map((c) => (
+          <CriterionField
+            key={c.id}
+            criterion={c}
+            item={data.items.find((i) => i.criterionId === c.id)}
+            readOnly
+            feedback
+            onView={setFile}
+          />
+        ))}
+        {history}
+        <Drawer
+          open={Boolean(file)}
+          onClose={() => setFile(null)}
+          title={file?.name}
+          size="xl"
+        >
+          <EvidenceViewer file={file} />
+        </Drawer>
+      </div>
+    );
+  const feedback = persisted.status !== "draft";
+  const flagged = (c) => {
+    const i = data.items.find((x) => x.criterionId === c.id);
+    return (
+      i?.verifyStatus === "INVALID" ||
+      (i?.declaredEntries ?? []).some((e) => e.verifyStatus === "INVALID")
+    );
+  };
+  const criteriaList =
+    persisted.status === "needs_update"
+      ? [...round.criteriaSnapshot.criteria].sort(
+          (a, b) => Number(flagged(b)) - Number(flagged(a)),
+        )
+      : round.criteriaSnapshot.criteria;
+  const flaggedCount = round.criteriaSnapshot.criteria.filter(flagged).length;
   return (
     <div className="space-y-6">
       <Panel>
@@ -161,7 +333,10 @@ export function ApplicationForm({ roundId, applicationId }) {
           <div className="min-w-0">
             <h2 className="text-title-2">{round.name}</h2>
             <p className="mt-1 text-body-sm text-ink-600">
-              {FLOW_LABEL[data.flow]} · Hạn tiếp nhận: {formatIct(round.intakeEnd)}
+              {FLOW_LABEL[data.flow]} ·{" "}
+              {request
+                ? `Hạn bổ sung: ${formatIct(request.dueAt)}`
+                : `Hạn tiếp nhận: ${formatIct(round.intakeEnd)}`}
             </p>
           </div>
           <div className="flex flex-col items-start gap-1.5 sm:items-end">
@@ -244,10 +419,16 @@ export function ApplicationForm({ roundId, applicationId }) {
               </div>
             </Panel>
           )}
+          {step === 1 && persisted.status === "needs_update" && (
+            <p className="text-body text-ink-700">
+              Giảng viên đánh dấu {flaggedCount} tiêu chí cần xem lại.
+            </p>
+          )}
           {step === 1 &&
-            round.criteriaSnapshot.criteria.map((c) => (
+            criteriaList.map((c) => (
               <CriterionField
                 key={c.id}
+                feedback={feedback}
                 criterion={c}
                 item={data.items.find((i) => i.criterionId === c.id)}
                 readOnly={!editable}
@@ -268,9 +449,6 @@ export function ApplicationForm({ roundId, applicationId }) {
                 <span className="text-metric tabular-nums text-ink-900">
                   {score.total}
                 </span>
-              </p>
-              <p className="mt-2 text-body text-ink-700">
-                Điểm chính thức do giảng viên xác minh có thể khác.
               </p>
               <p className="mt-2 flex items-center gap-2 text-body text-ink-700">
                 {score.eligible ? (
@@ -320,7 +498,11 @@ export function ApplicationForm({ roundId, applicationId }) {
               </Button>
             )}
             <p aria-live="polite" className="text-body-sm text-ink-600">
-              {dirty ? "Có thay đổi chưa lưu" : saved}
+              {persisted.status === "needs_update" && step === 2 && !dirty
+                ? "Hãy chỉnh giá trị hoặc minh chứng được yêu cầu trước khi gửi."
+                : dirty
+                  ? "Có thay đổi chưa lưu"
+                  : saved}
             </p>
           </>
         }
@@ -353,7 +535,9 @@ export function ApplicationForm({ roundId, applicationId }) {
           <Button
             className="max-sm:flex-1"
             loading={action.busy}
-            disabled={!data.committed}
+            disabled={
+              !data.committed || (persisted.status === "needs_update" && !dirty)
+            }
             onClick={async () => {
               const method =
                 persisted.status === "needs_update"
@@ -361,16 +545,24 @@ export function ApplicationForm({ roundId, applicationId }) {
                   : persisted.status === "draft"
                     ? "applications.submit"
                     : "applications.update";
-              const r = await action.run(method, {
-                id: data.id,
-                items: data.items,
-                phone: data.phone,
-                homeClass: data.homeClass,
-                committed: data.committed,
-              });
+              const r = await action.run(
+                method,
+                {
+                  id: data.id,
+                  items: data.items,
+                  phone: data.phone,
+                  homeClass: data.homeClass,
+                  committed: data.committed,
+                },
+                method === "applications.update" ? "Đã cập nhật hồ sơ." : "",
+              );
               if (r.ok) {
                 setDirty(false);
-                leave(`/app/my-applications/${data.id}`);
+                if (method !== "applications.update")
+                  setDone(
+                    method === "applications.resubmit" ? "resubmit" : "submit",
+                  );
+                else leave(`/app/my-applications/${data.id}`);
               }
             }}
           >
@@ -380,6 +572,7 @@ export function ApplicationForm({ roundId, applicationId }) {
           </Button>
         )}
       </ActionBar>
+      {applicationId && history}
       <Drawer
         open={Boolean(file)}
         onClose={() => setFile(null)}
@@ -391,7 +584,7 @@ export function ApplicationForm({ roundId, applicationId }) {
       <ConfirmDialog
         open={Boolean(pendingPath)}
         title="Rời trang khi chưa lưu?"
-        description="Bạn còn thay đổi chưa được lưu. Chọn Hủy để quay lại lưu hồ sơ."
+        description="Các thay đổi chưa lưu sẽ mất."
         confirmLabel="Rời trang"
         onCancel={() => setPendingPath(null)}
         onConfirm={() => {
@@ -423,6 +616,7 @@ export function StudentPortal({ page, id }) {
   const { db, me } = useBackend();
   const profile = studentProfile(db, me.id);
   const apps = db.applications.filter((a) => a.studentUserId === me.id);
+  const eligible = eligibleClasses(db, me.id);
   const relevant = db.rounds.filter(
     (r) => r.status === "open" && classifyFlow(db, me.id, r).allowed,
   );
@@ -433,22 +627,7 @@ export function StudentPortal({ page, id }) {
       return (
         <StatePage tone="danger">Không tìm thấy hồ sơ của bạn.</StatePage>
       );
-    return (
-      <div className="space-y-5">
-        <ApplicationForm key={id} applicationId={id} />
-        <Panel title="Lịch sử xử lý">
-          <Timeline
-            items={app.history.map((h) => ({
-              date: formatIct(h.at),
-              actor: h.actorName,
-              role: h.actorRoleLabel,
-              action: h.action,
-              note: h.note,
-            }))}
-          />
-        </Panel>
-      </div>
-    );
+    return <ApplicationForm key={id} applicationId={id} />;
   }
   if (page === "my-applications")
     return (
@@ -473,7 +652,13 @@ export function StudentPortal({ page, id }) {
             {
               key: "score",
               header: "Điểm tự khai / Chính thức",
-              cell: (a) => `${a.selfScore} / ${a.officialScore ?? "Chưa có"}`,
+              // Điểm chính thức chỉ hiện khi ĐXT đã công bố, như trang chi tiết hồ sơ.
+              cell: (a) =>
+                `${a.selfScore} / ${
+                  db.rounds.find((r) => r.id === a.roundId)?.status === "published"
+                    ? (a.officialScore ?? "Chưa có")
+                    : "Chưa công bố"
+                }`,
             },
             {
               key: "status",
@@ -537,10 +722,49 @@ export function StudentPortal({ page, id }) {
             </Button>
           </Callout>
         ))}
-      <p className="text-body-sm text-ink-600">
-        Bạn có thể nộp nhiều ĐXT, nhưng chỉ được trúng tuyển vào một lớp
-        CN/KSTN.
-      </p>
+      {page === "dashboard" && !profile?.isKSTN && (
+        <Panel title="Lớp phù hợp với bạn">
+          {eligible.length ? (
+            <ul className="divide-y divide-ink-200">
+              {eligible.map((c) => {
+                const program = db.programs.find((p) => p.id === c.programId),
+                  major = db.majors.find((m) => m.id === program?.majorId),
+                  lecturer = db.users.find((u) => u.id === c.lecturerId),
+                  classRound = db.rounds
+                    .filter((r) => r.classId === c.id && r.status !== "draft")
+                    .sort((a, b) =>
+                      String(b.intakeStart).localeCompare(String(a.intakeStart)),
+                    )[0];
+                return (
+                  <li
+                    key={c.id}
+                    className="flex flex-wrap items-center justify-between gap-3 py-3 first:pt-0 last:pb-0"
+                  >
+                    <div className="min-w-0 text-body text-ink-700">
+                      <p className="font-medium text-ink-900">
+                        <CodeTag>{c.code}</CodeTag> · {major?.name} · {c.cohort}
+                      </p>
+                      <p className="text-body-sm text-ink-600">
+                        GVPT: {lecturer?.fullName ?? "—"} ·{" "}
+                        {classRound?.status === "open"
+                          ? `Đang tiếp nhận đến ${formatIct(classRound.intakeEnd)}`
+                          : classRound?.status === "upcoming"
+                            ? `Mở tiếp nhận ${formatIct(classRound.intakeStart)}`
+                            : "Chưa có đợt xét tuyển"}
+                      </p>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          ) : (
+            <EmptyState
+              title="Chưa có lớp CN/KSTN cho ngành và khóa của bạn."
+              description="Nếu ngành hoặc khóa của bạn chưa đúng, hãy liên hệ Chủ nhiệm ngành."
+            />
+          )}
+        </Panel>
+      )}
       <DataList
         rows={rounds}
         columns={[
@@ -551,27 +775,29 @@ export function StudentPortal({ page, id }) {
             cell: (r) => formatIct(r.intakeEnd),
           },
         ]}
-        actions={(r) => (
-          <Button
-            size="sm"
-            onClick={() => {
-              const existing = apps.find(
-                (a) =>
-                  a.roundId === r.id &&
-                  ["draft", "pending", "needs_update", "approved"].includes(
-                    a.status,
-                  ),
-              );
-              navigate(
-                existing
-                  ? `/app/my-applications/${existing.id}`
-                  : `/app/apply/${r.id}`,
-              );
-            }}
-          >
-            {profile?.isKSTN ? "Cập nhật hồ sơ tích lũy" : "Nộp hồ sơ"}
-          </Button>
-        )}
+        actions={(r) => {
+          const existing = apps.find(
+            (a) =>
+              a.roundId === r.id &&
+              ["draft", "pending", "needs_update", "approved", "rejected"].includes(a.status),
+          );
+          return (
+            <Button
+              size="sm"
+              onClick={() =>
+                navigate(existing ? `/app/my-applications/${existing.id}` : `/app/apply/${r.id}`)
+              }
+            >
+              {existing?.status === "draft"
+                ? "Tiếp tục bản nháp"
+                : existing
+                  ? "Xem hồ sơ"
+                  : profile?.isKSTN
+                    ? "Cập nhật hồ sơ tích lũy"
+                    : "Nộp hồ sơ"}
+            </Button>
+          );
+        }}
       />
     </div>
   );

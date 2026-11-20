@@ -45,7 +45,7 @@ function declarative(i) {
     })),
   };
 }
-function applyValues(app, round, p) {
+function applyValues(app, round, p, now) {
   let changed = false;
   const incoming = new Map(
     (p.items ?? app.items).map((i) => [i.criterionId, i]),
@@ -70,6 +70,7 @@ function applyValues(app, round, p) {
           verifyNote: "",
           verifiedBy: null,
           verifiedAt: null,
+          updatedAt: now,
           declaredEntries: values.declaredEntries.map((e) => ({
             ...e,
             verifyStatus: "UNVERIFIED",
@@ -163,7 +164,9 @@ export const createDraft = defineService("applications.createDraft", {
         (a) =>
           a.roundId === round.id &&
           a.studentUserId === user.id &&
-          ["draft", "pending", "needs_update", "approved"].includes(a.status),
+          ["draft", "pending", "needs_update", "approved", "rejected"].includes(
+            a.status,
+          ),
       ),
       "CONFLICT",
       "Bạn đã có một hồ sơ hiệu lực trong ĐXT này.",
@@ -207,7 +210,7 @@ export const createDraft = defineService("applications.createDraft", {
       remindersSent: [],
       history: [],
     };
-    applyValues(app, round, p);
+    applyValues(app, round, p, ctx.now);
     db.applications.push(app);
     applicationHistory(db, ctx, app, "Lưu nháp");
     audit(db, ctx, {
@@ -270,7 +273,7 @@ function mutate(name, to) {
       });
       let changed = false;
       if (["saveDraft", "submit", "update", "resubmit"].includes(name))
-        changed = applyValues(app, round, p);
+        changed = applyValues(app, round, p, ctx.now);
       if (["submit", "update", "resubmit"].includes(name))
         complete(db, app, round);
       if (name === "resubmit") {

@@ -5,6 +5,21 @@ import { Callout } from "../ui/Display.jsx";
 import { Panel } from "../ui/Panel.jsx";
 import { EvidenceUploader } from "./EvidenceUploader.jsx";
 import { OPERATOR } from "../../domain/constants.js";
+const FEEDBACK = {
+  VALID: { label: "Hợp lệ", cls: "bg-success-bg text-success-fg" },
+  INVALID: { label: "Không hợp lệ", cls: "bg-danger-bg text-danger-fg" },
+};
+function FeedbackPill({ status }) {
+  const f = FEEDBACK[status];
+  if (!f) return null;
+  return (
+    <span
+      className={`rounded-full px-2 text-caption font-medium ${f.cls}`}
+    >
+      {f.label}
+    </span>
+  );
+}
 export function CriterionField({
   criterion: c,
   item = {},
@@ -12,6 +27,7 @@ export function CriterionField({
   withEvidence = true,
   onView,
   readOnly = false,
+  feedback = false,
 }) {
   const change = (patch) => onChange({ ...item, criterionId: c.id, ...patch });
   return (
@@ -28,10 +44,21 @@ export function CriterionField({
           <span className="text-body-sm font-normal text-ink-600">
             · {c.unit}
           </span>
+          {feedback && item.verifyStatus && (
+            <>
+              {" "}
+              <FeedbackPill status={item.verifyStatus} />
+            </>
+          )}
         </>
       }
     >
      <div className="space-y-3">
+      {feedback && item.verifyStatus === "INVALID" && item.verifyNote && (
+        <p className="text-body-sm text-ink-700">
+          Ghi chú của giảng viên: {item.verifyNote}
+        </p>
+      )}
       <div className="space-y-1 rounded-control bg-ink-25 px-3 py-2 text-body-sm text-ink-700">
         <p>
           Mức điểm:{" "}
@@ -56,6 +83,14 @@ export function CriterionField({
               key={entry.id}
               className="space-y-3 rounded-control border border-ink-200 p-4"
             >
+              {feedback && entry.verifyStatus && (
+                <p className="text-body-sm text-ink-700">
+                  <FeedbackPill status={entry.verifyStatus} />
+                  {entry.verifyStatus === "INVALID" && entry.verifyNote
+                    ? ` Ghi chú của giảng viên: ${entry.verifyNote}`
+                    : ""}
+                </p>
+              )}
               <div className="grid gap-3 sm:grid-cols-2">
               <Field label={`Tên thành tích ${i + 1}`}>
                 <Input
@@ -203,8 +238,7 @@ export function CriterionField({
             c.valueType === "COUNT" &&
             Number(item.declaredCount) > (item.evidence?.length ?? 0) && (
               <Callout tone="warning" role="status">
-                Số tệp minh chứng đang ít hơn số thành tích khai báo. Nên có một
-                minh chứng cho mỗi thành tích.
+                Số tệp minh chứng ít hơn số thành tích khai báo.
               </Callout>
             )}
           {withEvidence && !readOnly && (

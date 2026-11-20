@@ -3,7 +3,7 @@ export function addStudent(
   db,
   studentCode,
   fullName,
-  { majorId = "maj_ktpm", email, registered = true } = {},
+  { majorId = "maj_ktpm", email, registered = true, cohort = "K22" } = {},
 ) {
   const entry = {
     studentCode,
@@ -12,6 +12,12 @@ export function addStudent(
     dob: "2006-01-15",
     homeClass: `D${studentCode.slice(0, 2)}-${majorId.slice(4).toUpperCase()}`,
     majorId,
+    cohort,
+    importedBy:
+      db.userRoles.find((r) => r.role === "HEAD" && r.scopeId === majorId)
+        ?.userId ?? null,
+    importedAt: db.clock.now,
+    batchId: "seed_batch_1",
   };
   db.schoolDirectory.push(entry);
   if (!registered) return;
@@ -36,6 +42,7 @@ export function addStudent(
     dob: entry.dob,
     homeClass: entry.homeClass,
     majorId,
+    cohort,
     isKSTN: false,
   });
   addRole(db, id, "STUDENT", null);
@@ -51,19 +58,34 @@ export function seedDirectory(db) {
     ["26010011", "Hồ Ngọc Mai"],
     ["26010022", "Trương Gia Huy"],
   ]) {
-    addStudent(
-      db,
-      code,
-      name,
-      code === "26010022" ? { email: `fail.${code}@student.iuh.edu.vn` } : {},
-    );
+    addStudent(db, code, name, {
+      cohort: code.startsWith("2109")
+        ? "K20"
+        : code === "22073210"
+          ? "K21"
+          : "K22",
+      ...(code === "26010022"
+        ? { email: `fail.${code}@student.iuh.edu.vn` }
+        : {}),
+    });
   }
   addStudent(db, "26019999", "Phan Minh Khang", {
     email: "khang.26019999@student.iuh.edu.vn",
     registered: false,
+    cohort: "K22",
   });
-  addStudent(db, "26018888", "Lâm Bảo Ngọc", { registered: false });
-  for (let n = 1; n <= 12; n++)
+  addStudent(db, "26018888", "Lâm Bảo Ngọc", {
+    registered: false,
+    cohort: "K22",
+  });
+  // Khóa theo lớp: 1–3 KTPM K21, 4–6 HTTT K21, 7 và 10 CNTN-MKT-K20, còn lại MKT K22.
+  const extraNames = [
+    "Bùi Gia Huy",
+    "Đinh Thị Mỹ",
+    "Mai Quốc Trung",
+    "Hà Ngọc Anh",
+  ];
+  for (let n = 1; n <= 16; n++)
     addStudent(
       db,
       `2690${String(n).padStart(4, "0")}`,
@@ -80,8 +102,14 @@ export function seedDirectory(db) {
         "Trần Minh Long",
         "Võ Ngọc Ngân",
         "Nguyễn Anh Phúc",
+        ...extraNames,
       ][n - 1],
-      { majorId: n >= 7 ? "maj_mkt" : n >= 4 ? "maj_httt" : "maj_ktpm" },
+      n >= 13
+        ? { majorId: "maj_ktpm", cohort: "K22" }
+        : {
+            majorId: n >= 7 ? "maj_mkt" : n >= 4 ? "maj_httt" : "maj_ktpm",
+            cohort: n >= 7 ? ([7, 10].includes(n) ? "K20" : "K22") : "K21",
+          },
     );
   // Authorized IUH alias used to demonstrate OTP-confirmed email changes.
   const nam = db.schoolDirectory.find(

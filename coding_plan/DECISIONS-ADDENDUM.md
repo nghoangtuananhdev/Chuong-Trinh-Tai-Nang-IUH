@@ -56,3 +56,39 @@ Chạy các luồng U1–U15 trên Chromium (Playwright, headless) vì browser h
 - Trang chi tiết ĐXT công khai không có lối quay lại/nộp hồ sơ ⇒ thêm "Về trang chủ", "Nộp hồ sơ", "Xem kết quả".
 - Bổ sung: hiển thị các mức điểm trong form hồ sơ, lớp và năm đào tạo ở tổng quan SV, ẩn bản nháp khỏi danh sách duyệt, tiêu đề trang cho các route chi tiết.
 Có test hồi quy ở `src/mock/services/regression.test.js`.
+
+---
+
+# Quyết định sau báo cáo lần 1 (theo nhận xét của giảng viên, 11/11/2026)
+
+## A-16 — Xét duyệt tách khỏi trạng thái ĐXT
+Giữ nguyên 6 trạng thái ĐXT. `open` = đang tiếp nhận (GV đã được duyệt); `review` = đã đóng tiếp nhận, còn xét duyệt. GVPT/CNN được xác minh và ra quyết định khi ĐXT ở `open` hoặc `review` (`canReviewApplications`). `reviewStart`/`reviewEnd` chỉ là khung dự kiến để hiển thị, không chặn thao tác.
+
+## A-17 — Luật thời gian mới
+`intakeStart < intakeEnd`; `reviewStart < reviewEnd`; `intakeStart <= reviewStart`; `intakeEnd <= reviewEnd`; `approvalDue >= reviewEnd` (nếu có). Bỏ luật `intakeEnd <= reviewStart` nên khoảng xét duyệt được chồng lên khoảng tiếp nhận.
+
+## A-18 — GVPT sửa được các mốc thời gian
+`upcoming`: cả 5 mốc. `open`: `intakeEnd` (rút ngắn hoặc gia hạn, miễn sau hiện tại), `reviewStart`, `reviewEnd`, `approvalDue`. `review`: cùng bốn mốc đó; đặt `intakeEnd` sau hiện tại = mở lại tiếp nhận (ĐXT về `open`, audit `ROUND_INTAKE_REOPENED`, không khôi phục bản nháp đã bị hủy). `approving`/`published`: không sửa.
+
+## A-19 — Hạn bổ sung
+Chỉ cần sau thời điểm hiện tại, bỏ ràng buộc `<= reviewEnd`; vẫn bắt buộc có hạn (lỗi “Vui lòng chọn hạn bổ sung.”). Quá hạn hệ thống tự chuyển “Không đạt”. GV được hủy yêu cầu bổ sung (`reviews.cancelRequest`, bắt buộc lý do) để đưa hồ sơ về “Chờ duyệt”.
+
+## A-20 — Một hồ sơ sống cho mỗi sinh viên trong một ĐXT
+Hồ sơ `rejected` cũng chặn tạo hồ sơ mới cùng ĐXT (muốn làm lại: GV mở lại hoặc yêu cầu bổ sung). Chỉ `withdrawn`/`cancelled` mới cho tạo mới.
+
+## A-21 — Đánh dấu không hợp lệ không bắt buộc lý do
+Lý do chỉ bắt buộc khi điều chỉnh giá trị sinh viên khai và khi ra quyết định Không đạt / Yêu cầu bổ sung / Mở lại / Hủy yêu cầu. Ghi chú xác minh là tùy chọn, thuộc riêng từng tiêu chí/thành tích. `verifyItem` chỉ ghi `verifiedValue` khi payload có khóa này (`null` = xóa điều chỉnh). Tiêu chí bị sinh viên sửa được gắn `updatedAt` để GV thấy nhãn “Vừa cập nhật”.
+
+## A-22 — Danh sách sinh viên do CNN nhập
+`db.schoolDirectory` giữ tên nhưng đổi ý nghĩa thành “danh sách sinh viên được phép đăng ký”; chỉ CNN nhập cho ngành mình theo khóa (CSV hoặc dán từ Excel), qua `directory.import` (service tự chuẩn hóa và lập kế hoạch lại, không tin xem trước của client) và `directory.remove` (chỉ dòng chưa có tài khoản). Giao diện không còn chữ “danh bạ IUH”. Ngày sinh để trống được chấp nhận (lưu rỗng).
+
+## A-23 — Lớp phù hợp
+Sinh viên chưa thuộc lớp CN/KSTN chỉ nộp được vào ĐXT của lớp có `program.majorId === profile.majorId` và `class.cohort === profile.cohort` (`eligibleClasses`, `classifyFlow`). Luồng C giữ luật cũ. Dữ liệu seed của các ĐXT đã qua tiếp nhận (`review`, `approving`, `published`) là dữ liệu lịch sử trước khi áp luật này nên giữ nguyên (một số hồ sơ lệch ngành/khóa phục vụ test BR-08, đồng hạng, luồng B). Seed bổ sung 4 sinh viên KTPM K22 (26900013–26900016) thay các hồ sơ lệch ở `DXT-2026-01`.
+
+## A-24 — SCHEMA_VERSION = 4
+Hằng số chuyển sang `domain/constants.js` (schema.js re-export); dữ liệu v3 trong trình duyệt tự nạp lại seed mới. `DB_KEY`/`SESSION_KEY` giữ nguyên.
+
+# Quyết định sau góp ý của giảng viên về tính công khai (20/11/2026)
+
+## A-25 — Đợt xét tuyển và kết quả không còn công khai
+Trang chủ chỉ giới thiệu chương trình, quy trình sáu bước và lối **Đăng ký** / **Đăng nhập**; không liệt kê đợt, không có chi tiết đợt (`#/dot/:id`), kết quả công khai (`#/ket-qua/:id`) hay tra cứu bằng MSSV + OTP (`#/tra-cuu`) — ba route này không còn và rơi vào trang “Không tìm thấy trang”. Phía service bỏ hẳn `public.listRounds`, `public.getRound`, `public.results`, `public.lookup` và mục đích OTP `LOOKUP` (cùng mẫu email `OTP_LOOKUP`). Sinh viên phải đăng ký tài khoản (chỉ khi có tên trong danh sách CNN nhập, A-22); sau đó Tổng quan chỉ hiện đợt của lớp cùng ngành và khóa (A-23). Kết quả xem trong **Hồ sơ của tôi** và email; điểm chính thức chỉ hiện khi ĐXT đã công bố, kể cả ở danh sách hồ sơ.

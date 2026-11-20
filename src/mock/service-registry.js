@@ -10,9 +10,9 @@ import * as reviews from "./services/reviews.js";
 import * as auth from "./services/auth.js";
 import * as otp from "./services/otp.js";
 import * as account from "./services/account.js";
+import * as directory from "./services/directory.js";
 import * as lists from "./services/lists.js";
 import * as system from "./services/system.js";
-import * as publicPortal from "./services/publicPortal.js";
 const namespaces = {
   operations,
   applications,
@@ -26,9 +26,9 @@ const namespaces = {
   auth,
   otp,
   account,
+  directory,
   lists,
   system,
-  public: publicPortal,
 };
 export const services = Object.fromEntries(
   Object.entries(namespaces).flatMap(([namespace, methods]) =>

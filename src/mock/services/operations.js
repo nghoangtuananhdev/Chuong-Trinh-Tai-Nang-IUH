@@ -226,7 +226,7 @@ export const testEmail = defineService("system.testEmail", {
     );
     queueEmail(db, ctx, {
       to: p.to,
-      template: "OTP_LOOKUP",
+      template: "OTP_REGISTER",
       vars: { code: "000000", ttl: db.config.otp.ttlMinutes },
       relatedEntity: "test",
     });

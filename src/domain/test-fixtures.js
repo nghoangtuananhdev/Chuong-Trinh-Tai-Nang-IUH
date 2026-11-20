@@ -221,9 +221,9 @@ export function emptyDb() {
       { id: "p3", majorId: "m3" },
     ],
     classes: [
-      { id: "c1", programId: "p1", startYear: 2024 },
-      { id: "c2", programId: "p2", startYear: 2024 },
-      { id: "c3", programId: "p3", startYear: 2024 },
+      { id: "c1", programId: "p1", startYear: 2024, cohort: "K24" },
+      { id: "c2", programId: "p2", startYear: 2024, cohort: "K24" },
+      { id: "c3", programId: "p3", startYear: 2024, cohort: "K24" },
     ],
     users: [],
     userRoles: [],

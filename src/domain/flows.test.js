@@ -10,7 +10,12 @@ import {
 } from "./test-fixtures.js";
 const setup = () => {
   const db = emptyDb();
-  db.studentProfiles.push({ userId: "s1", isKSTN: false });
+  db.studentProfiles.push({
+    userId: "s1",
+    isKSTN: false,
+    majorId: "m1",
+    cohort: "K24",
+  });
   db.rounds.push(testRound());
   return db;
 };
@@ -41,6 +46,18 @@ test("B từng bị DROPPED không hạn chế nộp lại", () => {
     status: "DROPPED",
   });
   assert.equal(classifyFlow(db, "s1", db.rounds[0]).flow, "B");
+});
+test("A-23: sinh viên chỉ nộp được ĐXT của lớp cùng ngành và cùng khóa", () => {
+  const db = setup();
+  assert.equal(classifyFlow(db, "s1", testRound({ classId: "c1" })).allowed, true);
+  const otherMajor = classifyFlow(db, "s1", testRound({ classId: "c2" }));
+  assert.equal(otherMajor.allowed, false);
+  assert.equal(
+    otherMajor.reason,
+    "Đợt xét tuyển này không dành cho ngành và khóa của bạn.",
+  );
+  db.classes[0].cohort = "K25";
+  assert.equal(classifyFlow(db, "s1", testRound({ classId: "c1" })).allowed, false);
 });
 test("C chỉ lớp mình năm trước; chặn KSTN nộp lớp khác", () => {
   const db = setup();

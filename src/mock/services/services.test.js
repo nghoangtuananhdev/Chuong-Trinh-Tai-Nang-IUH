@@ -8,7 +8,6 @@ import * as account from "./account.js";
 import * as lists from "./lists.js";
 import * as reviews from "./reviews.js";
 import * as system from "./system.js";
-import * as portal from "./publicPortal.js";
 import { latestList } from "../../domain/selectors.js";
 const ctx = (db, username, role) => {
   const user = db.users.find((u) => u.username === username),
@@ -216,7 +215,7 @@ test("U10: CNN ngành HTTT quyết định hồ sơ KTPM → FORBIDDEN, db bất
   );
   assert.deepEqual(db, before);
 });
-test("Xác minh đủ mới được Đạt, sửa giá trị bắt buộc lý do, hạn bổ sung ≤ reviewEnd", () => {
+test("Xác minh đủ mới được Đạt, sửa giá trị bắt buộc lý do, hạn bổ sung không gắn reviewEnd", () => {
   let db = buildSeedDb();
   const app = db.applications.find(
     (a) => a.roundId === "DXT-2026-02" && a.studentCode === "21094518",
@@ -245,7 +244,7 @@ test("Xác minh đủ mới được Đạt, sửa giá trị bắt buộc lý d
         applicationId: app.id,
         decision: "NEEDS_UPDATE",
         note: "Bổ sung",
-        dueAt: "2026-11-21T00:00:00+07:00",
+        dueAt: "",
       }),
     { code: "VALIDATION" },
   );
@@ -324,7 +323,7 @@ test("U14: R3 CNN chọn đúng 1 hồ sơ đồng hạng mới xác nhận đư
   );
   assert.deepEqual(result.result.tieResolution.selectedApplicationIds, [id]);
 });
-test("U6/U9: R5 publish atomic, ACTIVE/DROPPED và kết quả công khai che dữ liệu", () => {
+test("U6/U9: R5 publish atomic, ACTIVE/DROPPED", () => {
   const db = buildSeedDb(),
     list = latestList(db, "DXT-2026-05"),
     r = lists.publish(db, ctx(db, "GV900"), { listId: list.id });
@@ -333,15 +332,6 @@ test("U6/U9: R5 publish atomic, ACTIVE/DROPPED và kết quả công khai che d�
   assert.equal(
     r.db.studentProfiles.find((p) => p.studentCode === "26900010").isKSTN,
     false,
-  );
-  const masked = portal.results(r.db, ctx(r.db), {
-    roundId: list.roundId,
-  }).result;
-  assert.equal(masked.length, 3);
-  assert.ok(
-    masked.every(
-      (row) => row.studentCode.includes("****") && row.name.includes("."),
-    ),
   );
   assert.throws(
     () => lists.publish(r.db, ctx(r.db, "GV900"), { listId: list.id }),

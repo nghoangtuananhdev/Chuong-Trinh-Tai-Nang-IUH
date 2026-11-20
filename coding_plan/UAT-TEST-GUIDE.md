@@ -72,7 +72,7 @@ MSSV **chưa có tài khoản** để thử đăng ký: `26019999` / `khang.2601
 | R5 `DXT-2026-05` | CNTN-MKT-K20 | Chờ phê duyệt – chờ PĐT | công bố |
 | R6 `DXT-2026-06` | CNTN-MKT-K22 | Chưa mở (mở 00:00 15/11) | tự mở theo đồng hồ |
 | R7 `DXT-2026-07` | KSTN-KHDL-K22 | Nháp | phát hành |
-| `DXT-2025-01`, `DXT-2024-01`, `DXT-2025-02`, `DXT-2025-03` | — | Đã công bố | kết quả công khai, lịch sử |
+| `DXT-2025-01`, `DXT-2024-01`, `DXT-2025-02`, `DXT-2025-03` | — | Đã công bố | kết quả trong tài khoản SV, lịch sử |
 
 ---
 
@@ -94,7 +94,7 @@ Kết quả mong đợi:
 - ☐ Bước 3: báo “Chỉ chấp nhận email sinh viên @student.iuh.edu.vn chứa đúng MSSV của bạn.”, không sang bước OTP.
 - ☐ Bước 4: thông điệp chung “Nếu thông tin hợp lệ, mã OTP đã được gửi…”, có đếm ngược “Còn 0 giờ 10 phút”.
 - ☐ Bước 6: mã sai báo “Mã OTP không đúng (còn 4 lần)”; gõ đè mã đúng thì mỗi phím nhảy sang ô kế tiếp và xác nhận thành công (kể cả khi mã có chữ số trùng với số đang nằm trong ô).
-- ☐ Bước 7: hiện họ tên **Phan Minh Khang**, ngày sinh, lớp sinh hoạt lấy từ danh bạ; mật khẩu yếu bị từ chối với lý do cụ thể; mật khẩu hợp lệ → tự đăng nhập và vào thẳng form nộp hồ sơ R1 (`#/app/apply/DXT-2026-01`), nhãn “Luồng A – Đăng ký mới”.
+- ☐ Bước 7: hiện họ tên **Phan Minh Khang**, ngày sinh, lớp sinh hoạt lấy từ danh sách sinh viên đã nhập; mật khẩu yếu bị từ chối với lý do cụ thể; mật khẩu hợp lệ → tự đăng nhập và vào thẳng form nộp hồ sơ R1 (`#/app/apply/DXT-2026-01`), nhãn “Luồng A – Đăng ký mới”.
 
 > Làm tiếp ngay **B1** để hoàn tất U1.
 
@@ -362,12 +362,12 @@ Luồng này cần một đợt đang tiếp nhận của lớp K20; được t�
 1. Đăng nhập nhanh `GV900`. Ở Tổng quan phải thấy “1 danh sách chờ bạn”.
 2. **Phê duyệt & Công bố** → `DXT-2026-05` → **Xem danh sách** → **Phê duyệt & Công bố**. Đọc hộp xác nhận → **Xác nhận**.
 3. Bấm **Email gửi lỗi** trong khung xanh.
-4. Mở `#/ket-qua/DXT-2026-05`. Về trang chủ, lọc tab **Đã công bố**.
+4. Đăng xuất, mở `#/ket-qua/DXT-2026-05`.
 5. Thử vào **Tra cứu ĐXT/lớp** → `DXT-2026-05`.
 
 - ☐ Hộp xác nhận ghi rõ hậu quả: “Công bố 3 sinh viên trúng tuyển; 1 sinh viên DROPPED; đưa 4 email vào hàng đợi. ĐXT sẽ bất biến.”
 - ☐ Sau công bố: v1 “Đã công bố”, cả 3 cấp “Đã duyệt”, khung “ĐXT đã công bố và bất biến”.
-- ☐ Trang kết quả công khai chỉ có 3 dòng, MSSV che dạng `26****07`, họ tên viết tắt dạng `Đ. M. Thư`.
+- ☐ Không có trang kết quả công khai: `#/ket-qua/DXT-2026-05` báo “Không tìm thấy trang” (A-25); sinh viên xem kết quả trong **Hồ sơ của tôi** và email.
 - ☐ Trang chi tiết đợt đã công bố không còn nút Sửa/Phát hành/Xóa.
 - ☐ Kiểm ở H3/H4: lớp CNTN-MKT-K20 năm 3 có Thư, Khánh, Lan “Đang học”; Trần Minh Long “Không đạt duy trì”; Khánh và Lan trở thành “SV CN/KSTN”.
 - ☐ Hộp thư: `26900007/08/09` nhận “Kết quả xét tuyển…”, `26900010` nhận “Kết quả duy trì lớp…”.
@@ -385,7 +385,7 @@ Luồng này cần một đợt đang tiếp nhận của lớp K20; được t�
 - ☐ Nam, Khoa, Bảo, Hân → **Trúng tuyển**; Việt giữ **Không đạt**.
 - ☐ Tú nhận email “Kết quả duy trì lớp KSTN-KTPM-K20… (lý do: Không nộp hồ sơ tích lũy)”; Tổng quan của Tú ghi “Ứng viên (chưa thuộc lớp CN/KSTN)” và menu có lại “Đợt xét tuyển đang mở”.
 - ☐ Dòng thời gian của Nam: 2026–2027 “Trúng tuyển · Năm 3: Đang học”.
-- ☐ `#/ket-qua/DXT-2026-02` có 4 dòng đã che.
+- ☐ `#/ket-qua/DXT-2026-02` báo “Không tìm thấy trang”; kết quả chỉ có trong tài khoản sinh viên.
 
 ### D5. Trúng tuyển hai lớp cùng năm học (U13) **[RESET]**
 
@@ -471,13 +471,15 @@ Luồng này cần một đợt đang tiếp nhận của lớp K20; được t�
 - ☐ BLĐ khoa với đợt đang tiếp nhận: chỉ sửa được hạn kết thúc tiếp nhận, mốc xét duyệt, hạn phê duyệt, mô tả, sĩ số.
 - ☐ PĐT: chỉ xem (không có Tạo/Sửa/Phát hành), chuyển qua lại được giữa tra cứu ĐXT và tra cứu lớp.
 
-### F4. Trang công khai của đợt
+### F4. Đợt và kết quả không công khai (A-25) **[RESET]**
 
-1. Đăng xuất. Trang chủ: thử ô tìm kiếm, các tab trạng thái, lọc Năm học / Học kỳ / Khoa.
-2. Bấm **Xem chi tiết** ở R1.
+1. Đăng xuất. Xem trang chủ.
+2. Mở lần lượt `#/dot/DXT-2026-01`, `#/ket-qua/DXT-2026-05`, `#/tra-cuu`.
+3. Đăng nhập `26010011` / `demo1234` (Mai, KTPM K22).
 
-- ☐ Tab trạng thái đúng 6 mục (không có “Đã kết thúc/closed”), số đếm khớp; đợt Nháp không xuất hiện.
-- ☐ Trang chi tiết có thông tin đợt, 4 mốc thời gian (đã đến/sắp tới), bảng tiêu chí với các mức điểm và yêu cầu minh chứng; có nút **Về trang chủ** và **Nộp hồ sơ** (đợt đã công bố thì là **Xem kết quả**).
+- ☐ Trang chủ chỉ có giới thiệu, nút **Đăng ký tài khoản sinh viên** / **Đăng nhập** và sáu bước quy trình; không có danh sách đợt, ô tìm kiếm, tab trạng thái hay kết quả.
+- ☐ Ba đường dẫn cũ báo “Không tìm thấy trang” kèm nút **Về trang chủ**.
+- ☐ Mai thấy “Lớp phù hợp với bạn” KSTN-KTPM-K22 và chỉ các đợt của lớp đó.
 
 ---
 
@@ -631,15 +633,14 @@ Luồng này cần một đợt đang tiếp nhận của lớp K20; được t�
 - ☐ Bản xem trước khi in không có thanh menu bên trái và thanh đầu trang.
 - ☐ GVPT chỉ chọn được các đợt của lớp mình.
 
-### I6. Tra cứu kết quả cá nhân bằng MSSV + OTP **[RESET]**
+### I6. Xem kết quả trong tài khoản sinh viên (thay tra cứu OTP, A-25) **[RESET]**
 
-1. Trang chủ → **Tra cứu kết quả** → MSSV `22073210`, email `22073210@student.iuh.edu.vn` → **Gửi mã OTP**.
-2. Lấy OTP ở Hộp thư (lọc `22073210`) → nhập → **Xác nhận và tra cứu**.
-3. Tra cứu với MSSV `21094602` (Bảo — hồ sơ đang cần bổ sung).
+1. Đăng nhập nhanh `22073210` (Hân) → **Hồ sơ của tôi**.
+2. Đăng nhập nhanh `21094602` (Bảo — hồ sơ đang cần bổ sung) → **Hồ sơ của tôi** → mở hồ sơ cần bổ sung.
 
-- ☐ Hân: 3 hồ sơ — đợt 2025–2026 “Không trúng tuyển” có điểm 140; hai đợt chưa công bố ghi “Chưa công bố” (không lộ điểm).
-- ☐ Bảo: dòng hồ sơ cần bổ sung hiện nội dung yêu cầu và lối đăng nhập để bổ sung.
-- ☐ Trang chỉ đọc, không có thao tác sửa.
+- ☐ Hân: đợt 2025–2026 “Không trúng tuyển” có điểm chính thức 140; các đợt chưa công bố ghi “Chưa công bố” (không lộ điểm).
+- ☐ Bảo: hồ sơ hiện nội dung yêu cầu, hạn bổ sung và tiêu chí bị đánh dấu.
+- ☐ Không còn trang **Tra cứu kết quả** công khai; `#/tra-cuu` báo “Không tìm thấy trang”.
 
 ### I7. Tổng quan theo vai trò
 
@@ -676,7 +677,7 @@ Luồng này cần một đợt đang tiếp nhận của lớp K20; được t�
 
 ## K. Giao diện, đáp ứng màn hình, khả năng truy cập **(phần lớn chưa kiểm bằng mắt)**
 
-1. DevTools → chế độ thiết bị → rộng **390px**: trang chủ, Đăng ký, Tra cứu, Tổng quan SV, form hồ sơ (cả 3 bước), Hồ sơ của tôi.
+1. DevTools → chế độ thiết bị → rộng **390px**: trang chủ, Đăng ký, Tổng quan SV, form hồ sơ (cả 3 bước), Hồ sơ của tôi.
 2. Rộng **1024px**: Duyệt hồ sơ (danh sách + chi tiết), Phê duyệt danh sách, Đợt xét tuyển.
 3. Rộng **1440px**: lướt mọi menu của từng vai trò.
 4. Bàn phím: Tab/Shift+Tab qua form; Esc đóng hộp thoại, ngăn kéo, bảng Demo; Enter gửi form đăng nhập.
@@ -926,19 +927,16 @@ Kết quả mong đợi:
 - ☐ Bộ kiểm tra tệp phát hiện chính xác việc đổi đuôi giả mạo thông qua magic bytes thực.
 - ☐ Chặn tệp rỗng và tệp vượt quá dung lượng cấu hình động của hệ thống.
 
-### O3. Bảo mật thông tin kết quả công khai và tính bất biến sau công bố (BR-03, BR-10, Q2)
+### O3. Kết quả không công khai và tính bất biến sau công bố (BR-03, BR-10, Q2, A-25)
 
-1. Đăng xuất ra trang chủ: Mở menu **Tra cứu kết quả** → Chọn tab **Đã công bố** → Chọn đợt `DXT-2025-01` (hoặc mở URL `#/ket-qua/DXT-2025-01`).
-2. Kiểm tra danh sách kết quả hiển thị công khai:
-   - Cột MSSV: Bị che 4 ký tự ở giữa (ví dụ `26****01`, `26****02`).
-   - Cột Họ tên: Viết tắt chữ lót và tên đệm (ví dụ `N. V. An`, `T. T. Bình`).
-   - Hoàn toàn KHÔNG hiển thị: Điểm chi tiết từng tiêu chí, số điện thoại, email, địa chỉ sinh hoạt.
+1. Đăng xuất, mở `#/ket-qua/DXT-2025-01`: báo “Không tìm thấy trang”, không có danh sách kết quả nào lộ ra ngoài tài khoản.
+2. Đăng nhập nhanh một sinh viên của đợt → **Hồ sơ của tôi**: chỉ thấy kết quả của chính mình.
 3. Đăng nhập nhanh `quantri` hoặc `GV004` → Mở đợt `DXT-2025-01`:
    - Kiểm tra các nút thao tác: Hoàn toàn KHÔNG có nút Sửa, Phát hành, Mở tiếp nhận, Đóng tiếp nhận, Xóa.
    - Khung thông báo: "ĐXT đã công bố và bất biến".
 
 Kết quả mong đợi:
-- ☐ Kết quả công khai tuân thủ tuyệt đối quy định bảo vệ dữ liệu cá nhân (che MSSV và họ tên).
+- ☐ Kết quả không xuất hiện công khai; mỗi sinh viên chỉ thấy kết quả của mình trong tài khoản.
 - ☐ Mọi đợt xét tuyển sau khi công bố đều trở thành bất biến vĩnh viễn (immutable).
 
 ---
@@ -1048,3 +1046,31 @@ Những điểm sau khác với mô tả chi tiết ở §9 của kế hoạch n
 - Sinh viên rút hồ sơ rồi nộp lại trong cùng đợt được xếp Luồng B (vì đã có lịch sử nộp) — đúng theo quy tắc phân luồng ở §6.6.
 - Email gửi tới địa chỉ chứa chuỗi `fail` luôn lỗi kể cả khi “Gửi lại” (mô phỏng D-21). Đổi “Chuỗi mô phỏng email lỗi” ở Cấu hình hệ thống nếu muốn thấy gửi lại thành công.
 - Không có backend, email thật, chữ ký số, nhập điểm từ PĐT, “quyết định điều chỉnh” sau công bố (ngoài phạm vi prototype, §1.2).
+
+---
+
+## Kịch bản sau báo cáo lần 1 (12/11/2026)
+
+> Các thay đổi này thay thế những bước cũ nói rằng GV chỉ duyệt khi ĐXT đã `review`, rằng phải ghi lý do khi đánh dấu sai, rằng hạn bổ sung không vượt `reviewEnd`, rằng sinh viên thấy “Điểm dự kiến” sau khi nộp, và rằng tài khoản đăng ký từ “danh bạ IUH”. Khi bước cũ mâu thuẫn, làm theo kịch bản dưới đây. Sau mỗi kịch bản có thể **[RESET]** dữ liệu.
+
+### S1. GVPT duyệt khi ĐXT đang tiếp nhận; sửa bốn mốc thời gian (WP1)
+1. Đăng nhập **GV005** (vai trò GVPT lớp KSTN-KTPM-K22) → “Duyệt hồ sơ”. `DXT-2026-01` đang `open` (tiếp nhận 01/11–30/11, xét duyệt dự kiến 10/11–10/12, chồng nhau).
+2. Mở một hồ sơ chờ duyệt → xác minh và ra quyết định được ngay, dù chưa hết hạn tiếp nhận. Panel đầu danh sách ghi hai khung thời gian và trạng thái “Đang diễn ra / Chưa bắt đầu”, không có khung đỏ. Nút “Chốt & gửi phê duyệt” bị vô hiệu với gợi ý “Cần đóng tiếp nhận trước khi chốt danh sách”.
+3. “ĐXT của lớp” → mở `DXT-2026-01` → Sửa: thấy `intakeEnd`, `reviewStart`, `reviewEnd`, `approvalDue`. Lưu khoảng xét duyệt chồng lên tiếp nhận → thành công. Rút ngắn `intakeEnd` về ngày sau hiện tại → thành công; đặt ngày quá khứ → lỗi tại ô.
+4. Với ĐXT `review` (ví dụ `DXT-2026-02`, GV001): đặt `intakeEnd` sau hiện tại → ĐXT về `open` (mở lại tiếp nhận).
+
+### S2. Đánh dấu “Không hợp lệ” tại tiêu chí, yêu cầu bổ sung, sinh viên bổ sung (WP2 + WP3)
+1. Ở màn duyệt, bấm **Không hợp lệ** ở một tiêu chí bắt buộc → nhãn đổi ngay, không toast lỗi, không khung đỏ; dòng tóm tắt đổi thành “Tiêu chí bắt buộc đạt …/…”. Ô “Ghi chú cho sinh viên” là tùy chọn, riêng từng tiêu chí.
+2. “Điều chỉnh giá trị” mở ra ô số + lý do (bắt buộc) + “Áp dụng”; “Bỏ điều chỉnh” khôi phục. Bấm Hợp lệ/Không hợp lệ sau đó không làm mất giá trị đã điều chỉnh.
+3. “Yêu cầu bổ sung” mở hộp thoại, nội dung điền sẵn danh sách tiêu chí không hợp lệ, hạn mặc định = giờ mô phỏng + 3 ngày; để trống hạn/nội dung → lỗi ngay tại ô. Hồ sơ chuyển “Cần bổ sung”, màn duyệt hiện “Đang chờ sinh viên bổ sung đến …” và nút “Hủy yêu cầu bổ sung” (cần lý do).
+4. Đăng nhập sinh viên của hồ sơ đó (mật khẩu mẫu) → “Hồ sơ của tôi”: đầu trang ghi “Hạn bổ sung”, bước 2 đưa tiêu chí không hợp lệ lên đầu kèm nhãn và ghi chú của GV. Nút “Gửi bổ sung” (bước 3) chỉ bật sau khi sửa. Gửi xong thấy “Đã gửi bổ sung thành công”.
+5. Đăng nhập lại GV: tiêu chí vừa sửa có nhãn “Vừa cập nhật”, có dòng “Sinh viên đã gửi bổ sung lúc …”.
+
+### S3. Nộp xong chỉ thông báo thành công (WP4)
+1. Đăng nhập **26010011** (có bản nháp ở `DXT-2026-01`) → hoàn thiện, tick cam kết → “Nộp hồ sơ chính thức”.
+2. Thấy màn “Nộp hồ sơ thành công” (mã hồ sơ, ĐXT, thời điểm nộp), không có điểm dự kiến. “Xem hồ sơ đã nộp” → hồ sơ; hồ sơ đã khóa (không còn sửa được) hiển thị trang chỉ đọc, không có stepper và “Điểm dự kiến”.
+
+### S4. CNN nhập danh sách sinh viên, đăng ký, lớp phù hợp (WP5)
+1. Đăng nhập **GV005** (vai trò CNN ngành Kỹ thuật phần mềm) → “Danh sách sinh viên” → “Nhập danh sách”: chọn khóa K22, dán 3 dòng (1 dòng cố ý sai MSSV) → xem trước “Thêm mới 2 · Cập nhật 0 · Lỗi 1” → nhập.
+2. Trang chủ → Đăng ký bằng MSSV vừa nhập (email `<mssv>@student.iuh.edu.vn`), lấy OTP ở “Hộp thư mô phỏng”. Bước 3 hiển thị Ngành và Khóa. MSSV không có trong danh sách thì không nhận được OTP.
+3. Tổng quan sinh viên: panel “Lớp phù hợp với bạn: KSTN-KTPM-K22”, nộp được vào `DXT-2026-01`; không thấy ĐXT của lớp khác ngành/khóa. Tài khoản đã đăng ký không xóa được khỏi danh sách.

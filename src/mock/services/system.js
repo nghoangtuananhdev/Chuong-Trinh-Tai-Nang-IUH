@@ -1,5 +1,6 @@
 import { tick as schedulerTick } from "../../domain/scheduler.js";
 import { toIct } from "../../domain/time.js";
+import { SCHEMA_VERSION } from "../../domain/constants.js";
 import { isRoleEffective } from "../../domain/permissions.js";
 import { defineService, audit, requireValue, find } from "./_kernel.js";
 export const tick = defineService("system.tick", {
@@ -60,7 +61,7 @@ export const demoLogin = defineService("system.demoLogin", {
 export const resetDemo = defineService("system.resetDemo", {
   handler(db, ctx) {
     requireValue(
-      ctx.seedDb?.schemaVersion === 3,
+      ctx.seedDb?.schemaVersion === SCHEMA_VERSION,
       "VALIDATION",
       "Không có dữ liệu mẫu hợp lệ.",
     );

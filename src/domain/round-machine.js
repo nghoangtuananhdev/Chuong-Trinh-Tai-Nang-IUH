@@ -5,7 +5,7 @@ export const ROUND_TRANSITIONS = Object.freeze({
   draft: ["upcoming"],
   upcoming: ["open"],
   open: ["review"],
-  review: ["approving"],
+  review: ["approving", "open"],
   approving: ["review", "published"],
   published: [],
 });
@@ -19,6 +19,14 @@ export function assertTransition(from, to) {
       ? IMMUTABLE_MESSAGE
       : "Không thể chuyển giai đoạn ĐXT theo thứ tự này.",
   );
+}
+export const canReviewApplications = (round) =>
+  ["open", "review"].includes(round?.status);
+export function phaseState(start, end, now) {
+  const t = timestamp(now);
+  if (t < timestamp(start)) return "upcoming";
+  if (t > timestamp(end)) return "ended";
+  return "active";
 }
 export function assertApprovalStage(round, level) {
   requireValue(
@@ -69,7 +77,13 @@ export function editableFields(status, role = "ADMIN") {
         ...(!lecturer ? ["description", "quota"] : []),
       ];
     case "review":
-      return ["reviewEnd", "approvalDue", ...(!lecturer ? ["quota"] : [])];
+      return [
+        "intakeEnd",
+        "reviewStart",
+        "reviewEnd",
+        "approvalDue",
+        ...(!lecturer ? ["quota"] : []),
+      ];
     default:
       return [];
   }
@@ -86,15 +100,21 @@ export function validateTimeline(round) {
     { field: "intakeEnd" },
   );
   requireValue(
-    end <= reviewStart,
+    start <= reviewStart,
     "VALIDATION",
-    "Ngày kết thúc tiếp nhận phải trước hoặc bằng ngày bắt đầu xét duyệt.",
+    "Ngày bắt đầu xét duyệt không được trước ngày bắt đầu tiếp nhận.",
     { field: "reviewStart" },
   );
   requireValue(
     reviewStart < reviewEnd,
     "VALIDATION",
     "Ngày kết thúc xét duyệt phải sau ngày bắt đầu xét duyệt.",
+    { field: "reviewEnd" },
+  );
+  requireValue(
+    end <= reviewEnd,
+    "VALIDATION",
+    "Ngày kết thúc xét duyệt không được trước ngày kết thúc tiếp nhận.",
     { field: "reviewEnd" },
   );
   if (round.approvalDue)

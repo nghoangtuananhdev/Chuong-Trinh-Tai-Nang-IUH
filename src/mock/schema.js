@@ -1,4 +1,5 @@
-export const SCHEMA_VERSION = 3;
+import { SCHEMA_VERSION } from "../domain/constants.js";
+export { SCHEMA_VERSION };
 export function createEmptyDb() {
   return {
     schemaVersion: SCHEMA_VERSION,

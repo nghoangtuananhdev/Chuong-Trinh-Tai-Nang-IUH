@@ -148,14 +148,23 @@ export const update = defineService("rounds.update", {
     Object.assign(round, structuredClone(changes));
     if (changes.quota !== undefined) round.quota = Number(changes.quota);
     if (round.status !== "draft") validate(db, round, ctx.now);
-    if (before.status === "open" && changes.intakeEnd)
+    if (["open", "review"].includes(before.status) && changes.intakeEnd)
       requireValue(
-        timestamp(round.intakeEnd) > timestamp(ctx.now) &&
-          timestamp(round.intakeEnd) >= timestamp(before.intakeEnd),
+        timestamp(round.intakeEnd) > timestamp(ctx.now),
         "VALIDATION",
-        "Gia hạn tiếp nhận phải sau hiện tại và không được rút ngắn.",
+        "Ngày kết thúc tiếp nhận phải sau thời điểm hiện tại.",
         { field: "intakeEnd" },
       );
+    let reopened = false;
+    if (
+      before.status === "review" &&
+      changes.intakeEnd &&
+      timestamp(round.intakeEnd) > timestamp(ctx.now)
+    ) {
+      assertTransition("review", "open");
+      Object.assign(round, { status: "open", reviewStartedAt: null });
+      reopened = true;
+    }
     audit(db, ctx, {
       action: "ROUND_UPDATED",
       entity: "round",
@@ -163,6 +172,31 @@ export const update = defineService("rounds.update", {
       before,
       after: round,
     });
+    if (reopened) {
+      audit(db, ctx, {
+        action: "ROUND_INTAKE_REOPENED",
+        entity: "round",
+        entityId: round.id,
+        before,
+        after: round,
+      });
+      notify(
+        db,
+        ctx,
+        roleRecipients(
+          db,
+          ["LECTURER", "HEAD"],
+          resolveScopeChain(db, "round", round),
+          ctx.now,
+        ),
+        {
+          type: "ROUND_CHANGED",
+          title: "ĐXT đã mở lại tiếp nhận",
+          body: round.name,
+          link: `/app/rounds/${round.id}`,
+        },
+      );
+    }
     return { result: round };
   },
 });

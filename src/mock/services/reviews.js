@@ -1,4 +1,5 @@
 import { assertTransition } from "../../domain/application-machine.js";
+import { canReviewApplications } from "../../domain/round-machine.js";
 import { scoreApplication } from "../../domain/scoring.js";
 import {
   defineService,
@@ -15,9 +16,9 @@ function reviewing(db, p) {
   const application = find(db, "applications", p.applicationId),
     round = find(db, "rounds", application.roundId);
   requireValue(
-    round.status === "review" && application.status === "pending",
+    canReviewApplications(round) && application.status === "pending",
     "INVALID_STATE",
-    "Chỉ xét duyệt hồ sơ chờ duyệt trong giai đoạn xét duyệt.",
+    "Chỉ xét duyệt hồ sơ chờ duyệt khi ĐXT đang tiếp nhận hoặc đang xét duyệt.",
   );
   return { application, round };
 }
@@ -42,11 +43,6 @@ export const verifyItem = defineService("reviews.verifyItem", {
       target,
       "NOT_FOUND",
       "Không tìm thấy thành tích cần xác minh.",
-    );
-    requireValue(
-      p.verifyStatus !== "INVALID" || p.note?.trim(),
-      "VALIDATION",
-      "Vui lòng ghi lý do minh chứng không hợp lệ.",
     );
     const original =
       criterion.valueType === "COUNT" ? item.declaredCount : item.declaredValue;
@@ -76,7 +72,8 @@ export const verifyItem = defineService("reviews.verifyItem", {
       verifiedBy: ctx.actor.user.id,
       verifiedAt: ctx.now,
     });
-    if (!p.entryId) item.verifiedValue = p.verifiedValue ?? null;
+    if (!p.entryId && p.verifiedValue !== undefined)
+      item.verifiedValue = p.verifiedValue ?? null;
     const result = scoreApplication(
       round.criteriaSnapshot,
       app.items,
@@ -97,7 +94,8 @@ export const verifyItem = defineService("reviews.verifyItem", {
       ctx,
       app,
       changesValue ? "Điều chỉnh điểm" : "Xác minh tiêu chí",
-      p.note ?? criterion.name,
+      p.note?.trim() ||
+        `${criterion.name} — ${p.verifyStatus === "VALID" ? "Hợp lệ" : "Không hợp lệ"}`,
     );
     return { result: app };
   },
@@ -195,6 +193,45 @@ export const decide = defineService("reviews.decide", {
       before,
       after: app,
       reason: p.note,
+    });
+    return { result: app };
+  },
+});
+export const cancelRequest = defineService("reviews.cancelRequest", {
+  permission: "application.review",
+  resolve,
+  handler(db, ctx, p) {
+    const app = find(db, "applications", p.applicationId),
+      round = find(db, "rounds", app.roundId);
+    assertTransition(app.status, "pending", {
+      round,
+      now: ctx.now,
+      actor: ctx.actor.roleAssignment.role,
+      note: p.reason,
+    });
+    const before = structuredClone(app);
+    app.status = "pending";
+    for (const r of db.reviewRequests.filter(
+      (r) => r.applicationId === app.id && !r.resolvedAt,
+    ))
+      Object.assign(r, {
+        resolvedAt: ctx.now,
+        cancelledBy: ctx.actor.user.id,
+      });
+    applicationHistory(db, ctx, app, "Hủy yêu cầu bổ sung", p.reason);
+    notify(db, ctx, [app.studentUserId], {
+      type: "REQUEST_CANCELLED",
+      title: "Yêu cầu bổ sung đã được hủy",
+      body: p.reason ?? "",
+      link: `/app/my-applications/${app.id}`,
+    });
+    audit(db, ctx, {
+      action: "APPLICATION_REQUEST_CANCELLED",
+      entity: "application",
+      entityId: app.id,
+      before,
+      after: app,
+      reason: p.reason,
     });
     return { result: app };
   },

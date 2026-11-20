@@ -170,3 +170,16 @@ export function scopeLabel(db, assignment) {
     (assignment.scopeType === "SELF" ? "Bản thân" : "Toàn trường")
   );
 }
+
+/** Lớp CN/KSTN còn hoạt động cùng ngành và cùng khóa với sinh viên (A-23). */
+export function eligibleClasses(db, studentUserId) {
+  const profile = studentProfile(db, studentUserId);
+  if (!profile?.cohort) return [];
+  return db.classes.filter(
+    (c) =>
+      !c.endedAt &&
+      c.cohort === profile.cohort &&
+      db.programs.find((p) => p.id === c.programId)?.majorId ===
+        profile.majorId,
+  );
+}

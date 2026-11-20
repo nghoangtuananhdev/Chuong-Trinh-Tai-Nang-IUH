@@ -98,11 +98,6 @@ export function AuthPage({ route, forced = false, embedded = false }) {
             code: form.code,
           });
           setVerified(r);
-          if (r.accountExists) {
-            setMessage(
-              "MSSV này đã có tài khoản. Vui lòng đăng nhập hoặc khôi phục mật khẩu.",
-            );
-          }
           setStep(3);
         } else {
           if (form.password !== form.confirmation)
@@ -182,6 +177,11 @@ export function AuthPage({ route, forced = false, embedded = false }) {
                 <p className="text-body-sm text-ink-600">
                   Email @student.iuh.edu.vn phải chứa đúng MSSV.
                 </p>
+                <p className="text-body-sm text-ink-600">
+                  Chỉ sinh viên có tên trong danh sách do Chủ nhiệm ngành nhập
+                  mới đăng ký được. Không nhận được mã OTP thì liên hệ Chủ nhiệm
+                  ngành.
+                </p>
               </>
             )}
             {step === 2 && (
@@ -223,6 +223,12 @@ export function AuthPage({ route, forced = false, embedded = false }) {
                     name={verified?.profile?.fullName}
                     meta={`${verified?.profile?.dob} · ${verified?.profile?.homeClass}`}
                   />
+                  <p className="mt-2 text-body-sm text-ink-700">
+                    Ngành:{" "}
+                    {db.majors.find((m) => m.id === verified?.profile?.majorId)
+                      ?.name ?? "—"}{" "}
+                    · Khóa: {verified?.profile?.cohort ?? "—"}
+                  </p>
                 </div>
                 {input("phone", "Số điện thoại", "tel", false)}
                 {input(
@@ -276,23 +282,29 @@ export function AuthPage({ route, forced = false, embedded = false }) {
     );
   const footerLinks = (
       <div className="flex flex-wrap gap-x-5 gap-y-2 text-body-sm">
-        <a
-          className="text-link"
-          href={buildHref(
-            `/dang-nhap${route.query.returnTo ? "?returnTo=" + encodeURIComponent(route.query.returnTo) : ""}`,
-          )}
-        >
-          Đăng nhập
-        </a>
-        <a
-          className="text-link"
-          href={buildHref(
-            `/dang-ky${route.query.returnTo ? "?returnTo=" + encodeURIComponent(route.query.returnTo) : ""}`,
-          )}
-        >
-          Đăng ký bằng email IUH
-        </a>
-        <a className="text-link" href={buildHref("/quen-mat-khau")}>Quên mật khẩu?</a>
+        {page !== "dang-nhap" && (
+          <a
+            className="text-link"
+            href={buildHref(
+              `/dang-nhap${route.query.returnTo ? "?returnTo=" + encodeURIComponent(route.query.returnTo) : ""}`,
+            )}
+          >
+            Đăng nhập
+          </a>
+        )}
+        {page !== "dang-ky" && (
+          <a
+            className="text-link"
+            href={buildHref(
+              `/dang-ky${route.query.returnTo ? "?returnTo=" + encodeURIComponent(route.query.returnTo) : ""}`,
+            )}
+          >
+            Đăng ký bằng email IUH
+          </a>
+        )}
+        {page !== "quen-mat-khau" && (
+          <a className="text-link" href={buildHref("/quen-mat-khau")}>Quên mật khẩu?</a>
+        )}
       </div>
   );
   return (

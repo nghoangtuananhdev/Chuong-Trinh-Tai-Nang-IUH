@@ -19,7 +19,7 @@ test("Luật import §4.1: domain thuần; service chỉ domain và kernel; đ�
       const text = readFileSync(file, "utf8"),
         label = relative(src, file);
       for (const [, specifier] of text.matchAll(
-        /(?:from\s+|import\s*)['"]([^'"]+)['"]/g,
+        /(?:from\s+|(?<![.\w])import\s*)['"]([^'"]+)['"]/g,
       )) {
         assert.ok(specifier.endsWith(".js"), `${label}: ${specifier}`);
         const target = relative(

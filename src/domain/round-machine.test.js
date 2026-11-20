@@ -48,6 +48,12 @@ test("Trường sửa theo vai trò/giai đoạn", () => {
     assert.deepEqual(editableFields("published", role), []);
     assert.deepEqual(editableFields("approving", role), []);
   }
+  assert.deepEqual(editableFields("review", "LECTURER"), [
+    "intakeEnd",
+    "reviewStart",
+    "reviewEnd",
+    "approvalDue",
+  ]);
   assert.deepEqual(editableFields("upcoming", "LECTURER"), [
     "intakeStart",
     "intakeEnd",
@@ -56,13 +62,13 @@ test("Trường sửa theo vai trò/giai đoạn", () => {
     "approvalDue",
   ]);
 });
-test("Ngày tiếp nhận/xét duyệt theo thứ tự, xét duyệt bắt đầu có thể bằng intakeEnd", () => {
+test("Xét duyệt có thể chồng lên tiếp nhận; từ chối reviewStart < intakeStart và reviewEnd < intakeEnd", () => {
   validateTimeline(testRound());
   validateTimeline(testRound({ reviewStart: "2026-10-31T00:00:00+07:00" }));
   for (const fields of [
     { intakeEnd: "2026-09-01T00:00:00+07:00" },
-    { reviewStart: "2026-10-20T00:00:00+07:00" },
-    { reviewEnd: "2026-11-01T00:00:00+07:00" },
+    { reviewStart: "2026-09-20T00:00:00+07:00" },
+    { reviewEnd: "2026-10-31T00:00:00+07:00" },
     { approvalDue: "2026-11-01T00:00:00+07:00" },
   ]) {
     assert.throws(() => validateTimeline(testRound(fields)), {

@@ -39,6 +39,7 @@ export const MENUS = {
   HEAD: [
     ["dashboard", "Tổng quan ngành", "dashboard"],
     ["classes", "Lớp CN/KSTN", "class"],
+    ["student-import", "Danh sách sinh viên", "users"],
     ["rounds", "Đợt xét tuyển", "calendar"],
     ["criteria", "Bộ tiêu chí", "criteria"],
     ["reviews", "Duyệt hồ sơ ngành", "approve"],
@@ -72,6 +73,7 @@ export const PAGE_PERMISSION = {
   classes: "class.view",
   lecturers: "lecturer.view",
   students: "student.view",
+  "student-import": "student.import",
   permissions: "role.assign",
   rounds: "round.view",
   criteria: "criteria.view",

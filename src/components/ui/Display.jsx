@@ -173,11 +173,14 @@ export function Timeline({ items, className = "" }) {
                 )}
               </p>
               <p className="mt-0.5 text-body-sm tabular-nums text-ink-600">{item.date}</p>
-              {item.note && (
-                <blockquote className="mt-2 rounded-control bg-ink-50 px-3 py-2 text-body text-ink-700">
-                  “{item.note}”
-                </blockquote>
-              )}
+              {item.note &&
+                (item.quote === false ? (
+                  <p className="mt-2 rounded-control bg-ink-50 px-3 py-2 text-body text-ink-700">{item.note}</p>
+                ) : (
+                  <blockquote className="mt-2 rounded-control bg-ink-50 px-3 py-2 text-body text-ink-700">
+                    “{item.note}”
+                  </blockquote>
+                ))}
             </div>
           </li>
         );

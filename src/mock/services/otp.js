@@ -15,7 +15,7 @@ export const GENERIC_OTP_MESSAGE =
 export const request = defineService("otp.request", {
   handler(db, ctx, { studentCode, email = "", purpose }) {
     requireValue(
-      ["REGISTER", "LOOKUP", "CHANGE_EMAIL"].includes(purpose),
+      ["REGISTER", "CHANGE_EMAIL"].includes(purpose),
       "VALIDATION",
       "Mục đích xác thực không hợp lệ.",
     );
@@ -67,7 +67,6 @@ export const request = defineService("otp.request", {
         to: email,
         template: {
           REGISTER: "OTP_REGISTER",
-          LOOKUP: "OTP_LOOKUP",
           CHANGE_EMAIL: "OTP_CHANGE_EMAIL",
         }[purpose],
         vars: { code, ttl: ctx.config.otp.ttlMinutes },

@@ -32,18 +32,39 @@ for (const actor of ["HEAD", "LECTURER"])
         dueAt: "2026-11-12T09:00:00+07:00",
       }));
   }
-test("Hạn bổ sung > reviewEnd hoặc <=now bị chặn", () => {
-  for (const dueAt of [now, "2026-11-21T00:00:00+07:00"])
-    assert.throws(
-      () =>
-        transition("pending", "needs_update", {
-          actor: "LECTURER",
-          round: testRound(),
-          note: "Yêu cầu",
-          dueAt,
-        }),
-      { code: "VALIDATION" },
-    );
+test("Hạn bổ sung chỉ cần sau hiện tại, có thể sau reviewEnd; hạn rỗng báo chọn hạn", () => {
+  const base = { actor: "LECTURER", round: testRound(), note: "Yêu cầu" };
+  transition("pending", "needs_update", {
+    ...base,
+    dueAt: "2026-11-21T00:00:00+07:00",
+  });
+  assert.throws(
+    () => transition("pending", "needs_update", { ...base, dueAt: now }),
+    { code: "VALIDATION" },
+  );
+  assert.throws(
+    () => transition("pending", "needs_update", { ...base, dueAt: "" }),
+    { code: "VALIDATION", message: "Vui lòng chọn hạn bổ sung." },
+  );
+});
+test("GVPT duyệt được khi ĐXT open; hủy yêu cầu bổ sung needs_update → pending", () => {
+  transition("pending", "approved", {
+    actor: "LECTURER",
+    round: testRound({ status: "open" }),
+  });
+  transition("needs_update", "pending", {
+    actor: "LECTURER",
+    round: testRound({ status: "open" }),
+    note: "Hủy",
+  });
+  assert.throws(
+    () =>
+      transition("pending", "approved", {
+        actor: "LECTURER",
+        round: testRound({ status: "upcoming" }),
+      }),
+    { code: "INVALID_STATE" },
+  );
 });
 test("NEEDS_UPDATE bổ sung trong hạn; đúng hạn còn cho nộp; quá hạn chặn", () => {
   transition("needs_update", "pending", { round: testRound(), dueAt: now });

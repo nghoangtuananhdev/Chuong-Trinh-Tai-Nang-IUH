@@ -158,3 +158,5 @@ export function getStatusMeta(value, domain = "general") {
     }
   );
 }
+
+export const SCHEMA_VERSION = 4;

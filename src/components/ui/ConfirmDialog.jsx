@@ -49,7 +49,7 @@ export function ConfirmDialog({
         role="alertdialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        aria-describedby={descId}
+        aria-describedby={description ? descId : undefined}
         className="overlay-panel w-full rounded-t-modal bg-white shadow-modal outline-none sm:max-w-[480px] sm:rounded-modal"
       >
         <div className="flex gap-4 px-5 pb-5 pt-6 sm:px-6">
@@ -60,9 +60,11 @@ export function ConfirmDialog({
             <h2 id={titleId} className="text-title-3 text-ink-900">
               {title}
             </h2>
-            <div id={descId} className="mt-1.5 text-body text-ink-600">
-              {description}
-            </div>
+            {description && (
+              <div id={descId} className="mt-1.5 text-body text-ink-600">
+                {description}
+              </div>
+            )}
             {children}
           </div>
         </div>

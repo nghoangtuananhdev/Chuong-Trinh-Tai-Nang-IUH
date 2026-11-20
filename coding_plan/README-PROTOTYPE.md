@@ -45,7 +45,7 @@ Mật khẩu tất cả tài khoản seed: **demo1234**. Có thể đăng nhập
 | 26010011 | Hồ Ngọc Mai | Ứng viên; nháp R1 |
 | 26010022 | Trương Gia Huy | Ứng viên; email chứa fail để mô phỏng lỗi |
 
-MSSV đăng ký mới: `26019999`, email `khang.26019999@student.iuh.edu.vn`; hoặc `26018888`, email `26018888@student.iuh.edu.vn`. Lấy OTP ở Bảng Demo → Hộp thư mô phỏng. Không dùng email ngoài danh bạ. Nam có alias được xác nhận `nam.21094501@student.iuh.edu.vn` để thử đổi email qua OTP.
+MSSV đăng ký mới: `26019999`, email `khang.26019999@student.iuh.edu.vn`; hoặc `26018888`, email `26018888@student.iuh.edu.vn`. Lấy OTP ở Bảng Demo → Hộp thư mô phỏng. Không dùng email ngoài danh sách sinh viên đã nhập. Nam có alias được xác nhận `nam.21094501@student.iuh.edu.vn` để thử đổi email qua OTP.
 
 Giữ đủ 7 entry HTML: index là ứng dụng chính; 6 trang vai trò là lối tắt demo và đưa về workspace qua hash. Các liên kết nội bộ dùng hash; có thể mở sâu `#/app/rounds/DXT-2026-02`, `#/app/approvals/DXT-2026-05`, `#/tra-cuu`.
 
@@ -56,7 +56,7 @@ Giữ đủ 7 entry HTML: index là ứng dụng chính; 6 trang vai trò là l�
 3. **4–5 phút – hết hạn tự động:** đặt 12/11/2026 09:01, Bảo chuyển Không đạt và nhận thông báo/email. Có thể xử lý Hân rồi chốt R2; CNN nhận thông báo. Tú chưa nộp sẽ bị DROPPED khi R2 công bố.
 4. **5–6 phút – đồng hạng:** đăng nhập GV005 (HEAD) → Xác nhận danh sách → R3. Chọn đúng một trong hai hồ sơ đồng hạng rồi xác nhận. Chuyển vai trò sang LECTURER để thấy menu/phạm vi khác.
 5. **6–8 phút – công bố R5:** đăng nhập GV900 → Phê duyệt & Công bố → R5. Kiểm tra phiên bản/bước duyệt, bấm công bố, đọc số trúng tuyển/DROPPED/email trong hộp xác nhận rồi xác nhận. Thành viên và isKSTN cập nhật tự động.
-6. **8–9 phút – kết quả:** về trang chủ → kết quả R5 che MSSV/tên. Tra cứu cá nhân qua MSSV và OTP để xem trạng thái/điểm đã công bố.
+6. **8–9 phút – kết quả:** kết quả không công khai (A-25). Đăng nhập một sinh viên của R5 → **Hồ sơ của tôi** xem trạng thái và điểm đã công bố; mở `#/ket-qua/DXT-2026-05` để thấy trang không còn tồn tại.
 7. **9–10 phút – vận hành:** xem báo cáo, xuất CSV/in PDF, nhật ký before/after. Đăng nhập quantri xem email fail và gửi lại; đặt đồng hồ 15/11 00:00 để R6 tự mở và snapshot.
 
 Các kịch bản có thể làm độc lập sau reset. Nếu muốn chạy R2 tới công bố, phải xử lý hết pending/needs_update, chốt rồi duyệt đủ HEAD → DEAN → TRAINING. Không có bước SV xác nhận nhập học.

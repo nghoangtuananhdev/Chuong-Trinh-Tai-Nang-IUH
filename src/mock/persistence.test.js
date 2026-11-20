@@ -71,3 +71,8 @@ test("Reset db hủy session và giữ key v2", () => {
   assert.equal(loadSession(s), null);
   assert.equal(s.getItem("iuh_talent_v2_admissions"), "cũ");
 });
+test("loadDb với schemaVersion 3 nạp lại seed mới (A-24)", () => {
+  const s = storage();
+  s.setItem(DB_KEY, JSON.stringify({ ...buildSeedDb(), schemaVersion: 3 }));
+  assert.equal(loadDb(buildSeedDb, s).schemaVersion, 4);
+});

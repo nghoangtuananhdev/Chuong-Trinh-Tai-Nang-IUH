@@ -95,7 +95,7 @@ Làm theo thứ tự: **1.1 → 2 (trọn chuỗi R2) → 3.2 (trả về) → 4
 7. Bước 3: tích cam kết → **Nộp hồ sơ chính thức**.
 
 **Cho giảng viên thấy:**
-- Họ tên, ngày sinh, lớp của sinh viên được lấy sẵn từ danh bạ trường; form ghi “Luồng A – Đăng ký mới”.
+- Họ tên, ngày sinh, lớp của sinh viên được lấy từ danh sách sinh viên do CNN nhập; form ghi “Luồng A – Đăng ký mới”.
 - Mỗi tiêu chí hiện rõ các mức điểm. “Điểm dự kiến” tính ngay khi nhập: **120 điểm, BB đạt 2/2**.
 - Hồ sơ tự lưu nháp sau vài giây ngừng thao tác.
 - Nộp xong: trạng thái **Chờ duyệt**, có mã `HS-2026-…`, Hộp thư có email “Đã tiếp nhận hồ sơ”.
@@ -116,14 +116,17 @@ Làm theo thứ tự: **1.1 → 2 (trọn chuỗi R2) → 3.2 (trả về) → 4
 ### 1.4 Sinh viên KSTN không nộp được lớp khác (B4) **[RESET]**
 
 1. Đăng nhập nhanh `21094501` (Nam). Menu **không có** “Đợt xét tuyển đang mở”.
-2. Đổi URL thành `#/` → thẻ R1 ghi “Bạn đang học lớp CN/KSTN khác.” thay cho nút Nộp hồ sơ.
+2. **Tổng quan** → bảng “Đợt phù hợp” trống: sinh viên đã thuộc lớp CN/KSTN không thấy đợt đầu vào của lớp khác.
 3. **Hồ sơ của tôi** → “Dòng thời gian chương trình” liệt kê 3 năm học với điểm từng năm (140, 170, 190).
 
-### 1.5 Tra cứu kết quả cá nhân bằng OTP (I6) **[RESET]**
+### 1.5 Đợt và kết quả không còn công khai (A-25) **[RESET]**
 
-1. Trang chủ → **Tra cứu kết quả** → MSSV `22073210`, email `22073210@student.iuh.edu.vn` → **Gửi mã OTP** → lấy mã ở Hộp thư → **Xác nhận và tra cứu**.
+1. Đăng xuất → trang chủ chỉ có giới thiệu, nút **Đăng ký tài khoản sinh viên** / **Đăng nhập** và sáu bước quy trình; không có danh sách đợt hay kết quả.
+2. Mở `#/dot/DXT-2026-01` hoặc `#/ket-qua/DXT-2026-02` → “Không tìm thấy trang” kèm nút **Về trang chủ**.
+3. Đăng nhập `26010011` / `demo1234` (Mai) → **Tổng quan** có “Lớp phù hợp với bạn” KSTN-KTPM-K22 và đúng đợt của lớp đó.
+4. Đăng nhập nhanh `22073210` (Hân) → **Hồ sơ của tôi**: đợt đã công bố hiện điểm chính thức, đợt chưa công bố ghi “Chưa công bố”.
 
-**Cho giảng viên thấy:** không cần đăng nhập vẫn tra được; đợt đã công bố hiện kết quả và điểm, đợt chưa công bố chỉ ghi “Chưa công bố”; trang chỉ đọc.
+**Cho giảng viên thấy:** phải đăng ký tài khoản trước; hệ thống tự xác định đợt theo ngành và khóa từ danh sách CNN đã nhập; kết quả chỉ xem trong tài khoản và email.
 
 ---
 
@@ -171,7 +174,7 @@ Làm theo thứ tự: **1.1 → 2 (trọn chuỗi R2) → 3.2 (trả về) → 4
 
 ### 2.5 Kết quả sau công bố (D4, O3)
 
-1. Mở `#/ket-qua/DXT-2026-02` → 4 dòng, MSSV và họ tên đã được che (dạng `26****07`, `Đ. M. Thư`).
+1. Kết quả không có trang công khai (A-25): mỗi sinh viên xem trong **Hồ sơ của tôi** và email kết quả.
 2. Đăng nhập nhanh `21094501` (Nam) → **Hồ sơ của tôi** → năm 2026–2027 ghi “Trúng tuyển · Năm 3: Đang học”.
 3. Đăng nhập nhanh `21094777` (Tú, không nộp hồ sơ) → Tổng quan ghi “Ứng viên (chưa thuộc lớp CN/KSTN)”; Hộp thư có email kết quả duy trì với lý do “Không nộp hồ sơ tích lũy”.
 4. Mở lại đợt R2 → không còn nút Sửa/Phát hành/Xóa, có khung “ĐXT đã công bố và bất biến”.
@@ -201,7 +204,7 @@ Làm theo thứ tự: **1.1 → 2 (trọn chuỗi R2) → 3.2 (trả về) → 4
 ### 3.3 PĐT công bố một đợt đang chờ (D3) **[RESET]**
 
 1. `GV900` → Tổng quan có “1 danh sách chờ bạn” → **Phê duyệt & Công bố** → `DXT-2026-05` → **Xem danh sách** → **Phê duyệt & Công bố** → **Xác nhận**.
-2. Mở `#/ket-qua/DXT-2026-05`; về trang chủ lọc tab **Đã công bố**.
+2. Demo → Hộp thư → lọc `DXT-2026-05`: email kết quả đã vào hàng đợi; sinh viên xem kết quả trong **Hồ sơ của tôi**.
 
 **Cho giảng viên thấy:** 3 sinh viên trúng tuyển, 1 sinh viên bị loại; 4 email kết quả nằm trong Hộp thư. Đây là cách nhanh nhất để minh họa bước công bố nếu không kịp làm trọn Phần 2.
 
@@ -282,7 +285,7 @@ Làm theo thứ tự: **1.1 → 2 (trọn chuỗi R2) → 3.2 (trả về) → 4
 1. `GV004` → **Đợt xét tuyển** → tab **Nháp** → `DXT-2026-07` → **Xem chi tiết**.
 2. **Sửa** → đặt “Bắt đầu xét duyệt” trước “Kết thúc tiếp nhận” → **Xác nhận** → **Phát hành** → bị chặn vì sai thứ tự mốc thời gian.
 3. **Sửa** lại cho đúng (tiếp nhận 01/12–10/12, xét duyệt 11/12–20/12) → **Phát hành** → **Xác nhận** → đợt sang “Chưa mở”.
-4. Đăng xuất → trang chủ, tab **Chưa mở** → R7 đã xuất hiện (đợt Nháp thì không hiện công khai).
+4. **Đợt xét tuyển** → tab **Chưa mở** → R7 đã xuất hiện. Đợt không hiện ở trang chủ; sinh viên cùng ngành và khóa thấy đợt trong Tổng quan.
 
 **Cho giảng viên thấy:** form sửa không có ô chọn trạng thái — trạng thái chỉ đổi qua thao tác (Phát hành, Mở/Đóng tiếp nhận) hoặc theo đồng hồ.
 
@@ -305,9 +308,9 @@ Làm theo thứ tự: **1.1 → 2 (trọn chuỗi R2) → 3.2 (trả về) → 4
 - `GV001` → **ĐXT của lớp**: GVPT không có nút Tạo đợt.
 - `GV900` → **Tra cứu ĐXT/lớp**: PĐT chỉ xem.
 
-### 5.5 Trang công khai (F4)
+### 5.5 Trang chủ công khai (F4)
 
-Đăng xuất → trang chủ: thử ô tìm kiếm, các tab trạng thái, bộ lọc Năm học / Học kỳ / Khoa. **Xem chi tiết** ở R1 → thông tin đợt, 4 mốc thời gian, bảng tiêu chí kèm mức điểm.
+Đăng xuất → trang chủ chỉ giới thiệu chương trình và quy trình sáu bước, không liệt kê đợt (A-25). Thông tin đợt, 4 mốc thời gian và bảng tiêu chí xem sau khi đăng nhập: sinh viên ở **Tổng quan** / **Nộp hồ sơ**, cán bộ ở **Đợt xét tuyển**.
 
 ---
 

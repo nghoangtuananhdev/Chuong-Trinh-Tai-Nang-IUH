@@ -4,6 +4,7 @@ import { useBackend } from "../../mock/backend.jsx";
 import { useToast } from "../../components/ui/ToastProvider.jsx";
 import { Drawer } from "../../components/ui/Drawer.jsx";
 import { ConfirmDialog } from "../../components/ui/ConfirmDialog.jsx";
+import { IconButton } from "../../components/ui/IconButton.jsx";
 import { Button } from "../../components/ui/Button.jsx";
 import { Field, Input, Select } from "../../components/ui/Form.jsx";
 import { FilterTabs } from "../../components/ui/FilterTabs.jsx";
@@ -63,20 +64,20 @@ export function DemoPanel({ open, onOpenChange, onLogin }) {
     );
     const anchor = document.createElement("a");
     anchor.href = url;
-    anchor.download = "kstn-prototype-v3.json";
+    anchor.download = "kstn-prototype-v4.json";
     anchor.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   };
   return (
     <>
-      <Button
+      <IconButton
         icon={FlaskConical}
-        variant="secondary"
+        label="Bảng điều khiển demo"
+        variant="primary"
+        size="lg"
         onClick={() => onOpenChange(true)}
-        className="fixed bottom-4 right-4 z-40 shadow-overlay"
-      >
-        Bảng điều khiển demo
-      </Button>
+        className="fixed bottom-24 right-0 z-40 !h-12 !w-9 !rounded-l-full !rounded-r-none !border-brand-950 !bg-brand-950 pl-1 text-accent-400 shadow-lift transition-[width] hover:!w-11 hover:!bg-brand-800"
+      />
       <Drawer
         open={open}
         onClose={() => onOpenChange(false)}

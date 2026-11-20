@@ -25,7 +25,7 @@ test("mã hồ sơ mới không trùng mã hồ sơ của dữ liệu mẫu", ()
   let db = buildSeedDb();
   const seedCodes = new Set(db.applications.map((a) => a.code));
   // Tú (SV KSTN) không nộp được R1; dùng ứng viên đã rút hồ sơ ở R1.
-  const student = db.users.find((u) => u.id === "usr_26900011") ??
+  const student = db.users.find((u) => u.id === "usr_26900016") ??
     db.users.find(
       (u) =>
         db.applications.some(

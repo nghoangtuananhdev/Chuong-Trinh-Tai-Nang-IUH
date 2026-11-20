@@ -209,7 +209,7 @@ test("U5: BLĐ trả về R4 → review, chốt v3 → HEAD từ đầu", async 
     "waiting_head",
   );
 });
-test("U6: PĐT công bố R5 và public results che MSSV/tên", async () => {
+test("U6: PĐT công bố R5; ĐXT và kết quả không còn công khai", async () => {
   const m = setup();
   await m.login("GV900");
   const r = await m.call("lists.publish", {
@@ -217,9 +217,18 @@ test("U6: PĐT công bố R5 và public results che MSSV/tên", async () => {
   });
   assert.equal(r.confirmed, 3);
   assert.equal(r.dropped, 1);
-  const rows = await m.call("public.results", { roundId: "DXT-2026-05" });
-  assert.ok(
-    rows.every((r) => r.studentCode.includes("****") && r.name.includes(".")),
+  // Không còn dịch vụ công khai: kết quả chỉ xem trong tài khoản sinh viên.
+  for (const name of ["public.results", "public.lookup", "public.listRounds"])
+    await assert.rejects(m.call(name, { roundId: "DXT-2026-05" }), {
+      code: "NOT_FOUND",
+    });
+  await assert.rejects(
+    m.call("otp.request", {
+      studentCode: "21094501",
+      email: "21094501@student.iuh.edu.vn",
+      purpose: "LOOKUP",
+    }),
+    { code: "VALIDATION" },
   );
   await m.login("quantri");
   await assert.rejects(

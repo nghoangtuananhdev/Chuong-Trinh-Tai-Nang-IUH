@@ -5,6 +5,7 @@ export const WORKSPACE_PAGES = new Set([
   "classes",
   "lecturers",
   "students",
+  "student-import",
   "student-passwords",
   "permissions",
   "rounds",
@@ -29,9 +30,6 @@ export const PUBLIC_PAGES = new Set([
   "dang-ky",
   "quen-mat-khau",
   "dat-lai-mat-khau",
-  "dot",
-  "ket-qua",
-  "tra-cuu",
 ]);
 export function isKnownRoute(route) {
   if (route.path === "/") return true;
@@ -40,9 +38,5 @@ export function isKnownRoute(route) {
       WORKSPACE_PAGES.has(route.segments[1]) &&
       route.segments.length <= (route.segments[1] === "records" ? 4 : 3)
     );
-  return (
-    PUBLIC_PAGES.has(route.segments[0]) &&
-    route.segments.length <=
-      (["dot", "ket-qua"].includes(route.segments[0]) ? 2 : 1)
-  );
+  return PUBLIC_PAGES.has(route.segments[0]) && route.segments.length === 1;
 }

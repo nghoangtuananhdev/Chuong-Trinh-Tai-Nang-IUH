@@ -18,7 +18,9 @@ export function ProgramTimeline({ db, userId }) {
           date: round?.academicYear,
           action: round?.name,
           actor: APPLICATION_STATUSES[a.status]?.label,
-          note: `${a.officialScore ?? "Chưa có"} điểm chính thức${membership ? ` · Năm ${membership.studyYear}: ${MEMBERSHIP_STATUS[membership.status]}` : ""}${a.decisionNote ? ` · ${a.decisionNote}` : ""}`,
+          quote: false,
+          // Dòng thời gian của sinh viên: điểm chính thức chỉ hiện khi ĐXT đã công bố (A-25).
+          note: `${round?.status === "published" ? `${a.officialScore ?? "Chưa có"} điểm chính thức` : "Chưa công bố điểm"}${membership ? ` · Năm ${membership.studyYear}: ${MEMBERSHIP_STATUS[membership.status]}` : ""}${a.decisionNote ? ` · ${a.decisionNote}` : ""}`,
         };
       })}
     />

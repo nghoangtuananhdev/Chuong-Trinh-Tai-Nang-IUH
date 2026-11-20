@@ -3,6 +3,7 @@ import {
   activeMembership,
   studyYear,
   isFirstRound,
+  eligibleClasses,
 } from "./selectors.js";
 
 export function classifyFlow(db, studentUserId, round) {
@@ -31,6 +32,12 @@ export function classifyFlow(db, studentUserId, round) {
         "Sinh viên đang học lớp CN/KSTN chỉ cập nhật hồ sơ tích lũy cho lớp của mình.",
     };
   }
+  if (!eligibleClasses(db, studentUserId).some((c) => c.id === round.classId))
+    return {
+      flow: null,
+      allowed: false,
+      reason: "Đợt xét tuyển này không dành cho ngành và khóa của bạn.",
+    };
   const hasHistory =
     db.applications.some(
       (a) =>
